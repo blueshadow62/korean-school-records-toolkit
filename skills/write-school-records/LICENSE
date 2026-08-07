@@ -1,21 +1,12 @@
-MIT License
+저작권과 이용 조건
 
-Copyright © 2026 blueshadow62
+© 2026 류기현(부산 동아공고). 제작·배포·관리: 류기현.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+본 소프트웨어(소스 코드, 문서 포함)는 크리에이티브 커먼즈 저작자표시-비영리-동일조건변경허락 4.0 국제 라이선스
+(CC BY-NC-SA 4.0)에 따라 이용할 수 있다.
+https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ko
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+- 이용·수정: 비영리 목적(학교 등 교육기관의 내부 사용 포함)에 한해 자유롭게 사용·수정·재배포할 수 있다.
+- 동일조건변경허락: 수정본을 배포할 때도 같은 라이선스(CC BY-NC-SA 4.0)를 적용해야 한다.
+- 저작자표시: 재배포 시 원저작자(류기현)를 표시해야 한다.
+- 상업적 이용: 금지한다. 별도 상업적 이용 허락이 필요하면 이 저장소의 GitHub Issue로 문의한다.

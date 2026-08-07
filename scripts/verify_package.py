@@ -32,7 +32,7 @@ EXPECTED_SPELL_FIXTURES = {
     "success_without_corrections.html",
     "unexpected_response.html",
 }
-WRITE_SCHOOL_RECORDS_LICENSE_MARKERS = ("MIT License", "Copyright © 2026 blueshadow62")
+WRITE_SCHOOL_RECORDS_LICENSE_MARKERS = ("CC BY-NC-SA 4.0", "류기현")
 
 
 def sha256(path: Path) -> str:

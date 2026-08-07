@@ -79,8 +79,8 @@ class PackageContractTests(unittest.TestCase):
         license_text = (
             PLUGIN_ROOT / "skills" / "write-school-records" / "LICENSE"
         ).read_text(encoding="utf-8")
-        self.assertIn("MIT License", license_text)
-        self.assertIn("Copyright © 2026 blueshadow62", license_text)
+        self.assertIn("CC BY-NC-SA 4.0", license_text)
+        self.assertIn("류기현", license_text)
         fixtures = {
             path.name
             for path in (

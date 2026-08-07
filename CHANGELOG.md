@@ -5,6 +5,8 @@
 ### Changed
 
 - Relicense `write-school-records` from the restrictive internal-use notice to MIT, keeping the Copyright © 2026 blueshadow62 attribution.
+- Relicense `write-school-records` again, from MIT to CC BY-NC-SA 4.0, and disclose the real author identity (© 2026 류기현, 부산 동아공고) in place of the `blueshadow62` handle. `korean-character-count` and `korean-spell-check` are unaffected (third-party sourced, remain MIT, no named copyright holder).
+- Add a notice recommending users confirm their own 시도교육청 AI usage guidelines before use.
 
 ## 1.1.0 — 2026-07-30
 
