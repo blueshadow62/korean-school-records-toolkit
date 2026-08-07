@@ -12,7 +12,7 @@ from datetime import date
 from pathlib import Path
 
 
-IGNORED_PARTS = {"__pycache__", ".pytest_cache", "dist"}
+IGNORED_PARTS = {"__pycache__", ".pytest_cache", "dist", ".git"}
 IGNORED_SUFFIXES = {".pyc", ".log"}
 LOCAL_ONLY_FILES = {"SOURCE_METADATA.local.json"}
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)

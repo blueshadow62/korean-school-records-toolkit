@@ -182,6 +182,7 @@ def verify_checksums(root: Path, errors: list[str]) -> None:
         and path.relative_to(root).as_posix() not in LOCAL_ONLY_FILES
         and "__pycache__" not in path.parts
         and ".pytest_cache" not in path.parts
+        and ".git" not in path.parts
         and path.suffix.lower() not in {".pyc", ".log", ".zip"}
     }
     if set(entries) != expected_files:
@@ -193,6 +194,8 @@ def verify_checksums(root: Path, errors: list[str]) -> None:
 def scan_text_files(root: Path, errors: list[str]) -> None:
     for path in root.rglob("*"):
         if not path.is_file() or path.name == "checksums.sha256":
+            continue
+        if ".git" in path.parts:
             continue
         if "__pycache__" in path.parts or path.suffix.lower() in {".pyc", ".zip"}:
             errors.append(f"Excluded artifact present: {path.relative_to(root)}")
