@@ -1,0 +1,9 @@
+Korean School Records Toolkit — license notice
+
+This distribution bundles three independent local skills.
+
+- korean-character-count: the source SKILL.md declares MIT.
+- korean-spell-check: the source SKILL.md declares MIT. Use of the external Nara/PNU spell-check surface remains subject to that service's current terms and usage policy.
+- write-school-records: the source SKILL.md declares MIT. Copyright © 2026 blueshadow62.
+
+This notice does not relicense third-party material. Copyright and license notices embedded in each skill remain controlling for that component.

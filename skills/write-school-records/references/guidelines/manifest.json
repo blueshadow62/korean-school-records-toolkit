@@ -1,0 +1,20 @@
+{
+  "active_version": "2026_2026-02-12",
+  "schema_version": 1,
+  "versions": {
+    "2026_2026-02-12": {
+      "archive_path": "references/guidelines/versions/2026_2026-02-12.md",
+      "confirmed_official": true,
+      "encoding": "UTF-8",
+      "file_size": 739238,
+      "original_filename": "2026 학교생활기록부 기재요령(고등학교).md",
+      "registered_at": "2026-07-21",
+      "revision_date": "2026-02-12",
+      "school_year": "2026",
+      "sha256": "b087236e5795c97c566f1f502db2e5cc88c60eeea2562c01f9548df2273fe343",
+      "source_title": "2026학년도 학교생활기록부 기재요령(고등학교)",
+      "source_url": "https://www.moe.go.kr/boardCnts/viewRenew.do?boardID=316&lev=0&statusYN=W&s=moe&m=030215&opType=N&boardSeq=105372",
+      "version": "2026_2026-02-12"
+    }
+  }
+}

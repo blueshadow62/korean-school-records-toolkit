@@ -1,0 +1,56 @@
+{
+  "plugin_name": "korean-school-records-toolkit",
+  "plugin_version": "1.1.0",
+  "build_date": "2026-07-30",
+  "compatible_environment": "Codex plugin schema and Claude Code plugin layout; see INSTALL.md and README_CLAUDE_CODE.md",
+  "spell_validation_report": "korean-spell-check-final-validation-and-sync-report.md",
+  "final_validation_status": "See TEST_REPORT.md",
+  "external_service_dependency": "korean-spell-check uses the Nara/PNU public web surface at low request volume.",
+  "approval_behavior": "Denied approval or service failure is reported as incomplete inspection, not as success or no spelling errors.",
+  "dependencies": {
+    "write-school-records": "Python 3 standard library; local reference files",
+    "korean-character-count": "Node.js 18+; no network",
+    "korean-spell-check": "Python 3.10+ standard library; network access to nara-speller.co.kr"
+  },
+  "skills": [
+    {
+      "name": "korean-character-count",
+      "declared_version": "not declared",
+      "file_count": 2,
+      "tree_sha256": "C2B89C0A419830D5E04DCF4175BFC5C3F7CDFA627F2BD80E63BD2A4299AFF862",
+      "package_tree_sha256": "C2B89C0A419830D5E04DCF4175BFC5C3F7CDFA627F2BD80E63BD2A4299AFF862",
+      "normalized_tree_sha256": "5eeb0c8889d92f86dc25cb90a7f39598b7df558d8ee127945e15c7147a922787",
+      "package_normalized_tree_sha256": "5eeb0c8889d92f86dc25cb90a7f39598b7df558d8ee127945e15c7147a922787",
+      "source_type": "existing 1.0.0 source selection",
+      "source_identifier": "existing-1.0.0-source:korean-character-count",
+      "test_status": "See TEST_REPORT.md",
+      "selection_reason": "Preserves the source selected for 1.0.0 without payload changes."
+    },
+    {
+      "name": "korean-spell-check",
+      "declared_version": "not declared",
+      "file_count": 10,
+      "tree_sha256": "49A80F526C09AA60BEF1CCDEA73ECDDDB9175FA5312131C96528A49ACF5F1276",
+      "package_tree_sha256": "49A80F526C09AA60BEF1CCDEA73ECDDDB9175FA5312131C96528A49ACF5F1276",
+      "normalized_tree_sha256": "01bfc0316e0dff7a29ec6d985b7d014ed76f23c3d5448f0d1c83e2352e085b82",
+      "package_normalized_tree_sha256": "01bfc0316e0dff7a29ec6d985b7d014ed76f23c3d5448f0d1c83e2352e085b82",
+      "source_type": "validated development baseline",
+      "source_identifier": "validated-development-baseline:korean-spell-check",
+      "test_status": "See TEST_REPORT.md",
+      "selection_reason": "Matches the recovered baseline and its P1-P10 fixture contract."
+    },
+    {
+      "name": "write-school-records",
+      "declared_version": "not declared",
+      "file_count": 31,
+      "tree_sha256": "D2364498F1662997D19501FC26218C2F07C0D18C70FA72CE1BD015A2FF357AD9",
+      "package_tree_sha256": "D2364498F1662997D19501FC26218C2F07C0D18C70FA72CE1BD015A2FF357AD9",
+      "normalized_tree_sha256": "869f0590dda5525a2a0f3f0fc30ca6379fff01b9bdb8128bffa374d50dae134f",
+      "package_normalized_tree_sha256": "869f0590dda5525a2a0f3f0fc30ca6379fff01b9bdb8128bffa374d50dae134f",
+      "source_type": "development baseline",
+      "source_identifier": "development-baseline:write-school-records",
+      "test_status": "See TEST_REPORT.md",
+      "selection_reason": "Required development baseline with the verified component license notice."
+    }
+  ]
+}

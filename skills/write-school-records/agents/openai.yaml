@@ -1,0 +1,4 @@
+interface:
+  display_name: "학교생활기록부 기재 도우미"
+  short_description: "2026 기재요령과 관찰 근거 중심 학생부 작성·점검"
+  default_prompt: "Use $write-school-records to draft and check a Korean high-school student record entry under the 2026 official guidance."
