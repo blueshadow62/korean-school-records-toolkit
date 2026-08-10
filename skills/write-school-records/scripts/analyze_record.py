@@ -10,6 +10,8 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
+from update_guidelines import GuidelineError, load_manifest, root_paths, verify_manifest
+
 
 ACTION_TERMS = (
     "분석",
@@ -94,35 +96,6 @@ FUTURE_PATTERNS = {
     "잠재력 단정": re.compile(r"잠재력이\s*(매우\s*)?(크|높)|성공할\s*것"),
 }
 
-PROHIBITED_2026_PATTERNS = {
-    "공인어학시험": re.compile(
-        r"공인\s*어학\s*시험|\b(?:TOEIC|TOEFL|TEPS|HSK|JPT|JLPT|DELF|DALF|TESTDAF|DSH|DSD|TORFL|DELE)\b",
-        re.IGNORECASE,
-    ),
-    "대회·수상": re.compile(r"(?:교내|교외|전국|국제)?\s*(?:경시|경진)?대회|수상\s*(?:실적|경력|함|하여)?|입상"),
-    "인증시험": re.compile(r"(?:교내|교외)?\s*인증\s*시험"),
-    "모의고사·전국연합학력평가": re.compile(r"모의고사|전국연합학력평가|전국\s*연합\s*학력\s*평가"),
-    "논문 투고·등재·학회 발표": re.compile(
-        r"논문.{0,16}(?:투고|등재|학회|발표)|학회.{0,16}(?:논문|발표)"
-    ),
-    "도서 출간": re.compile(r"(?:도서|책).{0,10}(?:출간|출판)"),
-    "지식재산권 출원·등록": re.compile(
-        r"(?:특허|실용신안|상표|디자인).{0,12}(?:출원|등록)"
-    ),
-    "해외 활동": re.compile(r"어학연수|해외.{0,20}(?:봉사|활동|체험|실적)"),
-    "부모·친인척의 사회경제적 지위": re.compile(
-        r"(?:부모|부친|모친|친인척|보호자).{0,24}(?:직업|직종|직장|직위|대표|교수|의사|변호사|사회.?경제)"
-    ),
-    "장학금": re.compile(r"장학(?:생|금)"),
-    "자격증": re.compile(r"자격증"),
-    "구체적인 대학·기관·학교명 후보": re.compile(
-        r"[가-힣A-Za-z0-9]{2,}(?:대학교|대학|고등학교|고교|연구소|협회|재단)"
-    ),
-    "K-MOOC·MOOC·KOCW": re.compile(r"\b(?:K-?MOOC|MOOC|KOCW)\b", re.IGNORECASE),
-    "방과후학교": re.compile(r"방과\s*후\s*학교"),
-    "연구보고서·소논문": re.compile(r"연구\s*보고서|소\s*논문"),
-}
-
 CREATIVE_CONDITION_PATTERNS = {
     "학교 밖 활동": re.compile(r"학교\s*밖|교외\s*(?:활동|기관|교육)"),
     "자율동아리": re.compile(r"자율\s*동아리"),
@@ -130,16 +103,54 @@ CREATIVE_CONDITION_PATTERNS = {
     "청소년단체활동": re.compile(r"청소년\s*단체"),
 }
 
-FIELD_NEIS_LIMITS = {
-    "subject": {"korean_characters": 500, "bytes": 1500},
-    "creative": {"korean_characters": 500, "bytes": 1500},
-    "behavior": {"korean_characters": 300, "bytes": 900},
-}
-
 PLACEHOLDER_PATTERN = re.compile(r"\[?확인\s*필요|TODO|TBD|미상|임시\s*문구", re.IGNORECASE)
 PHONE_PATTERN = re.compile(r"(?<!\d)01[016789][-.\s]?\d{3,4}[-.\s]?\d{4}(?!\d)")
 EMAIL_PATTERN = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 RESIDENT_ID_PATTERN = re.compile(r"(?<!\d)\d{6}[-\s]?\d{7}(?!\d)")
+GENERIC_EVALUATION_PATTERN = re.compile(r"역량을\s*보임|능력을\s*보임|태도가\s*돋보임|우수함")
+CHAINED_CONNECTIVE_PATTERN = re.compile(r"하며|하고|하여|해서")
+
+
+def load_year_rules(school_year: str, skill_root: Path | None = None) -> dict[str, object]:
+    """Load and validate analyzer rules for one school year."""
+    root = skill_root.resolve() if skill_root else Path(__file__).resolve().parents[1]
+    path = root / "references" / "guidelines" / "analyzer-rules" / f"{school_year}.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError as error:
+        raise ValueError(f"{school_year}학년도 분석 규칙 파일이 없습니다: {path}") from error
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError(f"분석 규칙 파일을 읽을 수 없습니다: {path} ({error})") from error
+
+    if data.get("schema_version") != 1 or str(data.get("school_year")) != school_year:
+        raise ValueError(f"분석 규칙 파일의 schema_version 또는 school_year가 올바르지 않습니다: {path}")
+
+    limits = data.get("field_neis_limits")
+    pattern_specs = data.get("prohibited_patterns")
+    if not isinstance(limits, dict) or not isinstance(pattern_specs, dict):
+        raise ValueError(f"분석 규칙 파일에 field_neis_limits와 prohibited_patterns가 필요합니다: {path}")
+
+    for field, limit in limits.items():
+        if not isinstance(field, str) or not isinstance(limit, dict):
+            raise ValueError(f"분석 규칙의 영역별 한도가 올바르지 않습니다: {path}")
+        if not all(isinstance(limit.get(key), int) and limit[key] > 0 for key in ("korean_characters", "bytes")):
+            raise ValueError(f"분석 규칙의 영역별 한도는 양의 정수여야 합니다: {path}")
+
+    compiled: dict[str, re.Pattern[str]] = {}
+    for label, spec in pattern_specs.items():
+        if not isinstance(label, str) or not isinstance(spec, dict) or not isinstance(spec.get("pattern"), str):
+            raise ValueError(f"분석 규칙의 금지 표현 패턴이 올바르지 않습니다: {path}")
+        flags = re.IGNORECASE if spec.get("ignore_case") is True else 0
+        try:
+            compiled[label] = re.compile(spec["pattern"], flags)
+        except re.error as error:
+            raise ValueError(f"분석 규칙의 정규식이 올바르지 않습니다: {label} ({error})") from error
+
+    return {
+        **data,
+        "school_year": school_year,
+        "prohibited_patterns": compiled,
+    }
 
 
 def count_terms(text: str, terms: Iterable[str]) -> dict[str, int]:
@@ -156,7 +167,21 @@ def approximate_sentence_count(text: str) -> int:
     return max(1, len(endings))
 
 
-def analyze(text: str, field: str = "other", target_chars: int | None = None) -> dict[str, object]:
+def analyze(
+    text: str,
+    field: str = "other",
+    target_chars: int | None = None,
+    rules: dict[str, object] | None = None,
+) -> dict[str, object]:
+    if rules is None:
+        context = active_rule_context()
+        rules = load_year_rules(context["school_year"])
+    school_year = str(rules["school_year"])
+    field_limits = rules["field_neis_limits"]
+    prohibited_patterns = rules["prohibited_patterns"]
+    assert isinstance(field_limits, dict)
+    assert isinstance(prohibited_patterns, dict)
+
     normalized = text.replace("\r\n", "\n").strip()
     action_counts = count_terms(normalized, ACTION_TERMS)
     evidence_counts = count_terms(normalized, EVIDENCE_TERMS)
@@ -172,10 +197,10 @@ def analyze(text: str, field: str = "other", target_chars: int | None = None) ->
     if target_chars is not None and char_count > target_chars:
         warnings.append(f"목표 글자 수를 {char_count - target_chars}자 초과했습니다.")
 
-    field_limit = FIELD_NEIS_LIMITS.get(field)
+    field_limit = field_limits.get(field)
     if field_limit is not None and neis_bytes > field_limit["bytes"]:
         warnings.append(
-            "활성 기재요령의 2026 참고 바이트 한도를 "
+            f"활성 기재요령의 {school_year} 참고 바이트 한도를 "
             f"{neis_bytes - field_limit['bytes']}Byte 초과했습니다"
             f"(한글 기준 {field_limit['korean_characters']}자, {field_limit['bytes']}Byte; "
             "실제 NEIS 입력값은 별도 확인 필요)."
@@ -196,7 +221,7 @@ def analyze(text: str, field: str = "other", target_chars: int | None = None) ->
         warnings.append("피드백, 수정, 성찰 또는 전후 변화가 필요한 기록인지 확인하세요.")
 
     if field == "subject" and not re.search(
-        r"개념|성취|과제|탐구|자료|실험|작품|표현|문제|코드|알고리즘|데이터|프로그래밍|컴퓨팅",
+        r"개념|성취|과제|탐구|자료|실험|측정|오차|조건|작품|표현|문제|코드|알고리즘|데이터|프로그래밍|컴퓨팅",
         normalized,
     ):
         warnings.append("교과세특인데 교과 개념·과제·탐구 방법이 충분히 드러나지 않습니다.")
@@ -214,11 +239,11 @@ def analyze(text: str, field: str = "other", target_chars: int | None = None) ->
         warnings.append("미래 예측보다 현재까지 관찰된 변화로 바꾸세요: " + ", ".join(future_hits))
 
     prohibited_hits = [
-        label for label, pattern in PROHIBITED_2026_PATTERNS.items() if pattern.search(normalized)
+        label for label, pattern in prohibited_patterns.items() if pattern.search(normalized)
     ]
     if prohibited_hits:
         warnings.append(
-            "2026 기재요령상 금지 또는 조건 확인이 필요한 표현 후보입니다: "
+            f"{school_year} 기재요령상 금지 또는 조건 확인이 필요한 표현 후보입니다: "
             + ", ".join(prohibited_hits)
         )
 
@@ -254,8 +279,27 @@ def analyze(text: str, field: str = "other", target_chars: int | None = None) ->
     if repeated_intensifiers >= 3:
         warnings.append("강조 부사의 반복을 줄이고 구체적 근거로 바꾸세요.")
 
+    if len(GENERIC_EVALUATION_PATTERN.findall(normalized)) >= 2:
+        warnings.append("추상 평가를 반복하지 말고 구체적인 행동·방법·결과로 압축하세요.")
+    if len(CHAINED_CONNECTIVE_PATTERN.findall(normalized)) >= 4:
+        warnings.append("연결어가 연속됩니다. 핵심 수행별로 문장을 나누고 인과를 분명히 하세요.")
+
+    signals = {
+        "actions": action_counts,
+        "evidence": evidence_counts,
+        "growth": growth_counts,
+        "judgments": judgment_counts,
+        "admission": admission_hits,
+        "future_prediction": future_hits,
+        "prohibited": prohibited_hits,
+        "creative_conditions": creative_condition_hits,
+        "privacy": privacy_hits,
+    }
+    signals[f"prohibited_{school_year}"] = prohibited_hits
+
     return {
         "field": field,
+        "rule_year": school_year,
         "metrics": {
             "unicode_characters": char_count,
             "characters_without_whitespace": len(re.sub(r"\s", "", normalized)),
@@ -274,19 +318,12 @@ def analyze(text: str, field: str = "other", target_chars: int | None = None) ->
             "approximate_sentences": approximate_sentence_count(normalized),
             "target_characters": target_chars,
         },
-        "signals": {
-            "actions": action_counts,
-            "evidence": evidence_counts,
-            "growth": growth_counts,
-            "judgments": judgment_counts,
-            "admission": admission_hits,
-            "future_prediction": future_hits,
-            "prohibited_2026": prohibited_hits,
-            "creative_conditions": creative_condition_hits,
-            "privacy": privacy_hits,
-        },
+        "signals": signals,
         "warnings": warnings,
-        "disclaimer": "2026 기재요령의 일부를 기계적으로 점검하는 보조 도구이며 최종 준수 판정은 교사가 원자료와 학교 규정을 대조해 수행해야 합니다.",
+        "disclaimer": (
+            f"{school_year} 기재요령의 일부를 기계적으로 점검하는 보조 도구이며 "
+            "최종 준수 판정은 교사가 원자료와 학교 규정을 대조해 수행해야 합니다."
+        ),
     }
 
 
@@ -306,9 +343,15 @@ def format_human(result: dict[str, object]) -> str:
         f"- UTF-8 바이트 수: {metrics['utf8_bytes']}",
         f"- 추정 문장 수: {metrics['approximate_sentences']}",
     ]
+    guideline = result.get("guideline")
+    if isinstance(guideline, dict):
+        lines.append(
+            f"- 활성 기재요령: {guideline.get('active_version', '')} "
+            f"({guideline.get('school_year', '')}학년도)"
+        )
     if metrics["default_neis_byte_limit"] is not None:
         lines.append(
-            "- 활성 기재요령의 2026 참고 바이트 한도: "
+            f"- 활성 기재요령의 {result.get('rule_year', '')} 참고 바이트 한도: "
             f"{metrics['default_neis_byte_limit']}Byte (실제 NEIS 입력값 확인 필요)"
         )
     if metrics["target_characters"] is not None:
@@ -322,7 +365,7 @@ def format_human(result: dict[str, object]) -> str:
             f"- 근거: {', '.join(signals['evidence']) or '없음'}",
             f"- 성장: {', '.join(signals['growth']) or '없음'}",
             f"- 판단: {', '.join(signals['judgments']) or '없음'}",
-            f"- 2026 금지·조건부 후보: {', '.join(signals['prohibited_2026']) or '없음'}",
+            f"- {result.get('rule_year', '')} 금지·조건부 후보: {', '.join(signals['prohibited']) or '없음'}",
             f"- 창체 조건 확인: {', '.join(signals['creative_conditions']) or '없음'}",
             "",
             "확인 사항",
@@ -354,6 +397,28 @@ def read_utf8_text(path: Path) -> str:
         raise ValueError(f"UTF-8 텍스트 파일을 읽을 수 없습니다: {path} ({error})") from error
 
 
+def active_rule_context(skill_root: Path | None = None) -> dict[str, str]:
+    """Verify the active guideline and refuse stale analyzer rules."""
+    root = skill_root.resolve() if skill_root else Path(__file__).resolve().parents[1]
+    paths = root_paths(root)
+    try:
+        manifest = load_manifest(paths)
+        verify_manifest(paths, manifest)
+    except GuidelineError as error:
+        raise ValueError(f"활성 기재요령을 검증할 수 없습니다: {error}") from error
+
+    active = manifest["active_version"]
+    entry = manifest["versions"][active]
+    school_year = str(entry.get("school_year", ""))
+    load_year_rules(school_year, root)
+    return {
+        "active_version": str(active),
+        "school_year": school_year,
+        "source_title": str(entry.get("source_title", "")),
+        "source_url": str(entry.get("source_url", "")),
+    }
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     source = parser.add_mutually_exclusive_group(required=True)
@@ -376,10 +441,13 @@ def main() -> int:
     args = parse_args()
     try:
         text = args.text if args.text is not None else read_utf8_text(args.file)
+        guideline = active_rule_context()
     except ValueError as error:
         print(f"오류: {error}", file=sys.stderr)
         return 2
-    result = analyze(text, field=args.field, target_chars=args.target_chars)
+    rules = load_year_rules(guideline["school_year"])
+    result = analyze(text, field=args.field, target_chars=args.target_chars, rules=rules)
+    result["guideline"] = guideline
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     else:

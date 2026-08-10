@@ -1,6 +1,29 @@
 # Changelog
 
-## Unreleased
+## 2.0.0 — 2026-08-10
+
+### Removed
+
+- Remove the bundled `korean-spell-check` skill and all external spell-check service dependencies.
+- Remove ZIP generation and all previously generated ZIP artifacts; distribute the repository plugin directory directly.
+- Remove the redundant single-skill installer, one-time achievement-corpus normalizer, generated checksum inventory, README banner automation, and duplicate HTML user guide.
+
+### Changed
+
+- Record common/core achievement-standards materials as NCIC KOGL Type 2 and elective materials as NKIS KOGL Type 1.
+- Update manifests, installation flows, documentation, and verification contracts for the two-skill bundle.
+- Use Node.js `util.parseArgs()` for the character-count CLI instead of a custom option parser.
+
+### Fixed
+
+- Track the public achievement-standards corpus in Git so GitHub distributions include all source files.
+
+## 1.2.0 — 2026-08-10
+
+### Added
+
+- Include the 2022 revised curriculum achievement-standards reference corpus in the public plugin.
+- Add separate attribution guidance for common/core subjects listed by NCIC and elective subjects published as KOGL Type 1 through NKIS.
 
 ### Changed
 

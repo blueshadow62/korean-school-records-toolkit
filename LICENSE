@@ -1,9 +1,10 @@
 Korean School Records Toolkit — license notice
 
-This distribution bundles three independent local skills.
+This distribution bundles two independent local skills.
 
 - korean-character-count: the source SKILL.md declares MIT.
-- korean-spell-check: the source SKILL.md declares MIT. Use of the external Nara/PNU spell-check surface remains subject to that service's current terms and usage policy.
 - write-school-records: the source SKILL.md declares CC BY-NC-SA 4.0. © 2026 류기현(부산 동아공고). Non-commercial use only; derivatives must stay under the same license; attribution required. Commercial licensing inquiries via this repository's GitHub Issues.
 
 This notice does not relicense third-party material. Copyright and license notices embedded in each skill remain controlling for that component.
+
+The achievement-standards reference corpus under `skills/write-school-records/references/achievement-standards/` is derived from public Ministry of Education materials. Common/core-course materials follow the NCIC Korea Open Government License Type 2 terms, and elective-course materials follow the NKIS Korea Open Government License Type 1 terms. Its source-specific attribution and reuse information is recorded in that directory's `ATTRIBUTION.md` and `sources.json`; those notices must be retained with redistributed copies.

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
 import argparse
+import hashlib
+import json
 from pathlib import Path
+import tempfile
 import unittest
 
-from analyze_record import analyze, positive_int, read_utf8_text
+from analyze_record import active_rule_context, analyze, load_year_rules, positive_int, read_utf8_text
 
 
 class AnalyzeRecordTests(unittest.TestCase):
@@ -22,6 +25,13 @@ class AnalyzeRecordTests(unittest.TestCase):
         result = analyze(
             "입력 데이터를 정제하고 알고리즘을 구현하여 테스트 결과를 코드로 기록함. "
             "오류를 수정해 처리 절차를 보완함.",
+            field="subject",
+        )
+        self.assertNotIn("교과세특인데 교과 개념·과제·탐구 방법이 충분히 드러나지 않습니다", result["warnings"])
+
+    def test_science_measurement_context_is_not_misclassified(self) -> None:
+        result = analyze(
+            "잎 면적 측정에서 촬영 거리와 조명 조건을 통제해 재측정하고 오차 원인을 설명함.",
             field="subject",
         )
         self.assertNotIn("교과세특인데 교과 개념·과제·탐구 방법이 충분히 드러나지 않습니다", result["warnings"])
@@ -101,9 +111,81 @@ class AnalyzeRecordTests(unittest.TestCase):
         with self.assertRaises(argparse.ArgumentTypeError):
             positive_int("not-a-number")
 
+    def test_repeated_generic_evaluation_and_connective_chains_are_flagged(self) -> None:
+        result = analyze(
+            "자료를 조사하며 비교하고 해석하여 표로 정리해서 분석 역량을 보임. "
+            "결론을 작성하며 설명하고 수정하여 보완해서 문제 해결 능력을 보임.",
+            field="subject",
+        )
+        warnings = " ".join(result["warnings"])
+        self.assertIn("추상 평가를 반복", warnings)
+        self.assertIn("연결어가 연속", warnings)
+
     def test_missing_file_has_actionable_error(self) -> None:
         with self.assertRaisesRegex(ValueError, "UTF-8 텍스트 파일을 읽을 수 없습니다"):
             read_utf8_text(Path("missing-record.txt"))
+
+    def test_active_guideline_requires_a_same_year_rule_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            guidelines = root / "references" / "guidelines"
+            versions = guidelines / "versions"
+            versions.mkdir(parents=True)
+            archive = versions / "2027_2027-02-01.md"
+            archive.write_text("# 2027 기재요령\n", encoding="utf-8")
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            (guidelines / "current.md").write_bytes(archive.read_bytes())
+            (guidelines / "current.index.md").write_text(
+                f"<!-- active_version=2027_2027-02-01 sha256={digest} -->\n",
+                encoding="utf-8",
+            )
+            (guidelines / "manifest.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "active_version": "2027_2027-02-01",
+                        "versions": {
+                            "2027_2027-02-01": {
+                                "school_year": "2027",
+                                "archive_path": "references/guidelines/versions/2027_2027-02-01.md",
+                                "sha256": digest,
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "2027.*규칙 파일"):
+                active_rule_context(root)
+
+    def test_year_rules_are_loaded_from_structured_json(self) -> None:
+        rules = load_year_rules("2026")
+        self.assertEqual("2026", rules["school_year"])
+        self.assertEqual(1500, rules["field_neis_limits"]["subject"]["bytes"])
+        self.assertIn("공인어학시험", rules["prohibited_patterns"])
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            rule_dir = root / "references" / "guidelines" / "analyzer-rules"
+            rule_dir.mkdir(parents=True)
+            (rule_dir / "2027.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "school_year": "2027",
+                        "field_neis_limits": {
+                            "subject": {"korean_characters": 400, "bytes": 1200}
+                        },
+                        "prohibited_patterns": {
+                            "테스트 후보": {"pattern": "TEST", "ignore_case": True}
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            future_rules = load_year_rules("2027", root)
+            self.assertEqual(1200, future_rules["field_neis_limits"]["subject"]["bytes"])
+            self.assertIsNotNone(future_rules["prohibited_patterns"]["테스트 후보"].search("test"))
 
 
 if __name__ == "__main__":

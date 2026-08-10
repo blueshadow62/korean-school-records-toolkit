@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Verify plugin structure, file checksums, and basic safety invariants."""
+"""Verify plugin structure, provenance, and basic safety invariants."""
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 import sys
@@ -14,48 +13,23 @@ from pathlib import Path
 EXPECTED_SKILLS = {
     "write-school-records",
     "korean-character-count",
-    "korean-spell-check",
 }
-EXPECTED_RELEASE_VERSION = "1.1.0"
+EXPECTED_RELEASE_VERSION = "2.0.0"
+IGNORED_PARTS = {
+    "__pycache__",
+    ".pytest_cache",
+    "dist",
+    ".git",
+    ".superpowers",
+    "superpowers",
+}
 SECRET_PATTERNS = (
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
     re.compile(r"AKIA[0-9A-Z]{16}"),
     re.compile(r"(?i)(?:api[_-]?key|secret[_-]?key)\s*[:=]\s*['\"][^'\"]{12,}"),
 )
 LOCAL_ONLY_FILES = {"SOURCE_METADATA.local.json"}
-EXPECTED_SPELL_FIXTURES = {
-    "blocked_response.html",
-    "current_response.html",
-    "multiple_corrections.html",
-    "service_error_response.html",
-    "success_with_corrections.html",
-    "success_without_corrections.html",
-    "unexpected_response.html",
-}
 WRITE_SCHOOL_RECORDS_LICENSE_MARKERS = ("CC BY-NC-SA 4.0", "류기현")
-
-
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest().upper()
-
-
-def parse_checksum_file(path: Path) -> dict[str, str]:
-    entries: dict[str, str] = {}
-    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-        if not line.strip():
-            continue
-        match = re.fullmatch(r"([0-9A-Fa-f]{64})  (.+)", line)
-        if not match:
-            raise ValueError(f"Malformed checksum line {line_number}")
-        digest, relative = match.groups()
-        if relative in entries:
-            raise ValueError(f"Duplicate checksum entry: {relative}")
-        entries[relative] = digest.upper()
-    return entries
 
 
 def frontmatter_name(skill_md: Path) -> str:
@@ -119,6 +93,28 @@ def verify_skills(root: Path, errors: list[str]) -> None:
         errors.append("Duplicate skill names")
 
 
+def verify_achievement_sources(root: Path, errors: list[str]) -> None:
+    corpus = root / "skills" / "write-school-records" / "references" / "achievement-standards"
+    attribution_path = corpus / "ATTRIBUTION.md"
+    catalog_path = corpus / "sources.json"
+    try:
+        attribution = attribution_path.read_text(encoding="utf-8")
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        errors.append(f"Invalid achievement-standards source information: {error}")
+        return
+    if catalog.get("distribution") != "public":
+        errors.append("Achievement-standards catalog must declare public distribution")
+    for marker in (
+        "NCIC 국가교육과정정보센터",
+        "NKIS 연구정보",
+        "공공누리 제1유형",
+        "공공누리 제2유형",
+    ):
+        if marker not in attribution:
+            errors.append(f"Achievement-standards attribution is missing: {marker}")
+
+
 def verify_release_contract(root: Path, errors: list[str]) -> None:
     version = (root / "VERSION").read_text(encoding="utf-8").strip()
     if version != EXPECTED_RELEASE_VERSION:
@@ -130,10 +126,6 @@ def verify_release_contract(root: Path, errors: list[str]) -> None:
         license_text = license_path.read_text(encoding="utf-8")
         if not all(marker in license_text for marker in WRITE_SCHOOL_RECORDS_LICENSE_MARKERS):
             errors.append("write-school-records/LICENSE does not match the approved notice")
-    fixture_root = root / "skills" / "korean-spell-check" / "tests" / "fixtures"
-    fixtures = {path.name for path in fixture_root.iterdir() if path.is_file()} if fixture_root.is_dir() else set()
-    if fixtures != EXPECTED_SPELL_FIXTURES:
-        errors.append(f"Spell-check fixture set mismatch: {sorted(fixtures)}")
     metadata_path = root / "SOURCE_METADATA.json"
     try:
         metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
@@ -142,6 +134,8 @@ def verify_release_contract(root: Path, errors: list[str]) -> None:
     else:
         if metadata.get("plugin_version") != EXPECTED_RELEASE_VERSION:
             errors.append(f"Public source metadata version must be {EXPECTED_RELEASE_VERSION}")
+        if {skill.get("name") for skill in metadata.get("skills", [])} != EXPECTED_SKILLS:
+            errors.append("Public source metadata must list exactly the two bundled skills")
         if "source_path" in metadata_path.read_text(encoding="utf-8"):
             errors.append("Public source metadata contains a local source_path")
     claude_readme = root / "README_CLAUDE_CODE.md"
@@ -155,52 +149,24 @@ def verify_release_contract(root: Path, errors: list[str]) -> None:
                 errors.append(f"Claude Code installation README is missing: {command}")
 
 
-def verify_checksums(root: Path, errors: list[str]) -> None:
-    checksum_path = root / "checksums.sha256"
-    try:
-        entries = parse_checksum_file(checksum_path)
-    except (OSError, ValueError) as error:
-        errors.append(f"Unable to read checksums: {error}")
-        return
-    for relative, expected in entries.items():
-        path = root / Path(relative)
-        try:
-            resolved = path.resolve()
-            resolved.relative_to(root.resolve())
-        except ValueError:
-            errors.append(f"Checksum path escapes package: {relative}")
-            continue
-        if not path.is_file():
-            errors.append(f"Checksum target missing: {relative}")
-        elif sha256(path) != expected:
-            errors.append(f"Checksum mismatch: {relative}")
-    expected_files = {
-        path.relative_to(root).as_posix()
-        for path in root.rglob("*")
-        if path.is_file()
-        and path.name != "checksums.sha256"
-        and path.relative_to(root).as_posix() not in LOCAL_ONLY_FILES
-        and "__pycache__" not in path.parts
-        and ".pytest_cache" not in path.parts
-        and ".git" not in path.parts
-        and path.suffix.lower() not in {".pyc", ".log", ".zip"}
-    }
-    if set(entries) != expected_files:
-        missing = sorted(expected_files - set(entries))
-        extra = sorted(set(entries) - expected_files)
-        errors.append(f"Checksum inventory mismatch: missing={missing}, extra={extra}")
+def verify_archives_absent(root: Path, errors: list[str]) -> None:
+    archives = [path.relative_to(root) for path in root.rglob("*.zip") if path.is_file()]
+    archive_checksums = [path.relative_to(root) for path in root.rglob("*.zip.sha256") if path.is_file()]
+    if archives or archive_checksums:
+        errors.append(f"ZIP artifacts must be absent: {archives + archive_checksums}")
 
 
 def scan_text_files(root: Path, errors: list[str]) -> None:
     for path in root.rglob("*"):
-        if not path.is_file() or path.name == "checksums.sha256":
+        if not path.is_file():
             continue
-        if ".git" in path.parts:
+        relative_path = path.relative_to(root)
+        if any(part in IGNORED_PARTS for part in relative_path.parts):
             continue
-        if "__pycache__" in path.parts or path.suffix.lower() in {".pyc", ".zip"}:
-            errors.append(f"Excluded artifact present: {path.relative_to(root)}")
+        if path.suffix.lower() in {".pyc", ".zip"}:
+            errors.append(f"Excluded artifact present: {relative_path}")
             continue
-        relative = path.relative_to(root).as_posix()
+        relative = relative_path.as_posix()
         if path.suffix.lower() not in {".md", ".py", ".js", ".json", ".yaml", ".yml", ""}:
             continue
         try:
@@ -225,8 +191,9 @@ def main() -> int:
     verify_manifest(root, errors)
     verify_claude_manifest(root, errors)
     verify_skills(root, errors)
+    verify_achievement_sources(root, errors)
     verify_release_contract(root, errors)
-    verify_checksums(root, errors)
+    verify_archives_absent(root, errors)
     scan_text_files(root, errors)
     if errors:
         for error in errors:

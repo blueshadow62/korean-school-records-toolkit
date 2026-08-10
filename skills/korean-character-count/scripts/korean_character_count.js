@@ -2,6 +2,7 @@
 "use strict";
 
 const fs = require("node:fs");
+const { parseArgs: parseNodeArgs } = require("node:util");
 
 const LINE_BREAK_PATTERN = /\r\n|[\n\r\u2028\u2029]/gu;
 const HANGUL_OR_MARK_PATTERN = /^[\p{Script=Hangul}\p{Mark}]+$/u;
@@ -99,94 +100,51 @@ function createReport(text, profile = "default") {
 }
 
 function parseArgs(argv, stdinIsTTY = process.stdin.isTTY) {
-  const options = {
-    format: "json",
-    inputMode: null,
-    profile: "default",
-    text: null,
-  };
+  const { tokens, values } = parseNodeArgs({
+    args: argv,
+    allowPositionals: false,
+    options: {
+      file: { type: "string" },
+      format: { type: "string", default: "json" },
+      help: { type: "boolean", short: "h" },
+      profile: { type: "string", default: "default" },
+      stdin: { type: "boolean" },
+      text: { type: "string" },
+    },
+    strict: true,
+    tokens: true,
+  });
+  const inputTokens = tokens.filter(
+    ({ kind, name }) => kind === "option" && ["file", "stdin", "text"].includes(name),
+  );
 
-  for (let index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-
-    if (arg === "--help" || arg === "-h") {
-      options.help = true;
-      continue;
-    }
-
-    if (arg === "--text") {
-      setInputMode(options, "text");
-      options.text = readNextValue(argv, ++index, arg);
-      continue;
-    }
-
-    if (arg === "--file") {
-      setInputMode(options, "file");
-      options.file = readNextValue(argv, ++index, arg);
-      continue;
-    }
-
-    if (arg === "--stdin") {
-      setInputMode(options, "stdin");
-      continue;
-    }
-
-    if (arg === "--profile") {
-      const value = readNextValue(argv, ++index, arg);
-
-      if (!["default", "neis"].includes(value)) {
-        throw new Error(`Unknown profile: ${value}`);
-      }
-
-      options.profile = value;
-      continue;
-    }
-
-    if (arg === "--format") {
-      const value = readNextValue(argv, ++index, arg);
-
-      if (!["json", "text"].includes(value)) {
-        throw new Error(`Unknown format: ${value}`);
-      }
-
-      options.format = value;
-      continue;
-    }
-
-    throw new Error(`Unknown option: ${arg}`);
+  if (!["default", "neis"].includes(values.profile)) {
+    throw new Error(`Unknown profile: ${values.profile}`);
   }
 
-  if (options.help) {
-    return options;
+  if (!["json", "text"].includes(values.format)) {
+    throw new Error(`Unknown format: ${values.format}`);
   }
 
-  if (!options.inputMode) {
-    if (stdinIsTTY) {
-      throw new Error("Provide exactly one input source with --text, --file, or --stdin.");
-    }
-
-    options.inputMode = "stdin";
-  }
-
-  return options;
-}
-
-function setInputMode(options, nextMode) {
-  if (options.inputMode) {
+  if (inputTokens.length > 1) {
     throw new Error("Provide exactly one input source with --text, --file, or --stdin.");
   }
 
-  options.inputMode = nextMode;
-}
-
-function readNextValue(argv, index, flagName) {
-  const value = argv[index];
-
-  if (value == null) {
-    throw new Error(`Missing value after ${flagName}`);
+  if (values.help) {
+    return { help: true };
   }
 
-  return value;
+  if (inputTokens.length === 0 && stdinIsTTY) {
+    throw new Error("Provide exactly one input source with --text, --file, or --stdin.");
+  }
+
+  return {
+    file: values.file,
+    format: values.format,
+    inputMode: inputTokens[0]?.name ?? "stdin",
+    profile: values.profile,
+    text: values.text ?? null,
+  };
 }
 
 function readInput(options) {

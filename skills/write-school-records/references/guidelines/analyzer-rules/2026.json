@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "school_year": "2026",
+  "field_neis_limits": {
+    "subject": {"korean_characters": 500, "bytes": 1500},
+    "creative": {"korean_characters": 500, "bytes": 1500},
+    "behavior": {"korean_characters": 300, "bytes": 900}
+  },
+  "prohibited_patterns": {
+    "공인어학시험": {
+      "pattern": "공인\\s*어학\\s*시험|\\b(?:TOEIC|TOEFL|TEPS|HSK|JPT|JLPT|DELF|DALF|TESTDAF|DSH|DSD|TORFL|DELE)\\b",
+      "ignore_case": true
+    },
+    "대회·수상": {"pattern": "(?:교내|교외|전국|국제)?\\s*(?:경시|경진)?대회|수상\\s*(?:실적|경력|함|하여)?|입상"},
+    "인증시험": {"pattern": "(?:교내|교외)?\\s*인증\\s*시험"},
+    "모의고사·전국연합학력평가": {"pattern": "모의고사|전국연합학력평가|전국\\s*연합\\s*학력\\s*평가"},
+    "논문 투고·등재·학회 발표": {"pattern": "논문.{0,16}(?:투고|등재|학회|발표)|학회.{0,16}(?:논문|발표)"},
+    "도서 출간": {"pattern": "(?:도서|책).{0,10}(?:출간|출판)"},
+    "지식재산권 출원·등록": {"pattern": "(?:특허|실용신안|상표|디자인).{0,12}(?:출원|등록)"},
+    "해외 활동": {"pattern": "어학연수|해외.{0,20}(?:봉사|활동|체험|실적)"},
+    "부모·친인척의 사회경제적 지위": {"pattern": "(?:부모|부친|모친|친인척|보호자).{0,24}(?:직업|직종|직장|직위|대표|교수|의사|변호사|사회.?경제)"},
+    "장학금": {"pattern": "장학(?:생|금)"},
+    "자격증": {"pattern": "자격증"},
+    "구체적인 대학·기관·학교명 후보": {"pattern": "[가-힣A-Za-z0-9]{2,}(?:대학교|대학|고등학교|고교|연구소|협회|재단)"},
+    "K-MOOC·MOOC·KOCW": {"pattern": "\\b(?:K-?MOOC|MOOC|KOCW)\\b", "ignore_case": true},
+    "방과후학교": {"pattern": "방과\\s*후\\s*학교"},
+    "연구보고서·소논문": {"pattern": "연구\\s*보고서|소\\s*논문"}
+  }
+}

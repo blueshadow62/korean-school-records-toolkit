@@ -1,0 +1,603 @@
+{
+  "schema_version": 1,
+  "distribution": "public",
+  "checked_on": "2026-08-10",
+  "publishers": {
+    "ncic": {
+      "name": "NCIC 국가교육과정정보센터",
+      "operators": [
+        "국가교육위원회",
+        "한국교육과정평가원"
+      ],
+      "url": "https://ncic.re.kr/"
+    },
+    "nkis": {
+      "name": "NKIS 국가정책연구포털",
+      "operators": [
+        "경제·인문사회연구회"
+      ],
+      "url": "https://nkis.re.kr/"
+    }
+  },
+  "rights_policies": {
+    "nkis_kogl_type_1": {
+      "url": "https://nkis.re.kr/prism_api_info_view.do?researchId=1342000-202400063&otpSeq=0&popup=P",
+      "kogl_type": 1,
+      "conditions": [
+        "attribution",
+        "commercial-use-allowed",
+        "derivative-works-allowed"
+      ],
+      "summary": "고등학교 선택과목 성취수준 개발 자료는 교육부 창작물이며 공공누리 제1유형으로 표시되어 있다."
+    },
+    "ncic_kogl_type_2": {
+      "url": "https://ncic.re.kr/mbr/policy.do",
+      "kogl_type": 2,
+      "conditions": [
+        "attribution",
+        "noncommercial-use-only",
+        "derivative-works-allowed"
+      ],
+      "summary": "공통과목·중고 합본과목 자료는 NCIC 저작권 정책의 공공누리 제2유형 조건에 따라 출처 표시·비상업 조건에서 변형 이용할 수 있다."
+    }
+  },
+  "sources": {
+    "ncic-2024-core-korean": {
+      "title": "(고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_국어과",
+      "url": "https://ncic.re.kr/bbs/standard/view/784.do?page=3&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-core-social": {
+      "title": "(고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_사회과",
+      "url": "https://ncic.re.kr/bbs/standard/view/783.do?page=3&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-core-history": {
+      "title": "(고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_역사과",
+      "url": "https://ncic.re.kr/bbs/standard/view/782.do?page=4&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-core-english": {
+      "title": "(고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_영어과",
+      "url": "https://ncic.re.kr/bbs/standard/view/781.do?page=4&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-core-math": {
+      "title": "(고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_수학과",
+      "url": "https://ncic.re.kr/bbs/standard/view/780.do?page=4&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-core-science": {
+      "title": "(고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_과학과",
+      "url": "https://ncic.re.kr/bbs/standard/view/779.do?page=4&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-information": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구보고서_정보과",
+      "url": "https://ncic.re.kr/bbs/standard/view/774.do?page=4&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-classical-chinese": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_한문과",
+      "url": "https://ncic.re.kr/bbs/standard/view/775.do?page=4&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-health": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_보건과",
+      "url": "https://ncic.re.kr/bbs/standard/view/776.do?page=4&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-environment": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_환경과",
+      "url": "https://ncic.re.kr/bbs/standard/view/777.do?page=4&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2024-career": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_진로와 직업",
+      "url": "https://ncic.re.kr/bbs/standard/view/778.do?page=4&searchkey=&searchword=",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2"
+    },
+    "ncic-2025-elective-korean": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_국어과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1422.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-elective-social": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_사회과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1404.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-elective-history": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_역사과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1399.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-elective-english": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_영어과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1398.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-elective-math": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_수학과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1396.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-elective-science": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_과학과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1400.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-elective-ethics": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_도덕과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1401.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-elective-physical-education": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_체육과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1403.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-elective-music": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_음악과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1402.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-elective-art": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_미술과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1405.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-technology-home-economics": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_기술과정과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1419.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-german": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_제2외국어과(독일어)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1406.do?page=6&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-french": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_제2외국어과(프랑스어)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1415.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-spanish": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_제2외국어과(스페인어)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1407.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-chinese": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_제2외국어과(중국어)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1409.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-japanese": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_제2외국어과(일본어)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1408.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-russian": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_제2외국어과(러시아어)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1411.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-arabic": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_제2외국어과(아랍어)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1410.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-vietnamese": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_제2외국어과(베트남어)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1413.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-general-studies": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_교양과",
+      "url": "https://ncic.re.kr/bbs/standard/view/1412.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-math-science-track": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_과학 계열(수학)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1423.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-science-track": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_과학 계열(과학)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1416.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-pe-track": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_체육 계열",
+      "url": "https://ncic.re.kr/bbs/standard/view/1417.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-art-track-music": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_예술 계열(음악)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1418.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-art-track-visual-art": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_예술 계열(미술)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1421.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-art-track-dance": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_예술 계열(무용)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1420.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-art-track-creative-writing": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_예술 계열(문예 창작)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1414.do?page=2&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-art-track-theatre": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_예술 계열(연극)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1425.do?page=1&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-art-track-film": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_예술 계열(영화)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1426.do?page=1&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    },
+    "ncic-2025-art-track-photography": {
+      "title": "(고) 2022 개정 교육과정에 따른 선택과목 성취수준 및 연구 보고서_예술 계열(사진)",
+      "url": "https://ncic.re.kr/bbs/standard/view/1424.do?page=1&searchkey=&searchword=",
+      "posted_on": "2025-07-22",
+      "publisher_id": "ncic",
+      "public_access": true,
+      "redistribution_status": "kogl_type_1",
+      "rights_policy_id": "nkis_kogl_type_1"
+    }
+  },
+  "groups": {
+    "arabic": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-arabic"
+      ]
+    },
+    "art": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2025-elective-art"
+      ]
+    },
+    "art-track": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-art-track-music",
+        "ncic-2025-art-track-visual-art",
+        "ncic-2025-art-track-dance",
+        "ncic-2025-art-track-creative-writing",
+        "ncic-2025-art-track-theatre",
+        "ncic-2025-art-track-film",
+        "ncic-2025-art-track-photography"
+      ]
+    },
+    "career": {
+      "achievement_level_scheme": "source-defined",
+      "source_ids": [
+        "ncic-2024-career"
+      ]
+    },
+    "chinese": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-chinese"
+      ]
+    },
+    "classical-chinese": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-classical-chinese"
+      ]
+    },
+    "english": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-core-english",
+        "ncic-2025-elective-english"
+      ]
+    },
+    "environment": {
+      "achievement_level_scheme": "source-defined",
+      "source_ids": [
+        "ncic-2024-environment"
+      ]
+    },
+    "ethics": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-elective-ethics"
+      ]
+    },
+    "french": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-french"
+      ]
+    },
+    "general-studies": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2025-general-studies"
+      ]
+    },
+    "german": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-german"
+      ]
+    },
+    "health": {
+      "achievement_level_scheme": "source-defined",
+      "source_ids": [
+        "ncic-2024-health"
+      ]
+    },
+    "history": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-core-history",
+        "ncic-2025-elective-history"
+      ]
+    },
+    "information": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-information"
+      ]
+    },
+    "japanese": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-japanese"
+      ]
+    },
+    "korean": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-core-korean",
+        "ncic-2025-elective-korean"
+      ]
+    },
+    "math": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-core-math",
+        "ncic-2025-elective-math"
+      ]
+    },
+    "math-science-track": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-math-science-track"
+      ]
+    },
+    "music": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2025-elective-music"
+      ]
+    },
+    "pe-track": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-pe-track"
+      ]
+    },
+    "physical-education": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2025-elective-physical-education"
+      ]
+    },
+    "russian": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-russian"
+      ]
+    },
+    "science": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-core-science",
+        "ncic-2025-elective-science"
+      ]
+    },
+    "science-track": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-science-track"
+      ]
+    },
+    "social-studies": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-core-social",
+        "ncic-2025-elective-social"
+      ]
+    },
+    "spanish": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-spanish"
+      ]
+    },
+    "technology-home-economics": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-technology-home-economics"
+      ]
+    },
+    "vietnamese": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2025-vietnamese"
+      ]
+    }
+  }
+}

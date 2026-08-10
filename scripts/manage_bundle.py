@@ -17,7 +17,6 @@ from pathlib import Path
 SKILL_NAMES = (
     "write-school-records",
     "korean-character-count",
-    "korean-spell-check",
 )
 IGNORED_PARTS = {"__pycache__", ".pytest_cache"}
 IGNORED_SUFFIXES = {".pyc", ".log"}

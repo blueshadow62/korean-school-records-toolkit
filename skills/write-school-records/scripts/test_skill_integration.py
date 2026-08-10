@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
 
+import json
 import unittest
 from pathlib import Path
 
 
 SKILL_TEXT = (Path(__file__).parents[1] / "SKILL.md").read_text(encoding="utf-8")
+WRITING_QUALITY = json.loads(
+    (Path(__file__).parents[1] / "references" / "writing-quality.json").read_text(encoding="utf-8")
+)
 
 
 class SkillIntegrationContractTests(unittest.TestCase):
-    def test_general_count_and_spell_requests_are_excluded(self) -> None:
-        self.assertIn("일반 글자 수·맞춤법", SKILL_TEXT)
-        self.assertIn("일반 글자 수·맞춤법 요청에는 각각", SKILL_TEXT)
+    def test_general_count_requests_are_routed_to_the_bundled_count_skill(self) -> None:
+        self.assertIn("일반 글자 수 요청에는 `korean-character-count`", SKILL_TEXT)
 
-    def test_final_record_review_names_both_independent_skills(self) -> None:
-        self.assertIn("korean-spell-check", SKILL_TEXT)
+    def test_final_record_review_names_the_counting_skill(self) -> None:
         self.assertIn("korean-character-count", SKILL_TEXT)
         self.assertIn("analyze_record.py", SKILL_TEXT)
 
-    def test_spell_then_count_order_is_explicit(self) -> None:
-        spell_position = SKILL_TEXT.index("최종본 또는 명시적 요청 때만")
-        recount_position = SKILL_TEXT.index("수정 후 `analyze_record.py`")
-        self.assertLess(spell_position, recount_position)
-        self.assertIn("고유명사·교과 용어·활동명·제목은 자동 수정하지 않으며", SKILL_TEXT)
-        self.assertIn("불확실한 제안은 `[확인 필요]`", SKILL_TEXT)
+    def test_final_review_recounts_without_spell_dependency(self) -> None:
+        self.assertIn("최종본을 `analyze_record.py`로 검사", SKILL_TEXT)
+
+    def test_achievement_standards_reference_is_curriculum_basis_only(self) -> None:
+        self.assertIn("achievement-standards/index.md", SKILL_TEXT)
+        self.assertIn("교과별 성취수준 자료는 `curriculum_basis` 등급으로만 사용한다", SKILL_TEXT)
+        self.assertIn("학생의 실제 성취를 이 자료로 새로 만들거나 단정하지 않으며", SKILL_TEXT)
 
     def test_generation_is_default_and_precedes_mechanical_checks(self) -> None:
         self.assertIn("생성 요청은 학생 자료 기반 초안 생성을 기본", SKILL_TEXT)
@@ -153,6 +156,20 @@ class SkillIntegrationContractTests(unittest.TestCase):
         )
         self.assertIn("다양성을 위해 입력에 없는 질문·발표·피드백·협업·추가 탐구·진로 연계·성장·높은 성취·지속적 태도를 만들지 않는다", SKILL_TEXT)
         self.assertIn("예시 자료에서는 전개 순서와 사실·해석의 연결 방식만 참고하고", SKILL_TEXT)
+
+    def test_sentence_quality_gate_requires_precision_cohesion_and_compression(self) -> None:
+        self.assertIn("## 문장 품질 게이트", SKILL_TEXT)
+        self.assertIn("writing-quality.json", SKILL_TEXT)
+        self.assertEqual(1, WRITING_QUALITY["schema_version"])
+        self.assertEqual(
+            {"구체성", "응집성", "압축성"},
+            set(WRITING_QUALITY["quality_dimensions"]),
+        )
+        self.assertEqual(
+            ["대상", "방법", "판단 기준", "결과"],
+            WRITING_QUALITY["required_evidence_fields"],
+        )
+        self.assertGreaterEqual(len(WRITING_QUALITY["rules"]), 6)
 
 
 if __name__ == "__main__":
