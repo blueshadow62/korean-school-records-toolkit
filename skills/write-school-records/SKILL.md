@@ -44,7 +44,7 @@ license: CC-BY-NC-SA-4.0
 | 공학·컴퓨터·교육·예술·융합 전공 렌즈 | [major-technology-arts.md](references/major-technology-arts.md) |
 | 초안·첨삭의 문장 품질 정밀화 | [evidence-writing-guide.md](references/evidence-writing-guide.md) |
 | 현행 규정·출처·자료 시점 질문 | [source-policy.md](references/source-policy.md) |
-| 교과별 성취수준 공식 서술과 대조 | 공통 개념은 [achievement-standards/common.md](references/achievement-standards/common.md), 교과·과목 원문과 단계 체계·출처는 [achievement-standards/index.md](references/achievement-standards/index.md)와 [achievement-standards/sources.json](references/achievement-standards/sources.json)에서 확인한 뒤 필요한 파일만 읽는다 |
+| 교과별 성취수준 공식 서술과 대조 | 공통 개념은 [achievement-standards/common.md](references/achievement-standards/common.md), 교과·과목 원문과 단계 체계는 [achievement-standards/index.md](references/achievement-standards/index.md)에서 확인한 뒤 필요한 파일만 읽는다. 출처·라이선스 표시가 필요하면 그때 교과별 `index.md`가 가리키는 `sources.json`과 [ATTRIBUTION.md](references/achievement-standards/ATTRIBUTION.md)를 읽는다 |
 
 교과별 성취수준 자료는 `curriculum_basis` 등급으로만 사용한다. 학생의 실제 성취를 이 자료로 새로 만들거나 단정하지 않으며, 교사가 확인한 사실을 서술할 때 공식 어휘·강도를 맞추는 용도로만 쓴다.
 
