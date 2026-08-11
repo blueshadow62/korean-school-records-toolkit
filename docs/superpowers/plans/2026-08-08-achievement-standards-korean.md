@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Source file (read-only, never modified): `C:\Users\USER\Documents\Codex\2026-08-08\dl\outputs\통합본\2022 개정 교육과정에 따른 성취수준(통합본).md` (15,467 lines, UTF-8).
+- Source file (read-only, never modified): `<원본 자료 폴더>\통합본\2022 개정 교육과정에 따른 성취수준(통합본).md` (15,467 lines, UTF-8).
 - **Do not commit anything under `skills/write-school-records/` to git.** That directory is outside any git repository (confirmed: `school-records-toolkit/` top level is not a git repo; only `plugins/korean-school-records-toolkit/` is). None of the tasks below touch `plugins/korean-school-records-toolkit/`, so none of them end with a `git commit` step — this is intentional, not an omission.
 - Do not copy any extracted achievement-standard text into `plugins/korean-school-records-toolkit/skills/write-school-records/` (the public package). The source license from NCIC could not be confirmed as open (site footer: "Copyright(C) 2026 by NCIC. ALL RIGHTS RESERVED.") — see the spec's "저작권 확인 결과" section.
 - Preserve source wording verbatim in the 10 course files — do not paraphrase or summarize achievement-level sentences.
@@ -57,12 +57,12 @@ Shared intro (Ⅰ. 성취수준 개발의 이해 + Ⅱ. 성취수준 활용, app
 - [ ] **Step 1: Run the extraction script**
 
 ```bash
-cd "C:\Users\USER\Documents\CodexSkills\school-records-toolkit\skills\write-school-records"
+cd "<repo>\skills\write-school-records"
 mkdir -p references/achievement-standards/korean
 python3 - <<'PY'
 from pathlib import Path
 
-SRC = Path(r"C:\Users\USER\Documents\Codex\2026-08-08\dl\outputs\통합본\2022 개정 교육과정에 따른 성취수준(통합본).md")
+SRC = Path(r"<원본 자료 폴더>\통합본\2022 개정 교육과정에 따른 성취수준(통합본).md")
 OUT_DIR = Path("references/achievement-standards/korean")
 SHARED_OUT = Path("references/achievement-standards/_shared_intro.txt")
 
@@ -123,7 +123,7 @@ Expected: 10 files under `korean/`, plus the one file directly under `achievemen
 - [ ] **Step 1: Check no file contains an image placeholder line**
 
 ```bash
-cd "C:\Users\USER\Documents\CodexSkills\school-records-toolkit\skills\write-school-records"
+cd "<repo>\skills\write-school-records"
 grep -rl '^!\[image\]' references/achievement-standards/ || echo "PASS: no image lines"
 ```
 
@@ -193,7 +193,7 @@ Read the output. If it looks garbled or clearly off-topic, stop and re-examine t
 - [ ] **Step 1: Read the shared-intro text to use as the file's opening section**
 
 ```bash
-cd "C:\Users\USER\Documents\CodexSkills\school-records-toolkit\skills\write-school-records"
+cd "<repo>\skills\write-school-records"
 cat references/achievement-standards/_shared_intro.txt
 ```
 
@@ -284,7 +284,7 @@ Insert a new paragraph directly before it:
 - [ ] **Step 3: Verify both strings landed correctly**
 
 ```bash
-cd "C:\Users\USER\Documents\CodexSkills\school-records-toolkit\skills\write-school-records"
+cd "<repo>\skills\write-school-records"
 grep -F "achievement-standards/index.md" SKILL.md
 grep -F 'curriculum_basis` 등급으로만 사용한다' SKILL.md
 ```
@@ -319,7 +319,7 @@ Add this method to the existing `SkillIntegrationContractTests` class (place it 
 (Task 4 already added the text this test checks for, so this confirms Task 4 landed correctly rather than testing a fail-first cycle — that's expected here since Task 4 and Task 5 both encode the same contract.)
 
 ```bash
-cd "C:\Users\USER\Documents\CodexSkills\school-records-toolkit\skills\write-school-records\scripts"
+cd "<repo>\skills\write-school-records\scripts"
 python -m unittest test_skill_integration.SkillIntegrationContractTests.test_achievement_standards_reference_is_curriculum_basis_only -v
 ```
 
@@ -334,7 +334,7 @@ Expected: `ok`, 1 test run.
 - [ ] **Step 1: Run the full write-school-records test suite**
 
 ```bash
-cd "C:\Users\USER\Documents\CodexSkills\school-records-toolkit\skills\write-school-records\scripts"
+cd "<repo>\skills\write-school-records\scripts"
 python -m unittest test_analyze_record test_compare_neis_counts test_sync_install test_update_guidelines test_skill_integration -v
 ```
 
@@ -343,14 +343,14 @@ Expected: all tests pass (75 tests before this plan; 76 after Task 5 adds one).
 - [ ] **Step 2: Confirm nothing was written to the public package or to git**
 
 ```bash
-cd "C:\Users\USER\Documents\CodexSkills\school-records-toolkit\plugins\korean-school-records-toolkit"
+cd "<repo>\plugins\korean-school-records-toolkit"
 git status --short
 ```
 
 Expected: empty output (no changes) — this plan does not touch anything under `plugins/korean-school-records-toolkit/`.
 
 ```bash
-find "C:\Users\USER\Documents\CodexSkills\school-records-toolkit\plugins\korean-school-records-toolkit\skills\write-school-records" -iname "achievement-standards"
+find "<repo>\plugins\korean-school-records-toolkit\skills\write-school-records" -iname "achievement-standards"
 ```
 
 Expected: no output (the reference folder must not exist in the public package copy).

@@ -41,6 +41,6 @@
 - 플러그인은 학생 사실을 임의로 만들지 않는다.
 - 분량 계산은 기록의 사실성을 대신하지 않는다.
 - 성취수준 참고 자료의 공통과목·중고 합본과목은 NCIC 공공누리 제2유형, 선택과목은 NKIS 공공누리 제1유형 조건을 따른다. 자세한 출처 표시는 `skills/write-school-records/references/achievement-standards/ATTRIBUTION.md`를 따른다.
-- 기재요령 원문 참고 자료는 교육부 공공누리 제4유형(출처표시+상업적 이용금지+변경금지) 조건을 따른다. 본 저작물은 교육부에서 2026년 작성하여 공공누리 제4유형으로 개방한 「2026학년도 학교생활기록부 기재요령 안내」를 이용하였으며, 해당 저작물은 교육부 홈페이지(https://www.moe.go.kr)에서 무료로 내려받으실 수 있다. 형식 변환 내역을 포함한 자세한 안내는 `skills/write-school-records/references/guidelines/ATTRIBUTION.md`를 따른다.
+- `references/guidelines/`의 기재요령 자료는 원문이 아니라 **원문을 근거로 재가공한 참조본**이다. 공식 효력을 갖는 것은 교육부 배포 원문이며, 내용이 다르면 원문을 따른다. 본 저작물은 교육부에서 2026년 작성하여 공공누리 제4유형(출처표시+상업적 이용금지+변경금지)으로 개방한 「2026학년도 학교생활기록부 기재요령 안내」를 이용하였으며, 해당 저작물은 교육부 홈페이지(https://www.moe.go.kr)에서 무료로 내려받으실 수 있다. 재가공 내역을 포함한 자세한 안내는 `skills/write-school-records/references/guidelines/ATTRIBUTION.md`를 따른다.
 
 Codex 설치·업데이트·제거 절차는 [INSTALL.md](INSTALL.md)를 따른다. Claude Code 설치와 로컬 검증은 [README_CLAUDE_CODE.md](README_CLAUDE_CODE.md)를 따른다.
