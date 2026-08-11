@@ -44,3 +44,11 @@
 - `references/guidelines/`의 기재요령 자료는 원문이 아니라 **원문을 근거로 재가공한 참조본**이다. 공식 효력을 갖는 것은 교육부 배포 원문이며, 내용이 다르면 원문을 따른다. 본 저작물은 교육부에서 2026년 작성하여 공공누리 제4유형(출처표시+상업적 이용금지+변경금지)으로 개방한 「2026학년도 학교생활기록부 기재요령 안내」를 이용하였으며, 해당 저작물은 교육부 홈페이지(https://www.moe.go.kr)에서 무료로 내려받으실 수 있다. 재가공 내역을 포함한 자세한 안내는 `skills/write-school-records/references/guidelines/ATTRIBUTION.md`를 따른다.
 
 Codex 설치·업데이트·제거 절차는 [INSTALL.md](INSTALL.md)를 따른다. Claude Code 설치와 로컬 검증은 [README_CLAUDE_CODE.md](README_CLAUDE_CODE.md)를 따른다.
+
+## 더 읽을 문서
+
+| 문서 | 내용 |
+|---|---|
+| [USER_GUIDE.md](USER_GUIDE.md) | 실제로 어떻게 요청하고 쓰는지 |
+| [docs/how-it-works.html](docs/how-it-works.html) | 이 도구가 왜 이렇게 판단하는지를 쉬운 말로 설명. 내려받아 브라우저로 연다 |
+| [docs/dev-vs-package.md](docs/dev-vs-package.md) | 개발본과 배포본의 의도된 차이 (기여자용) |
