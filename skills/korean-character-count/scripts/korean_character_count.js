@@ -41,7 +41,8 @@ function countNeisBytes(text) {
   for (const match of text.matchAll(LINE_BREAK_PATTERN)) {
     const breakIndex = match.index ?? 0;
     total += countNeisChunkBytes(text.slice(lastIndex, breakIndex));
-    total += 2;
+    // 2026 기재요령: 엔터(Enter)는 1Byte. CRLF도 하나의 줄바꿈으로 본다.
+    total += 1;
     lastIndex = breakIndex + match[0].length;
   }
 
@@ -81,7 +82,7 @@ function createReport(text, profile = "default") {
       characters: "Unicode extended grapheme clusters via Intl.Segmenter",
       bytes:
         profile === "neis"
-          ? "NEIS-compatible bytes: Hangul grapheme=3B, ASCII grapheme=1B, each line break=2B, everything else falls back to UTF-8 bytes"
+          ? "NEIS-compatible bytes: Hangul grapheme=3B, ASCII grapheme=1B, each line break=1B (2026 guideline), everything else falls back to UTF-8 bytes"
           : "Actual UTF-8 encoded byte length",
       lines:
         "Empty string => 0 lines; otherwise count CRLF, LF, CR, U+2028, U+2029 as one line break each and add 1",
