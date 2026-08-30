@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.1.0 — 2026-08-30
+
+### Fixed
+
+- `korean-character-count` `neis` 프로필의 줄바꿈 바이트를 2B에서 1B로 수정해 2026 기재요령(한글 3Byte, 영문·숫자 1Byte, 엔터 1Byte) 및 `analyze_record.py`와 일치시킴.
+- `analyze_record.py`·`update_guidelines.py`가 Windows 기본 콘솔(cp949)에서 한글을 깨뜨리지 않도록 UTF-8 출력으로 고정.
+
+### Changed
+
+- `write-school-records` SKILL.md의 S1–S10 서술 구조 절을 `references/sentence-structures.md`로 분리.
+- 두 스킬의 NEIS 바이트 교차검증 테스트, JS 단위 테스트, 개발본/배포본 드리프트 테스트 추가.
+
+### Added
+
+- 금지 표현 점검 보강: 대학 약칭(서울대 등), 공인어학시험 한글 표기(토익 등), 사교육·강사, 재학 학교 식별 후보. 연결어미·인용어미 오탐 방지 테스트 포함.
+- `update_guidelines.py import/activate`가 새 학년도 분석 규칙을 이전 학년도에서 `reviewed: false`로 복사하고, 점검기는 미검토 규칙 경고를 출력.
+- `analyze_record.py`에 `--grade`, `--subject-type`, `--area`, `--combine-with`(공통과목 합산), `--batch`(10행 이상 반복률 검토 경고) 추가. 규칙 파일에 `field_limits_v2` 블록 추가(기존 키 유지).
+- `references/intake-template.md`(교사 입력 형식·엑셀 열→출처 유형 매핑), `references/output-skeleton.md`(응답 골격·D 판정 작성 틀), SKILL.md 「지원 영역」 표.
+- `tests/eval-cases/` 합성 행동 평가 케이스 15건과 채점 절차, 스키마 테스트.
+
 ## 2.0.0 — 2026-08-10
 
 ### Removed

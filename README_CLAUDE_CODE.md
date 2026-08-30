@@ -31,6 +31,14 @@ Claude Code 안에서 `/help`로 다음 스킬이 표시되는지 확인한다.
 
 파일을 수정한 뒤에는 Claude Code에서 `/reload-plugins`를 실행한다.
 
+테스트는 표준 라이브러리 `unittest`만으로 실행된다(`pytest` 불필요).
+
+```powershell
+python -m unittest discover -s tests -p "test_*.py"
+python -m unittest discover -s skills\write-school-records\scripts -p "test_*.py"
+node --test skills\korean-character-count\scripts\korean_character_count.test.js
+```
+
 ## 개인 범위 설치
 
 Claude Code를 종료한 뒤 플러그인 디렉터리 전체를 다음 위치에 복사한다.

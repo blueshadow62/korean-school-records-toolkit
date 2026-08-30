@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "korean-school-records-toolkit",
   "displayName": "한국어 학교생활기록부 도구",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "학교생활기록부 초안 생성과 한국어 글자 수·NEIS Byte 계산을 제공하는 Claude Code용 스킬 플러그인",
   "author": {
     "name": "Local education tooling team"

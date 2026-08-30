@@ -1,6 +1,6 @@
 {
   "plugin_name": "korean-school-records-toolkit",
-  "plugin_version": "2.0.0",
+  "plugin_version": "2.1.0",
   "provenance_recorded_on": "2026-08-10",
   "compatible_environment": "Codex plugin schema and Claude Code plugin layout; see INSTALL.md and README_CLAUDE_CODE.md",
   "final_validation_status": "See TEST_REPORT.md",

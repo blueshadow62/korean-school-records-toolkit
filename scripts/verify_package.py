@@ -14,7 +14,7 @@ EXPECTED_SKILLS = {
     "write-school-records",
     "korean-character-count",
 }
-EXPECTED_RELEASE_VERSION = "2.0.0"
+EXPECTED_RELEASE_VERSION = "2.1.0"
 IGNORED_PARTS = {
     "__pycache__",
     ".pytest_cache",
