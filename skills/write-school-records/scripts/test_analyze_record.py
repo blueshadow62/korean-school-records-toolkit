@@ -7,7 +7,15 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from analyze_record import active_rule_context, analyze, load_year_rules, positive_int, read_utf8_text
+from analyze_record import (
+    active_rule_context,
+    analyze,
+    analyze_batch,
+    load_year_rules,
+    positive_int,
+    read_batch_tsv,
+    read_utf8_text,
+)
 
 
 class AnalyzeRecordTests(unittest.TestCase):
@@ -69,6 +77,64 @@ class AnalyzeRecordTests(unittest.TestCase):
         self.assertIn("K-MOOC·MOOC·KOCW", warnings)
         self.assertIn("방과후학교", warnings)
 
+    def test_2026_extended_prohibited_candidates_are_flagged(self) -> None:
+        result = analyze(
+            "서울대 진학이 기대됨. 한빛대에 입학함. 토익 900점. OO학원 강사의 지도를 받음. "
+            "새롬고등학교 및 한빛고 재학 중임.",
+            field="subject",
+        )
+        prohibited = result["signals"]["prohibited"]
+        self.assertIn("서울대 등 대학 약칭·별칭 후보", prohibited)
+        self.assertIn("공인어학시험", prohibited)
+        self.assertIn("학원 강사 등 사교육·외부활동 후보", prohibited)
+        self.assertIn("재학 학교 식별 후보", prohibited)
+
+    def test_2026_extended_prohibited_patterns_avoid_common_false_positives(self) -> None:
+        result = analyze("기대됨. 확대함. 최대값을 구함. AI 활용 방안을 설명함.", field="subject")
+        prohibited = result["signals"]["prohibited"]
+        self.assertNotIn("서울대 등 대학 약칭·별칭 후보", prohibited)
+        self.assertNotIn("공인어학시험", prohibited)
+        self.assertNotIn("학원 강사 등 사교육·외부활동 후보", prohibited)
+        self.assertNotIn("재학 학교 식별 후보", prohibited)
+
+    def test_school_identification_pattern_excludes_connective_endings(self) -> None:
+        positive = analyze("한빛고 재학 중임. 새롬고등학교에 재학함. 과학고에서 수업함.")
+        self.assertIn("재학 학교 식별 후보", positive["signals"]["prohibited"])
+
+        for text in (
+            "예상과 다른 결과의 원인을 토의하고 기대 효과를 정리함.",
+            "선생님이 되고 싶다고 밝힘.",
+            "친구가 옳다고 인정하고 수정함.",
+            "교내 대회는 제외하고 수업 중 발표만 기록함.",
+            "보고서를 작성함.",
+            "비교하고 정리함.",
+            "참고 자료를 제시함.",
+        ):
+            with self.subTest(text=text):
+                result = analyze(text, field="subject")
+                self.assertNotIn("재학 학교 식별 후보", result["signals"]["prohibited"])
+
+    def test_private_education_pattern_excludes_instructor_fee(self) -> None:
+        positive = analyze("OO학원 강사의 지도를 받음. 과외를 받아.")
+        self.assertIn("학원 강사 등 사교육·외부활동 후보", positive["signals"]["prohibited"])
+
+        for text in (
+            "강사료 지급 기준을 조사하는 경제 프로젝트를 수행함.",
+            "학원 밀집 지역의 상권을 지도로 분석함.",
+        ):
+            with self.subTest(text=text):
+                result = analyze(text, field="subject")
+                self.assertNotIn("학원 강사 등 사교육·외부활동 후보", result["signals"]["prohibited"])
+
+    def test_unreviewed_rules_warn_but_reviewed_2026_rules_do_not(self) -> None:
+        reviewed_rules = load_year_rules("2026")
+        self.assertNotIn("미검토 초안", " ".join(analyze("자료를 분석함.", rules=reviewed_rules)["warnings"]))
+        unreviewed_rules = dict(reviewed_rules)
+        unreviewed_rules["school_year"] = "2027"
+        unreviewed_rules["reviewed"] = False
+        warnings = " ".join(analyze("자료를 분석함.", rules=unreviewed_rules)["warnings"])
+        self.assertIn("2027 분석 규칙은 이전 학년도에서 복사된 미검토 초안입니다.", warnings)
+
     def test_creative_condition_candidates_are_flagged_without_treating_them_as_automatic_bans(self) -> None:
         result = analyze(
             "학교 밖 기관의 자율동아리 활동과 학교스포츠클럽, 청소년단체 활동을 입력함.",
@@ -95,6 +161,90 @@ class AnalyzeRecordTests(unittest.TestCase):
         result = analyze("가" * 500, field="subject")
         warnings = " ".join(result["warnings"])
         self.assertNotIn("참고 바이트 한도", warnings)
+
+    def test_context_specific_limits_and_warnings_are_resolved(self) -> None:
+        rules = load_year_rules("2026")
+        service = analyze(
+            "자료를 비교함.", field="creative", grade=2, area="service", rules=rules
+        )
+        self.assertIn("봉사활동 특기사항 영역은 2026학년도 3학년에만 있음", service["warnings"])
+        self.assertIn("2학년 창체 봉사활동 특기사항", service["metrics"]["resolved_limit_label"])
+        self.assertIn("객관적 내용", " ".join(service["warnings"]))
+
+        common = analyze("가" * 300, field="subject", subject_type="common", rules=rules)
+        self.assertIn("공통과목 1·2 합산", common["metrics"]["resolved_limit_label"])
+        self.assertIn("한 텍스트만 확인", " ".join(common["warnings"]))
+
+        vocational = analyze("자료를 비교함.", field="subject", subject_type="vocational", rules=rules)
+        self.assertIn("전공실무과목 학기별", vocational["metrics"]["resolved_limit_label"])
+
+    def test_common_course_combined_bytes_are_checked(self) -> None:
+        result = analyze(
+            "가" * 300,
+            field="subject",
+            subject_type="common",
+            combine_with_text="나" * 201,
+            rules=load_year_rules("2026"),
+        )
+        self.assertEqual(1503, result["metrics"]["combined_neis_bytes"])
+        self.assertIn("합산 참고 바이트 한도", " ".join(result["warnings"]))
+        self.assertNotIn("한 텍스트만 확인", " ".join(result["warnings"]))
+
+    def test_batch_repetition_thresholds_with_synthetic_tsv(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "synthetic.tsv"
+            repeated = ["자료 비교 분석 결과를 정리하여 역량을 보임." for _ in range(4)]
+            varied = [f"서로다른{i} 관찰 내용을 기록하여 마무리{i}함." for i in range(8)]
+            path.write_text("id\t초안\n" + "\n".join(f"{i}\t{text}" for i, text in enumerate(repeated + varied)), encoding="utf-8")
+            texts = read_batch_tsv(path)
+        result = analyze_batch(
+            texts,
+            field="subject",
+            target_chars=None,
+            rules=load_year_rules("2026"),
+            grade=None,
+            subject_type="elective",
+            area=None,
+        )
+        warnings = " ".join(result["batch_warnings"])
+        self.assertIn("첫 3어절", warnings)
+        self.assertIn("마지막 서술어", warnings)
+        self.assertIn("역량을 보임", warnings)
+        self.assertIn("구조 유형(S1–S10)", result["notes"][0])
+
+    def test_batch_repetition_below_threshold_has_no_warnings(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "synthetic.tsv"
+            rows = [f"시작{i} 자료{i} 비교{i} 결과를 정리하여 마침{i}." for i in range(12)]
+            path.write_text("draft\n" + "\n".join(rows), encoding="utf-8")
+            texts = read_batch_tsv(path)
+        result = analyze_batch(
+            texts,
+            field="other",
+            target_chars=None,
+            rules=load_year_rules("2026"),
+            grade=None,
+            subject_type="elective",
+            area=None,
+        )
+        self.assertEqual([], result["batch_warnings"])
+
+    def test_batch_under_ten_rows_skips_repetition_warnings(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "synthetic.tsv"
+            path.write_text("초안\n" + "\n".join(["같은 첫 세어절 역량을 보임."] * 9), encoding="utf-8")
+            texts = read_batch_tsv(path)
+        result = analyze_batch(
+            texts,
+            field="other",
+            target_chars=None,
+            rules=load_year_rules("2026"),
+            grade=None,
+            subject_type="elective",
+            area=None,
+        )
+        self.assertEqual([], result["batch_warnings"])
+        self.assertIn("10명 이상", " ".join(result["notes"]))
 
     def test_mixed_unicode_input_uses_documented_codepoint_and_utf8_contract(self) -> None:
         result = analyze("가A1 !\n🙂가", field="other")
@@ -162,6 +312,7 @@ class AnalyzeRecordTests(unittest.TestCase):
         rules = load_year_rules("2026")
         self.assertEqual("2026", rules["school_year"])
         self.assertEqual(1500, rules["field_neis_limits"]["subject"]["bytes"])
+        self.assertEqual(1500, rules["field_limits_v2"]["subject"]["common_combined"]["bytes"])
         self.assertIn("공인어학시험", rules["prohibited_patterns"])
 
         with tempfile.TemporaryDirectory() as temp:

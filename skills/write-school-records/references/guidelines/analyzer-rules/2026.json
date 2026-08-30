@@ -1,14 +1,43 @@
 {
   "schema_version": 1,
   "school_year": "2026",
+  "reviewed": true,
   "field_neis_limits": {
     "subject": {"korean_characters": 500, "bytes": 1500},
     "creative": {"korean_characters": 500, "bytes": 1500},
     "behavior": {"korean_characters": 300, "bytes": 900}
   },
+  "field_limits_v2": {
+    "subject": {
+      "default": {"korean_characters": 500, "bytes": 1500},
+      "common_combined": {
+        "korean_characters": 500,
+        "bytes": 1500,
+        "note": "공통과목 1·2 합산"
+      },
+      "vocational_per_semester": {
+        "korean_characters": 500,
+        "bytes": 1500,
+        "note": "전공실무과목 학기별"
+      }
+    },
+    "creative": {
+      "autonomy": {"korean_characters": 500, "bytes": 1500},
+      "club": {"korean_characters": 500, "bytes": 1500},
+      "career": {"korean_characters": 500, "bytes": 1500},
+      "service": {"grades": [3], "korean_characters": 500, "bytes": 1500},
+      "service_record_item": {
+        "korean_characters": 50,
+        "bytes": 150,
+        "objective_only": true
+      }
+    },
+    "behavior": {"korean_characters": 300, "bytes": 900},
+    "individual_subject": {"korean_characters": 500, "bytes": 1500}
+  },
   "prohibited_patterns": {
     "공인어학시험": {
-      "pattern": "공인\\s*어학\\s*시험|\\b(?:TOEIC|TOEFL|TEPS|HSK|JPT|JLPT|DELF|DALF|TESTDAF|DSH|DSD|TORFL|DELE)\\b",
+      "pattern": "공인\\s*어학\\s*시험|(?:토익스피킹|토익|토플|텝스|아이엘츠|오픽|토스|\\b(?:IELTS|OPIC|TOEIC|TOEFL|TEPS|HSK|JPT|JLPT|DELF|DALF|TESTDAF|DSH|DSD|TORFL|DELE|TOPIK)\\b)(?:\\s*(?:\\d+(?:\\.\\d+)?\\s*(?:점|급)?|N\\s*급))?",
       "ignore_case": true
     },
     "대회·수상": {"pattern": "(?:교내|교외|전국|국제)?\\s*(?:경시|경진)?대회|수상\\s*(?:실적|경력|함|하여)?|입상"},
@@ -22,6 +51,14 @@
     "장학금": {"pattern": "장학(?:생|금)"},
     "자격증": {"pattern": "자격증"},
     "구체적인 대학·기관·학교명 후보": {"pattern": "[가-힣A-Za-z0-9]{2,}(?:대학교|대학|고등학교|고교|연구소|협회|재단)"},
+    "서울대 등 대학 약칭·별칭 후보": {
+      "pattern": "(?:서울대|연대|고대|성대|한대|중대|경희대|외대|서강대|이대|카이스트|KAIST|포스텍|POSTECH|유니스트|지스트|디지스트|교대|경찰대|사관학교|과기원)(?![가-힣A-Za-z])|(?<![가-힣])(?!(?:최대|확대|기대|반대|절대|상대)(?=\\s|에|의|를|을|로|에서|진학|입학|합격|$))[가-힣]{1,4}대(?=\\s|에|의|를|을|로|에서|진학|입학|합격|$)",
+      "ignore_case": true
+    },
+    "학원 강사 등 사교육·외부활동 후보": {
+      "pattern": "학원(?=\\s*(?:강사|수강|에서|의\\s*지도|을\\s*다니|에\\s*다니))|과외|인강|인터넷\\s*강의|강사(?!료)|외부\\s*멘토링|외부\\s*컨설팅|외부\\s*캠프|아카데미|교습소"
+    },
+    "재학 학교 식별 후보": {"pattern": "[가-힣]{2,}고등학교|[가-힣]{2,}(?<![하이되않치보알듣읽쓰따말누펴리르다라자냐])고(?=\\s*(?:재학|졸업|출신|학생|에서|에|의|를|을|과|와|로)(?![가-힣])|\\s*$)"},
     "K-MOOC·MOOC·KOCW": {"pattern": "\\b(?:K-?MOOC|MOOC|KOCW)\\b", "ignore_case": true},
     "방과후학교": {"pattern": "방과\\s*후\\s*학교"},
     "연구보고서·소논문": {"pattern": "연구\\s*보고서|소\\s*논문"}
