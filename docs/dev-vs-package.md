@@ -16,6 +16,8 @@
 3. 개발본의 `scripts/`에는 `sync_install.py`와 `test_sync_install.py`가 추가로 있다. 개발·설치 동기화용 파일이며 배포 패키지에는 필요하지 않다.
 4. 개발본의 `scripts/`에는 `trim_achievement_examples.py`가 추가로 있다. 성취수준 코퍼스에서 예시 평가 도구 구간을 잘라내는 정비 도구이며, 스킬 실행 중에는 쓰이지 않는다. 같은 계열의 코퍼스 재현 도구는 저장소의 `tools/corpus/`에 있다.
 5. 두 트리의 `scripts/test_skill_integration.py`가 다르다. 이 테스트가 각 트리의 `SKILL.md`를 검사하기 때문이며, 1·2번 차이의 직접적인 결과다. 개발본은 `korean-spell-check` 연계와 맞춤법·재계산 순서를 검증하고, 배포본은 연계 없이 `analyze_record.py`로 최종 확인하는 흐름을 검증한다. 한쪽 `SKILL.md`를 고치면 같은 트리의 이 테스트도 함께 고쳐야 한다.
+6. 개발본에는 `references/achievement-standards-middle/`와 `scripts/test_achievement_standards_middle.py`가 추가로 있다. 중학교 성취수준 자료로, 게시물별 재배포 조건을 확인하지 못해 로컬에서만 쓰고 배포 패키지에 넣지 않는다.
+7. 6번 때문에 개발본 `SKILL.md`의 참조 표에 중학교 줄이 더 있고, 개발본 `references/source-policy.md`에 중학교 자료 설명 줄이 더 있다. `source-policy.md`의 나머지 내용은 같게 유지한다.
 
 ## 의도되지 않은 차이 확인
 
