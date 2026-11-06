@@ -1,6 +1,6 @@
 ---
 name: korean-character-count
-description: Count Korean text deterministically with exact grapheme, line, and byte contracts for self-intros and form limits.
+description: Count Korean text deterministically with exact grapheme, line, and byte contracts for self-intros and form limits. Use for "글자 수 세줘", "바이트 계산", "NEIS Byte 확인", "1000자 넘는지" requests.
 license: MIT
 metadata:
   category: writing
@@ -50,7 +50,7 @@ metadata:
 - bytes:
   - 한글 grapheme => `3B`
   - ASCII grapheme => `1B`
-  - Enter/줄바꿈 시퀀스 => `2B`
+  - Enter/줄바꿈 시퀀스(`CRLF`·`LF`·`CR`) => `1B` (2026 학교생활기록부 기재요령: 한글 3Byte, 영문·숫자 1Byte, 엔터 1Byte)
   - 그 외 문자는 UTF-8 byte 길이로 fallback
 
 ## Prerequisites
@@ -88,7 +88,7 @@ cat essay.txt | node scripts/korean_character_count.js --stdin --profile neis
 - 글자 수, 줄 수, byte 수가 함께 반환된다.
 - `default` 와 `neis` 계약 차이가 문서에 명시된다.
 - `node scripts/korean_character_count.js --help` 가 동작한다.
-- 혼합 한국어/영문/공백/개행/emoji 입력에 대한 테스트가 있다.
+- 혼합 한국어/영문/공백/개행/emoji 입력에 대한 테스트가 있다 (`node --test scripts/korean_character_count.test.js`).
 
 ## Notes
 

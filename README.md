@@ -1,10 +1,10 @@
 # 한국어 학교생활기록부 도구
 
 <!-- CHANGELOG:START -->
-> **최근 업데이트: 2.0.0** — 자세한 변경 내역은 [CHANGELOG.md](CHANGELOG.md)를 확인하세요.
+> **최근 업데이트: 2.1.0** — 자세한 변경 내역은 [CHANGELOG.md](CHANGELOG.md)를 확인하세요.
 <!-- CHANGELOG:END -->
 
-현재 버전은 `2.0.0`이다.
+현재 버전은 `2.1.0`이다.
 
 학교생활기록부 초안 생성과 글자 수·NEIS Byte 계산을 한 설치 단위로 제공하는 Codex·Claude Code 겸용 스킬 플러그인이다. 두 기능은 서로 독립적으로 사용할 수 있다.
 

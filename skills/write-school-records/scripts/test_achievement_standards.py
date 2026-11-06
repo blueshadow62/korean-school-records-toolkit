@@ -30,18 +30,40 @@ NEW_COURSES = {
     "arabic": ["아랍어", "심화_아랍어", "아랍어_회화", "아랍_문화"],
     "vietnamese": ["베트남어", "심화_베트남어", "베트남어_회화", "베트남_문화"],
 }
+# 파일을 잘못 잘랐거나 빠졌던 과목. 코드 접두와 고시의 성취기준 수로 파일과 내용이 맞는지 본다.
+COURSE_CODES = {
+    "english/공통영어1": ("[10공영1-", 16),
+    "english/공통영어2": ("[10공영2-", 17),
+    "english/기본영어1": ("[10기영1-", 16),
+    "english/기본영어2": ("[10기영2-", 16),
+    "english/미디어_영어": ("[12미영", 10),
+    "english/세계_문화와_영어": ("[12세영", 10),
+    "history/세계사": ("[12세사", 13),
+    "history/역사로_탐구하는_현대_세계": ("[12역현", 14),
+    "korean/언어생활_탐구": ("[12언탐", 7),
+    "math/경제_수학": ("[12경수", 18),
+    "social-studies/여행지리": ("[12여지", 12),
+    "social-studies/사회문제_탐구": ("[12사탐", 12),
+    "social-studies/금융과_경제생활": ("[12금융", 12),
+    "social-studies/기후변화와_지속가능한_세계": ("[12기지", 12),
+}
+CODE = re.compile(r"\[\d{2}[^\]\s]{1,14}\d{2}-\d{2}\]")
+
+
+def course_files() -> list[Path]:
+    return sorted(
+        path
+        for path in CORPUS.rglob("*.md")
+        if path.name not in {"index.md", "common.md", "ATTRIBUTION.md"}
+    )
 
 
 @unittest.skipUnless(CORPUS_PRESENT, "성취수준 코퍼스가 없는 환경")
 class AchievementStandardsCorpusTests(unittest.TestCase):
     def test_all_course_files_are_descriptor_only(self) -> None:
         excluded = re.compile(r"성취수준 개발의 이해|성취수준 활용|예시.{0,20}평가|<img|!\[|image_[0-9]+", re.I)
-        paths = sorted(
-            path
-            for path in CORPUS.rglob("*.md")
-            if path.name not in {"index.md", "common.md", "ATTRIBUTION.md"}
-        )
-        self.assertEqual(224, len(paths))
+        paths = course_files()
+        self.assertEqual(231, len(paths))
         for path in paths:
             with self.subTest(path=path):
                 text = path.read_text(encoding="utf-8")
@@ -137,6 +159,58 @@ class AchievementStandardsCorpusTests(unittest.TestCase):
         catalog = json.loads((CORPUS / "sources.json").read_text(encoding="utf-8"))
         schemes = {g["achievement_level_scheme"] for g in catalog["groups"].values()}
         self.assertTrue({"A~C", "A~E"} <= schemes)
+
+    def test_repaired_courses_hold_their_own_codes(self) -> None:
+        for course, (prefix, count) in COURSE_CODES.items():
+            with self.subTest(course=course):
+                text = (CORPUS / f"{course}.md").read_text(encoding="utf-8")
+                codes = set(CODE.findall(re.sub(r"<[^>]+>", "", text)))
+                self.assertEqual(count, len(codes))
+                self.assertTrue(all(code.startswith(prefix) for code in codes))
+
+    def test_numbered_courses_hold_codes_of_their_own_number(self) -> None:
+        checked = 0
+        for path in course_files():
+            number = re.search(r"([12])$", path.stem)
+            codes = re.findall(r"\[10[^\]\s]{1,8}?([12])-\d{2}-\d{2}\]", path.read_text(encoding="utf-8"))
+            if number and codes:
+                checked += 1
+                with self.subTest(path=path.name):
+                    self.assertEqual({number.group(1)}, set(codes))
+        self.assertGreaterEqual(checked, 16)
+
+    def test_no_two_course_files_share_a_body(self) -> None:
+        seen: dict[str, Path] = {}
+        for path in course_files():
+            body = "\n".join(path.read_text(encoding="utf-8").splitlines()[1:])
+            with self.subTest(path=path.name):
+                self.assertNotIn(body, seen)
+            seen[body] = path
+
+    def test_course_files_are_not_report_narrative_chapters(self) -> None:
+        for path in course_files():
+            with self.subTest(path=path.name):
+                self.assertNotIn("개발 원리", path.read_text(encoding="utf-8"))
+
+    def test_standards_sit_in_their_level_tables(self) -> None:
+        # 코드 문장이 표 밖에 줄로 나와 있으면 수준 설명과 짝이 끊어진다.
+        for path in course_files():
+            outside = re.sub(r"<table.*?</table>", "", path.read_text(encoding="utf-8"), flags=re.S)
+            with self.subTest(path=path.name):
+                self.assertIsNone(re.search(r"^\[\d{2}[^\]\s]{1,14}\d{2}-\d{2}\]", outside, flags=re.M))
+
+    def test_source_code_typos_are_corrected_in_tables_and_noted(self) -> None:
+        english = (CORPUS / "english" / "영어Ⅱ.md").read_text(encoding="utf-8")
+        self.assertIn(">[12영Ⅱ-01-01]", english)
+        self.assertNotIn(">[12영II-01-01]", english)
+        self.assertIn("`[12영II-01-01]`", english[:200])
+        energy = (CORPUS / "science" / "물질과_에너지.md").read_text(encoding="utf-8")
+        self.assertIn(">[12물에03-03]", energy)
+        self.assertNotIn(">[12화학03-03]", energy)
+        self.assertIn("`[12화학03-03]`", energy[:200])
+        sports = (CORPUS / "physical-education" / "스포츠_생활2.md").read_text(encoding="utf-8")
+        self.assertIn(">[12스생2-01-01] ", sports)
+        self.assertIn("`〔2스생2-01-01`", sports[:200])
 
 
 if __name__ == "__main__":

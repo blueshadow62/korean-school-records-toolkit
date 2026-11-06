@@ -48,6 +48,23 @@ class UpdateGuidelinesCliTests(unittest.TestCase):
             *extra,
         )
 
+    def write_analyzer_rule(self, year: str) -> Path:
+        path = self.root / "references" / "guidelines" / "analyzer-rules" / f"{year}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "school_year": year,
+                    "reviewed": True,
+                    "field_neis_limits": {"subject": {"korean_characters": 500, "bytes": 1500}},
+                    "prohibited_patterns": {"테스트": {"pattern": "TEST"}},
+                }
+            ),
+            encoding="utf-8",
+        )
+        return path
+
     def test_register_activate_list_and_verify(self) -> None:
         first = self.write_input("2026.md", "# 공통\n\n## 세특\n내용\n")
         result = self.import_version(first, "2026", "2026-02-15", "--activate")
@@ -59,6 +76,30 @@ class UpdateGuidelinesCliTests(unittest.TestCase):
         paths = root_paths(self.root)
         self.assertEqual(paths["current"].read_text(encoding="utf-8"), first.read_text(encoding="utf-8"))
         self.assertIn("| 2 | 세특 | 3 | 4 |", paths["index"].read_text(encoding="utf-8"))
+
+    def test_import_bootstraps_unreviewed_rules_from_latest_prior_year(self) -> None:
+        self.write_analyzer_rule("2026")
+        source = self.write_input("2027.md", "# 2027 기재요령\n")
+        result = self.import_version(source, "2027", "2027-02-15")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        rules_path = root_paths(self.root)["analyzer_rules"] / "2027.json"
+        rules = json.loads(rules_path.read_text(encoding="utf-8"))
+        self.assertEqual(rules["school_year"], "2027")
+        self.assertFalse(rules["reviewed"])
+        self.assertEqual(rules["copied_from"], "2026")
+        self.assertEqual(rules["prohibited_patterns"], {"테스트": {"pattern": "TEST"}})
+
+    def test_activate_bootstraps_missing_rules_from_latest_prior_year(self) -> None:
+        source = self.write_input("2027.md", "# 2027 기재요령\n")
+        self.assertEqual(self.import_version(source, "2027", "2027-02-15").returncode, 0)
+        rules_path = root_paths(self.root)["analyzer_rules"] / "2027.json"
+        self.assertFalse(rules_path.exists())
+        self.write_analyzer_rule("2026")
+        result = self.run_cli("activate", "--version", "2027_2027-02-15")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        rules = json.loads(rules_path.read_text(encoding="utf-8"))
+        self.assertFalse(rules["reviewed"])
+        self.assertEqual(rules["copied_from"], "2026")
 
     def test_multiple_revisions_and_rollback(self) -> None:
         first = self.write_input("a.md", "# 2026\n")

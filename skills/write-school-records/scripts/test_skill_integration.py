@@ -6,6 +6,8 @@ from pathlib import Path
 
 
 SKILL_TEXT = (Path(__file__).parents[1] / "SKILL.md").read_text(encoding="utf-8")
+STRUCTURE_TEXT = (Path(__file__).parents[1] / "references" / "sentence-structures.md").read_text(encoding="utf-8")
+SKELETON_TEXT = (Path(__file__).parents[1] / "references" / "output-skeleton.md").read_text(encoding="utf-8")
 WRITING_QUALITY = json.loads(
     (Path(__file__).parents[1] / "references" / "writing-quality.json").read_text(encoding="utf-8")
 )
@@ -129,33 +131,34 @@ class SkillIntegrationContractTests(unittest.TestCase):
 
     def test_evidence_driven_sentence_structures_cover_ten_types(self) -> None:
         for structure_id in range(1, 11):
-            self.assertIn(f"S{structure_id}.", SKILL_TEXT)
-        self.assertIn("가장 구체적이고 확인 수준이 높은 핵심 근거", SKILL_TEXT)
+            self.assertIn(f"S{structure_id}.", STRUCTURE_TEXT)
+        self.assertIn("가장 구체적이고 확인 수준이 높은 핵심 근거", STRUCTURE_TEXT)
         self.assertIn("구조 코드는 내부 계획에만 사용하고 결과에 노출하지 않는다", SKILL_TEXT)
+        self.assertIn("sentence-structures.md", SKILL_TEXT)
 
     def test_structure_selection_rejects_random_rotation_and_synonym_swaps(self) -> None:
-        self.assertIn("무작위 순환 배정이나 동의어 교체만으로 다양화하지 않는다", SKILL_TEXT)
-        self.assertIn("근거가 하나뿐이면 복잡한 성장 서사를 만들지 않는다", SKILL_TEXT)
-        self.assertIn("결과물만 있는 B 모드는 S4를 사용해도 교사 관찰로 확대하지 않으며", SKILL_TEXT)
+        self.assertIn("무작위 순환 배정이나 동의어 교체만으로 다양화하지 않는다", STRUCTURE_TEXT)
+        self.assertIn("근거가 하나뿐이면 복잡한 성장 서사를 만들지 않는다", STRUCTURE_TEXT)
+        self.assertIn("결과물만 있는 B 모드는 S4를 사용해도 교사 관찰로 확대하지 않으며", STRUCTURE_TEXT)
 
     def test_abstract_competency_endings_require_observable_behavior(self) -> None:
-        self.assertIn("추상 명사는 대응하는 행동이 먼저 드러나고", SKILL_TEXT)
-        self.assertIn("행동만으로 충분하면 `역량을 보임`, `능력을 보임`, `과정을 드러냄`을 덧붙이지 않는다", SKILL_TEXT)
+        self.assertIn("추상 명사는 대응하는 행동이 먼저 드러나고", STRUCTURE_TEXT)
+        self.assertIn("행동만으로 충분하면 `역량을 보임`, `능력을 보임`, `과정을 드러냄`을 덧붙이지 않는다", STRUCTURE_TEXT)
 
     def test_large_batches_have_review_warnings_not_forced_rewrites(self) -> None:
-        self.assertIn("학생이 10명 이상이면", SKILL_TEXT)
-        self.assertIn("첫 3어절 또는 마지막 서술어가 25%를 넘거나", SKILL_TEXT)
-        self.assertIn("한 구조 유형이 40%를 넘거나", SKILL_TEXT)
-        self.assertIn("중 하나가 20%를 넘으면 검토 경고", SKILL_TEXT)
-        self.assertIn("이 기준은 재작성 명령이 아니며", SKILL_TEXT)
+        self.assertIn("학생이 10명 이상이면", STRUCTURE_TEXT)
+        self.assertIn("첫 3어절 또는 마지막 서술어가 25%를 넘거나", STRUCTURE_TEXT)
+        self.assertIn("한 구조 유형이 40%를 넘거나", STRUCTURE_TEXT)
+        self.assertIn("중 하나가 20%를 넘으면 검토 경고", STRUCTURE_TEXT)
+        self.assertIn("이 기준은 재작성 명령이 아니며", STRUCTURE_TEXT)
 
     def test_factuality_and_source_strength_precede_variety(self) -> None:
         self.assertIn(
             "학생별 사실 → 출처의 표현 강도 → 실제 수업 맥락 → 성취기준 연결 → 기재요령 → 문장 다양성",
             SKILL_TEXT,
         )
-        self.assertIn("다양성을 위해 입력에 없는 질문·발표·피드백·협업·추가 탐구·진로 연계·성장·높은 성취·지속적 태도를 만들지 않는다", SKILL_TEXT)
-        self.assertIn("예시 자료에서는 전개 순서와 사실·해석의 연결 방식만 참고하고", SKILL_TEXT)
+        self.assertIn("다양성을 위해 입력에 없는 질문·발표·피드백·협업·추가 탐구·진로 연계·성장·높은 성취·지속적 태도를 만들지 않는다", STRUCTURE_TEXT)
+        self.assertIn("예시 자료에서는 전개 순서와 사실·해석의 연결 방식만 참고하고", STRUCTURE_TEXT)
 
     def test_sentence_quality_gate_requires_precision_cohesion_and_compression(self) -> None:
         self.assertIn("## 문장 품질 게이트", SKILL_TEXT)
@@ -170,6 +173,35 @@ class SkillIntegrationContractTests(unittest.TestCase):
             WRITING_QUALITY["required_evidence_fields"],
         )
         self.assertGreaterEqual(len(WRITING_QUALITY["rules"]), 6)
+
+    def test_worksheet_self_report_stays_a_student_statement(self) -> None:
+        self.assertIn("학생이 자기 행동을 적은 내용은 `~했다고 적음`처럼 학생의 진술로 쓰고", SKILL_TEXT)
+
+    def test_d_warning_wording_follows_the_requested_area(self) -> None:
+        for text in (SKILL_TEXT, SKELETON_TEXT):
+            self.assertIn("완성형 창체 특기사항을", text)
+            self.assertIn("완성형 행동특성 및 종합의견을", text)
+
+    def test_output_skeleton_keeps_internal_names_out_of_teacher_responses(self) -> None:
+        for name in (
+            "teacher_observation",
+            "student_product",
+            "assessment_result",
+            "student_self_report",
+            "shared_class_context",
+            "curriculum_basis",
+            "supporting_lens",
+        ):
+            self.assertNotIn(name, SKELETON_TEXT)
+        self.assertIn("교사 관찰 | 학생 결과물 | 평가 결과", SKELETON_TEXT)
+        self.assertIn("스크립트 이름·파일 경로·manifest·버전 문자열도 사용자가 요청하지 않으면 쓰지 않는다", SKILL_TEXT)
+        self.assertIn("학년도·개정일·공식 확인 여부를 일반 언어로 표시", SKILL_TEXT)
+
+    def test_output_skeleton_fixes_the_draft_labels(self) -> None:
+        self.assertIn("```markdown\n[세특 초안]\n", SKELETON_TEXT)
+        self.assertNotIn("[세특 초안 | 창체 초안", SKELETON_TEXT)
+        for label in ("`[창체 초안]`", "`[행특 초안]`", "`[작성 지원]`", "`[학생별 근거 확인 필요]`"):
+            self.assertIn(label, SKELETON_TEXT)
 
 
 if __name__ == "__main__":

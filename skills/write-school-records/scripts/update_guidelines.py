@@ -46,6 +46,7 @@ def root_paths(root: Path) -> dict[str, Path]:
         "current": guidelines / "current.md",
         "index": guidelines / "current.index.md",
         "index_terms": guidelines / "index-terms.json",
+        "analyzer_rules": guidelines / "analyzer-rules",
     }
 
 
@@ -95,6 +96,35 @@ def atomic_write(path: Path, data: bytes) -> None:
 
 def json_bytes(value: dict[str, Any]) -> bytes:
     return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
+
+
+def bootstrap_analyzer_rules(paths: dict[str, Path], school_year: str) -> Path | None:
+    """Copy the latest prior-year rules as an explicitly unreviewed draft."""
+    destination = paths["analyzer_rules"] / f"{school_year}.json"
+    if destination.exists():
+        return None
+
+    candidates: list[tuple[int, Path]] = []
+    if paths["analyzer_rules"].exists():
+        for path in paths["analyzer_rules"].glob("*.json"):
+            if YEAR_RE.fullmatch(path.stem) and int(path.stem) < int(school_year):
+                candidates.append((int(path.stem), path))
+    if not candidates:
+        return None
+
+    previous_year, source = max(candidates)
+    try:
+        rules = json.loads(source.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise GuidelineError(f"이전 학년도 분석 규칙을 읽을 수 없습니다: {source} ({error})") from error
+    if not isinstance(rules, dict):
+        raise GuidelineError(f"이전 학년도 분석 규칙 형식이 올바르지 않습니다: {source}")
+
+    rules["school_year"] = school_year
+    rules["reviewed"] = False
+    rules["copied_from"] = str(previous_year)
+    atomic_write(destination, json_bytes(rules))
+    return destination
 
 
 def heading_index(text: str) -> list[dict[str, Any]]:
@@ -379,6 +409,9 @@ def activate_version(paths: dict[str, Path], manifest: dict[str, Any], identifie
     if identifier not in versions:
         raise GuidelineError(f"등록된 버전이 없습니다: {identifier}")
     entry = versions[identifier]
+    school_year = str(entry.get("school_year", ""))
+    validate_year(school_year)
+    bootstrap_analyzer_rules(paths, school_year)
     archive = entry_path(paths, entry)
     if not archive.exists() or sha256_bytes(archive.read_bytes()) != entry.get("sha256"):
         raise GuidelineError(f"활성화 전 해시 검증에 실패했습니다: {identifier}")
@@ -442,6 +475,7 @@ def command_import(args: argparse.Namespace, paths: dict[str, Path]) -> None:
         "encoding": "UTF-8",
     }
     manifest["versions"][identifier] = entry
+    created_rule = bootstrap_analyzer_rules(paths, args.school_year)
     if args.activate:
         activate_version(paths, manifest, identifier, args.allow_unconfirmed)
     else:
@@ -452,6 +486,11 @@ def command_import(args: argparse.Namespace, paths: dict[str, Path]) -> None:
                 archive.unlink()
             except FileNotFoundError:
                 pass
+            if created_rule is not None:
+                try:
+                    created_rule.unlink()
+                except FileNotFoundError:
+                    pass
             raise
     if not args.source_url:
         print("경고: source-url이 없어 출처 URL을 빈 값으로 기록했습니다.", file=sys.stderr)
@@ -551,6 +590,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     parser = build_parser()
     args = parser.parse_args(argv)
     root = args.root.resolve() if args.root else Path(__file__).resolve().parents[1]

@@ -60,11 +60,11 @@ class PackageContractTests(unittest.TestCase):
         self.assertEqual(len(self.manager.SKILL_NAMES), len(set(self.manager.SKILL_NAMES)))
 
     def test_release_version_and_license(self) -> None:
-        self.assertEqual("2.0.0", (PLUGIN_ROOT / "VERSION").read_text(encoding="utf-8").strip())
+        self.assertEqual("2.1.0", (PLUGIN_ROOT / "VERSION").read_text(encoding="utf-8").strip())
         manifest = json.loads(
             (PLUGIN_ROOT / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
         )
-        self.assertEqual("2.0.0", manifest["version"])
+        self.assertEqual("2.1.0", manifest["version"])
         license_text = (
             PLUGIN_ROOT / "skills" / "write-school-records" / "LICENSE"
         ).read_text(encoding="utf-8")
@@ -76,7 +76,7 @@ class PackageContractTests(unittest.TestCase):
             (PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8")
         )
         self.assertEqual("korean-school-records-toolkit", manifest["name"])
-        self.assertEqual("2.0.0", manifest["version"])
+        self.assertEqual("2.1.0", manifest["version"])
         self.assertEqual("./skills/", manifest["skills"])
         self.assertEqual(
             {"write-school-records", "korean-character-count"},

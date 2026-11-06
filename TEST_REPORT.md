@@ -1,5 +1,15 @@
 # Test report
 
+## 2.1.0 — tested on 2026-08-30 (Windows, Python 3.14, Node.js 24)
+
+- Package contract tests (`tests/`, incl. dev/package drift check): 11 passed.
+- `write-school-records` package-local scripts: 116 passed.
+- `write-school-records` development source: 123 passed, 2 skipped (JS cross-check skipped where the sibling skill is absent).
+- `korean-character-count` node tests: 3 passed.
+- `verify_package.py`: passed.
+- NEIS byte contract: both skills now agree on all 15 synthetic cases (line break = 1 Byte per the 2026 guideline).
+- Behavior eval cases (`tests/eval-cases/`, 15 cases): schema tests passed; model-run scoring not yet performed.
+
 Tested on 2026-08-10 on Windows with local Python 3.14 and Node.js runtimes.
 
 ## Release contract
