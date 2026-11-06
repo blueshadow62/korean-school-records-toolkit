@@ -1,0 +1,502 @@
+{
+  "schema_version": 1,
+  "distribution": "public",
+  "checked_on": "2026-11-06",
+  "publishers": {
+    "ncic": {
+      "name": "NCIC 국가교육과정정보센터",
+      "operators": [
+        "국가교육위원회",
+        "한국교육과정평가원"
+      ],
+      "url": "https://ncic.re.kr/"
+    }
+  },
+  "rights_policies": {
+    "ncic_kogl_type_2": {
+      "url": "https://ncic.re.kr/mbr/policy.do",
+      "kogl_type": 2,
+      "conditions": [
+        "attribution",
+        "noncommercial-use-only",
+        "derivative-works-allowed"
+      ],
+      "summary": "2026-08-10에 확인한 NCIC 저작권 정책이다. 중학교 게시물의 개별 표시는 확인하지 못했고, 원본 파일에는 별도의 이용 조건 문구가 없다(2026-11-06 확인)."
+    }
+  },
+  "curriculum_notices": {
+    "제2022-33호": {
+      "issued_on": "2022-12-22",
+      "status": "처음 대조한 판(교과별 별책)"
+    },
+    "제2024-3호": {
+      "issued_on": "2024-08-16",
+      "amended_volumes": [
+        1,
+        2,
+        3,
+        4,
+        7,
+        12,
+        14,
+        18,
+        19,
+        22,
+        41
+      ]
+    },
+    "제2026-1호": {
+      "issued_on": "2026-01-21",
+      "amended_volumes": [
+        1,
+        2,
+        3,
+        4,
+        15
+      ],
+      "status": "현행 대조 판(별책 3, 중학교 합본)",
+      "checked_on": "2026-11-06"
+    }
+  },
+  "sources": {
+    "ncic-2024-middle-773": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_국어과",
+      "url": "https://ncic.re.kr/bbs/standard/view/773.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(국어).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-770": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_사회과",
+      "url": "https://ncic.re.kr/bbs/standard/view/770.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(사회).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-768": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_역사과",
+      "url": "https://ncic.re.kr/bbs/standard/view/768.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(역사).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-769": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_도덕과",
+      "url": "https://ncic.re.kr/bbs/standard/view/769.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(도덕).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-772": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_수학과",
+      "url": "https://ncic.re.kr/bbs/standard/view/772.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(수학).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-767": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_과학과",
+      "url": "https://ncic.re.kr/bbs/standard/view/767.do?searchword=&searchkey=&page=5",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(과학).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-763": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_기술 가정",
+      "url": "https://ncic.re.kr/bbs/standard/view/763.do?searchword=&searchkey=&page=5",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(기술가정).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-774": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구보고서_정보과",
+      "url": "https://ncic.re.kr/bbs/standard/view/774.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "1. 정보과 성취수준 (중학교).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-764": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_체육과",
+      "url": "https://ncic.re.kr/bbs/standard/view/764.do?searchword=&searchkey=&page=5",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(체육).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-765": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_음악과",
+      "url": "https://ncic.re.kr/bbs/standard/view/765.do?searchword=&searchkey=&page=5",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(음악).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-766": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_미술과",
+      "url": "https://ncic.re.kr/bbs/standard/view/766.do?searchword=&searchkey=&page=5",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(미술).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-771": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_영어과",
+      "url": "https://ncic.re.kr/bbs/standard/view/771.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(영어).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-762": {
+      "title": "(중) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_ 생활 외국어",
+      "url": "https://ncic.re.kr/bbs/standard/view/762.do?searchword=&searchkey=&page=5",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "(중등)2022 개정 교육과정에 따른 성취수준(생활외국어).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-775": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_한문과",
+      "url": "https://ncic.re.kr/bbs/standard/view/775.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "2. 한문과 성취수준 (중학교).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-776": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_보건과",
+      "url": "https://ncic.re.kr/bbs/standard/view/776.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "3. 보건과 성취수준 (중학교).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-777": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_환경과",
+      "url": "https://ncic.re.kr/bbs/standard/view/777.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "4. 환경과 성취수준 (중학교).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    },
+    "ncic-2024-middle-778": {
+      "title": "(중고) 2022 개정 교육과정에 따른 성취수준 및 연구 보고서_진로와 직업",
+      "url": "https://ncic.re.kr/bbs/standard/view/778.do?searchword=&searchkey=&page=4",
+      "posted_on": "2024-09-05",
+      "publisher_id": "ncic",
+      "source_file": "5. 진로와 직업 성취수준 (중학교).hwp",
+      "public_access": true,
+      "redistribution_status": "kogl_type_2",
+      "rights_policy_id": "ncic_kogl_type_2",
+      "rights_basis": "ncic-site-policy"
+    }
+  },
+  "groups": {
+    "국어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-773"
+      ],
+      "curriculum_volume": 5,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "사회_지리": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-770"
+      ],
+      "curriculum_volume": 7,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "사회_일반사회": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-770"
+      ],
+      "curriculum_volume": 7,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "역사": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-768"
+      ],
+      "curriculum_volume": 7,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "도덕": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-769"
+      ],
+      "curriculum_volume": 6,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "수학": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-772"
+      ],
+      "curriculum_volume": 8,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "과학": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-767"
+      ],
+      "curriculum_volume": 9,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "기술_가정": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-763"
+      ],
+      "curriculum_volume": 10,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "정보": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-774"
+      ],
+      "curriculum_volume": 10,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "체육": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2024-middle-764"
+      ],
+      "curriculum_volume": 11,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "음악": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2024-middle-765"
+      ],
+      "curriculum_volume": 12,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "미술": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2024-middle-766"
+      ],
+      "curriculum_volume": 13,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "영어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-771"
+      ],
+      "curriculum_volume": 14,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "생활_독일어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-762"
+      ],
+      "curriculum_volume": 16,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "생활_프랑스어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-762"
+      ],
+      "curriculum_volume": 16,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "생활_스페인어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-762"
+      ],
+      "curriculum_volume": 16,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "생활_중국어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-762"
+      ],
+      "curriculum_volume": 16,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "생활_일본어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-762"
+      ],
+      "curriculum_volume": 16,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "생활_러시아어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-762"
+      ],
+      "curriculum_volume": 16,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "생활_아랍어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-762"
+      ],
+      "curriculum_volume": 16,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "생활_베트남어": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-762"
+      ],
+      "curriculum_volume": 16,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "한문": {
+      "achievement_level_scheme": "A~E",
+      "source_ids": [
+        "ncic-2024-middle-775"
+      ],
+      "curriculum_volume": 17,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "보건": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2024-middle-776"
+      ],
+      "curriculum_volume": 18,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "환경": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2024-middle-777"
+      ],
+      "curriculum_volume": 18,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    },
+    "진로와_직업": {
+      "achievement_level_scheme": "A~C",
+      "source_ids": [
+        "ncic-2024-middle-778"
+      ],
+      "curriculum_volume": 18,
+      "curriculum_edition_checked": "국가교육위원회 고시 제2026-1호 별책 3",
+      "amended_by_unchecked": [],
+      "first_checked_edition": "교육부 고시 제2022-33호"
+    }
+  }
+}

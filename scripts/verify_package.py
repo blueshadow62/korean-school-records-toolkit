@@ -115,6 +115,21 @@ def verify_achievement_sources(root: Path, errors: list[str]) -> None:
             errors.append(f"Achievement-standards attribution is missing: {marker}")
 
 
+def verify_middle_achievement_sources(root: Path, errors: list[str]) -> None:
+    corpus = root / "skills" / "write-school-records" / "references" / "achievement-standards-middle"
+    try:
+        attribution = (corpus / "ATTRIBUTION.md").read_text(encoding="utf-8")
+        catalog = json.loads((corpus / "sources.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        errors.append(f"Invalid middle-school achievement source information: {error}")
+        return
+    if catalog.get("distribution") != "public":
+        errors.append("Middle-school achievement catalog must declare public distribution")
+    for marker in ("NCIC 국가교육과정정보센터", "공공누리 제2유형"):
+        if marker not in attribution:
+            errors.append(f"Middle-school achievement attribution is missing: {marker}")
+
+
 def verify_release_contract(root: Path, errors: list[str]) -> None:
     version = (root / "VERSION").read_text(encoding="utf-8").strip()
     if version != EXPECTED_RELEASE_VERSION:
@@ -192,6 +207,7 @@ def main() -> int:
     verify_claude_manifest(root, errors)
     verify_skills(root, errors)
     verify_achievement_sources(root, errors)
+    verify_middle_achievement_sources(root, errors)
     verify_release_contract(root, errors)
     verify_archives_absent(root, errors)
     scan_text_files(root, errors)

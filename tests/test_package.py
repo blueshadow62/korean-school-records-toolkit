@@ -107,6 +107,14 @@ class PackageContractTests(unittest.TestCase):
         self.assertIn("공공누리 제1유형", attribution)
         self.assertIn("공공누리 제2유형", attribution)
 
+    def test_public_middle_standards_include_attribution(self) -> None:
+        corpus = PLUGIN_ROOT / "skills" / "write-school-records" / "references" / "achievement-standards-middle"
+        catalog = json.loads((corpus / "sources.json").read_text(encoding="utf-8"))
+        attribution = (corpus / "ATTRIBUTION.md").read_text(encoding="utf-8")
+        self.assertEqual("public", catalog["distribution"])
+        self.assertIn("NCIC 국가교육과정정보센터", attribution)
+        self.assertIn("공공누리 제2유형", attribution)
+
     def test_public_metadata_omits_local_absolute_paths(self) -> None:
         metadata_text = (PLUGIN_ROOT / "SOURCE_METADATA.json").read_text(encoding="utf-8")
         self.assertNotIn("source_path", metadata_text)

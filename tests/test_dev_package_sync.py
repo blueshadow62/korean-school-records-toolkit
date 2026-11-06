@@ -10,14 +10,8 @@ PACKAGE = PLUGIN_ROOT / "skills" / "write-school-records"
 DEV = PLUGIN_ROOT.parents[1] / "skills" / "write-school-records"
 
 # docs/dev-vs-package.md의 의도된 차이 목록. 여기에 없는 차이는 드리프트다.
-ALLOWED_DIFFERENT = {"SKILL.md", "references/source-policy.md", "scripts/test_skill_integration.py"}
-ALLOWED_DEV_ONLY = {
-    "scripts/sync_install.py",
-    "scripts/test_achievement_standards_middle.py",
-    "scripts/test_sync_install.py",
-    "scripts/trim_achievement_examples.py",
-}
-LOCAL_ONLY_DIR = "references/achievement-standards-middle/"
+ALLOWED_DIFFERENT = {"SKILL.md", "scripts/test_skill_integration.py"}
+ALLOWED_DEV_ONLY = {"scripts/sync_install.py", "scripts/test_sync_install.py", "scripts/trim_achievement_examples.py"}
 IGNORED_DIRS = {"__pycache__", ".pytest_cache"}
 
 
@@ -34,9 +28,7 @@ class DevPackageSyncTests(unittest.TestCase):
     def test_only_documented_differences_exist(self) -> None:
         pkg, dev = walk(PACKAGE), walk(DEV)
         self.assertEqual(set(pkg) - set(dev), set(), "배포본에만 있는 파일")
-        dev_only = {rel for rel in set(dev) - set(pkg) if not rel.startswith(LOCAL_ONLY_DIR)}
-        self.assertEqual(dev_only, ALLOWED_DEV_ONLY, "개발본에만 있는 파일")
-        self.assertFalse([rel for rel in pkg if rel.startswith(LOCAL_ONLY_DIR)], "배포본에 들어간 로컬 전용 자료")
+        self.assertEqual(set(dev) - set(pkg), ALLOWED_DEV_ONLY, "개발본에만 있는 파일")
         different = {rel for rel in pkg if not filecmp.cmp(pkg[rel], dev[rel], shallow=False)}
         self.assertEqual(different, ALLOWED_DIFFERENT, "문서화되지 않은 내용 차이")
 
