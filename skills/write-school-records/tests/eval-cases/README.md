@@ -6,7 +6,7 @@
 
 ## 파일
 
-- `cases.json` — 평가 케이스 15건. 필드 설명은 아래 참고.
+- `cases.json` — 평가 케이스 18건. 필드 설명은 아래 참고.
 - `scripts/test_eval_cases.py`(스킬 `scripts/` 아래 위치) — `cases.json`의 스키마와 최소 커버리지를 검증하는 unittest. 모델을 호출하지 않는다.
 
 ## 케이스 필드

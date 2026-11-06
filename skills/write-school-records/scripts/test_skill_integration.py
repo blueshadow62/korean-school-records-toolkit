@@ -158,7 +158,7 @@ class SkillIntegrationContractTests(unittest.TestCase):
             SKILL_TEXT,
         )
         self.assertIn("다양성을 위해 입력에 없는 질문·발표·피드백·협업·추가 탐구·진로 연계·성장·높은 성취·지속적 태도를 만들지 않는다", STRUCTURE_TEXT)
-        self.assertIn("예시 자료에서는 전개 순서와 사실·해석의 연결 방식만 참고하고", STRUCTURE_TEXT)
+        self.assertIn("예시 자료에서는 전개 순서, 사실·해석의 연결 방식, 어휘, 표현 강도, 분량 감각만 참고하고", STRUCTURE_TEXT)
 
     def test_sentence_quality_gate_requires_precision_cohesion_and_compression(self) -> None:
         self.assertIn("## 문장 품질 게이트", SKILL_TEXT)
@@ -202,6 +202,16 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertNotIn("[세특 초안 | 창체 초안", SKELETON_TEXT)
         for label in ("`[창체 초안]`", "`[행특 초안]`", "`[작성 지원]`", "`[학생별 근거 확인 필요]`"):
             self.assertIn(label, SKELETON_TEXT)
+
+    def test_school_level_is_asked_before_drafting(self) -> None:
+        self.assertIn("`학교급이 어디인가요? (중학교/고등학교)`라고 한 번 묻고", SKILL_TEXT)
+        self.assertIn("엑셀·표 일괄 작업은 처음에 한 번만 묻고 학생별로 묻지 않는다", SKILL_TEXT)
+        self.assertIn("점검·분석만 요청했거나", SKILL_TEXT)
+
+    def test_middle_school_draft_is_flagged(self) -> None:
+        self.assertIn("교사 확인 사항에 `중학교 기재요령 미확인`을 적는다", SKILL_TEXT)
+        self.assertIn("한도는 `[확인 필요]`로 둔다", SKILL_TEXT)
+        self.assertIn("`중학교 기재요령 미확인`", SKELETON_TEXT)
 
 
 if __name__ == "__main__":

@@ -157,18 +157,12 @@ class MiddleAchievementStandardsTests(unittest.TestCase):
             with self.subTest(path=path.name):
                 self.assertNotRegex(path.read_text(encoding="utf-8"), r"\[9[가-힣]")
 
-    def test_skill_routes_here_only_on_explicit_request(self) -> None:
+    def test_skill_routes_here_for_middle_school(self) -> None:
         skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
         row = next(line for line in skill.splitlines() if "achievement-standards-middle/index.md" in line)
-        self.assertIn("중학교라고 명시", row)
-        self.assertIn("명시가 없으면 고등학교 자료를 쓴다", row)
-        self.assertIn("중학교 세특 문장 생성과 분량 판단은 하지 않는다", row)
-        self.assertIn("achievement-standards/index.md", skill)
-
-    def test_not_copied_into_public_package(self) -> None:
-        plugin = SKILL_ROOT.parents[1] / "plugins" / "korean-school-records-toolkit"
-        if plugin.is_dir():
-            self.assertFalse((plugin / "skills" / "write-school-records" / "references" / CORPUS.name).exists())
+        self.assertIn("학교급이 중학교이거나", row)
+        self.assertIn("학교급이 고등학교이면 쓰지 않는다", row)
+        self.assertNotIn("분량 판단은 하지 않는다", skill)
 
 
 if __name__ == "__main__":
