@@ -192,6 +192,13 @@ class AchievementStandardsCorpusTests(unittest.TestCase):
             with self.subTest(path=path.name):
                 self.assertNotIn("개발 원리", path.read_text(encoding="utf-8"))
 
+    def test_standards_sit_in_their_level_tables(self) -> None:
+        # 코드 문장이 표 밖에 줄로 나와 있으면 수준 설명과 짝이 끊어진다.
+        for path in course_files():
+            outside = re.sub(r"<table.*?</table>", "", path.read_text(encoding="utf-8"), flags=re.S)
+            with self.subTest(path=path.name):
+                self.assertIsNone(re.search(r"^\[\d{2}[^\]\s]{1,14}\d{2}-\d{2}\]", outside, flags=re.M))
+
     def test_source_code_typos_are_corrected_in_tables_and_noted(self) -> None:
         english = (CORPUS / "english" / "영어Ⅱ.md").read_text(encoding="utf-8")
         self.assertIn(">[12영Ⅱ-01-01]", english)
