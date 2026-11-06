@@ -9,10 +9,10 @@ CASES_PATH = Path(__file__).parents[1] / "tests" / "eval-cases" / "cases.json"
 VALID_AREAS = {"subject", "creative", "behavior"}
 VALID_GRADES = {"A", "B", "C", "D", "mixed"}
 CODE_MARKERS = {"A 판정", "B 판정", "C 판정", "D 판정", "A 모드", "B 모드", "C 모드", "D 모드"}
-D_REQUIRED_WARNINGS = (
-    "[학생별 사실 미확인 — 그대로 입력하지 않는 작성 후보]",
-    "학생별 관찰·결과가 확인되지 않았으므로 완성형 세특을 생성하지 않습니다.",
-)
+D_REQUIRED_HEADER = "[학생별 사실 미확인 — 그대로 입력하지 않는 작성 후보]"
+D_WARNING = "학생별 관찰·결과가 확인되지 않았으므로 완성형 {}을 생성하지 않습니다."
+# 영역이 드러나지 않는 요청은 세특 문구를 쓰므로, 행특을 명시한 사례만 영역별 문구를 요구한다.
+D_WARNINGS = tuple(D_WARNING.format(word) for word in ("세특", "창체 특기사항", "행동특성 및 종합의견"))
 REQUIRED_FIELDS = (
     "id",
     "title",
@@ -97,12 +97,16 @@ class EvalCasesSchemaTests(unittest.TestCase):
         ]
         self.assertGreaterEqual(len(d_cases), 3, "D 케이스가 3건 미만임")
         for case in d_cases:
-            for warning in D_REQUIRED_WARNINGS:
-                self.assertIn(
-                    warning,
-                    case["must_include"],
-                    f"{case['id']}(D)의 must_include에 필수 경고문이 없음: {warning}",
-                )
+            self.assertIn(D_REQUIRED_HEADER, case["must_include"], f"{case['id']}(D)에 필수 머리 문구가 없음")
+            self.assertTrue(
+                set(D_WARNINGS) & set(case["must_include"]),
+                f"{case['id']}(D)의 must_include에 필수 경고문이 없음",
+            )
+
+    def test_explicit_behavior_request_uses_the_behavior_warning(self) -> None:
+        case = next(case for case in self.cases if case["id"].startswith("D-03"))
+        self.assertIn(D_WARNING.format("행동특성 및 종합의견"), case["must_include"])
+        self.assertNotIn(D_WARNING.format("세특"), case["must_include"])
 
     def test_grade_distribution_covers_all_required_situations(self) -> None:
         grades = [case["expected_internal_grade"] for case in self.cases]
