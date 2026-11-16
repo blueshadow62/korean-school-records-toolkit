@@ -25,6 +25,8 @@ MAX_ANCHOR_TEXT_LENGTH = 80
 MAX_TABLE_HEADER_ANCHOR_TEXT_LENGTH = 500
 ANCHOR_LOOKBACK = 4
 ANCHOR_LOOKAHEAD = 45
+# 기재요령은 학교급별로 따로 배포되므로 활성 버전도 학교급마다 따로 둔다. 기본값은 기존 동작(고등학교)이다.
+LEVEL_DIRECTORIES = {"high": "guidelines", "middle": "guidelines-middle"}
 
 
 class GuidelineError(Exception):
@@ -35,9 +37,11 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def root_paths(root: Path) -> dict[str, Path]:
+def root_paths(root: Path, level: str = "high") -> dict[str, Path]:
+    if level not in LEVEL_DIRECTORIES:
+        raise GuidelineError(f"지원하지 않는 학교급입니다: {level}")
     root = root.resolve()
-    guidelines = root / "references" / "guidelines"
+    guidelines = root / "references" / LEVEL_DIRECTORIES[level]
     return {
         "root": root,
         "guidelines": guidelines,
@@ -566,6 +570,12 @@ def command_update_metadata(args: argparse.Namespace, paths: dict[str, Path]) ->
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, help="스킬 디렉터리(기본: 이 스크립트의 상위 디렉터리)")
+    parser.add_argument(
+        "--level",
+        choices=tuple(LEVEL_DIRECTORIES),
+        default="high",
+        help="학교급(high: references/guidelines, middle: references/guidelines-middle). 기본값 high",
+    )
     sub = parser.add_subparsers(dest="command", required=True)
     imp = sub.add_parser("import", help="새 Markdown 원문 등록")
     imp.add_argument("--input", type=Path, required=True)
@@ -596,7 +606,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     root = args.root.resolve() if args.root else Path(__file__).resolve().parents[1]
-    paths = root_paths(root)
+    paths = root_paths(root, args.level)
     try:
         if args.command == "import":
             command_import(args, paths)

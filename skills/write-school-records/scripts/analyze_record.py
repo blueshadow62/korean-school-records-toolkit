@@ -12,7 +12,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Iterable
 
-from update_guidelines import GuidelineError, load_manifest, root_paths, verify_manifest
+from update_guidelines import LEVEL_DIRECTORIES, GuidelineError, load_manifest, root_paths, verify_manifest
 
 
 ACTION_TERMS = (
@@ -115,10 +115,12 @@ BATCH_ENDING_PHRASES = ("역량을 보임", "능력을 보임", "과정을 드�
 BATCH_MINIMUM_ROWS = 10
 
 
-def load_year_rules(school_year: str, skill_root: Path | None = None) -> dict[str, object]:
-    """Load and validate analyzer rules for one school year."""
+def load_year_rules(school_year: str, skill_root: Path | None = None, level: str = "high") -> dict[str, object]:
+    """Load and validate analyzer rules for one school year and school level."""
     root = skill_root.resolve() if skill_root else Path(__file__).resolve().parents[1]
-    path = root / "references" / "guidelines" / "analyzer-rules" / f"{school_year}.json"
+    if level not in LEVEL_DIRECTORIES:
+        raise ValueError(f"지원하지 않는 학교급입니다: {level}")
+    path = root / "references" / LEVEL_DIRECTORIES[level] / "analyzer-rules" / f"{school_year}.json"
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError as error:
@@ -218,6 +220,9 @@ def resolve_field_limit(
         elif field == "behavior":
             limit = limits_v2.get("behavior", limit)
             label_prefix = "행동특성 및 종합의견"
+        elif field == "free_semester":
+            limit = limits_v2.get("free_semester", limit)
+            label_prefix = "자유학기활동 영역별 특기사항"
 
     if not isinstance(limit, dict):
         return None, None
@@ -226,6 +231,7 @@ def resolve_field_limit(
             "subject": "과목별 세부능력 및 특기사항",
             "creative": "창의적 체험활동 특기사항",
             "behavior": "행동특성 및 종합의견",
+            "free_semester": "자유학기활동 영역별 특기사항",
         }.get(field)
     grade_prefix = f"{grade}학년 " if grade is not None else ""
     label = (
@@ -263,7 +269,7 @@ def analyze(
     if rules.get("reviewed") is False:
         warnings.append(
             f"{school_year} 분석 규칙은 이전 학년도에서 복사된 미검토 초안입니다. "
-            "기재요령 「08 영역별 입력 가능 최대 글자수」와 대조 후 reviewed를 true로 바꾸세요."
+            "해당 학교급 기재요령의 「영역별 입력 가능 최대 글자수」 표와 대조 후 reviewed를 true로 바꾸세요."
         )
     if not normalized:
         warnings.append("문장이 비어 있습니다.")
@@ -448,9 +454,10 @@ def format_human(result: dict[str, object]) -> str:
     ]
     guideline = result.get("guideline")
     if isinstance(guideline, dict):
+        level_label = ", 중학교" if guideline.get("school_level") == "middle" else ""
         lines.append(
             f"- 활성 기재요령: {guideline.get('active_version', '')} "
-            f"({guideline.get('school_year', '')}학년도)"
+            f"({guideline.get('school_year', '')}학년도{level_label})"
         )
     if metrics["default_neis_byte_limit"] is not None:
         lines.append(
@@ -603,11 +610,11 @@ def format_batch_human(result: dict[str, object]) -> str:
     return "\n".join(lines)
 
 
-def active_rule_context(skill_root: Path | None = None) -> dict[str, str]:
-    """Verify the active guideline and refuse stale analyzer rules."""
+def active_rule_context(skill_root: Path | None = None, level: str = "high") -> dict[str, str]:
+    """Verify the active guideline of one school level and refuse stale analyzer rules."""
     root = skill_root.resolve() if skill_root else Path(__file__).resolve().parents[1]
-    paths = root_paths(root)
     try:
+        paths = root_paths(root, level)
         manifest = load_manifest(paths)
         verify_manifest(paths, manifest)
     except GuidelineError as error:
@@ -616,10 +623,11 @@ def active_rule_context(skill_root: Path | None = None) -> dict[str, str]:
     active = manifest["active_version"]
     entry = manifest["versions"][active]
     school_year = str(entry.get("school_year", ""))
-    load_year_rules(school_year, root)
+    load_year_rules(school_year, root, level)
     return {
         "active_version": str(active),
         "school_year": school_year,
+        "school_level": level,
         "source_title": str(entry.get("source_title", "")),
         "source_url": str(entry.get("source_url", "")),
     }
@@ -633,9 +641,15 @@ def parse_args() -> argparse.Namespace:
     source.add_argument("--batch", type=Path, help="초안 또는 draft 열이 있는 UTF-8 TSV 파일")
     parser.add_argument(
         "--field",
-        choices=("subject", "creative", "behavior", "other"),
+        choices=("subject", "creative", "behavior", "free_semester", "other"),
         default="other",
-        help="기재 영역",
+        help="기재 영역(free_semester는 중학교 자유학기활동 특기사항)",
+    )
+    parser.add_argument(
+        "--school-level",
+        choices=tuple(LEVEL_DIRECTORIES),
+        default="high",
+        help="학교급별 활성 기재요령과 한도(기본: high)",
     )
     parser.add_argument(
         "--target-chars", type=positive_int, help="사용자가 지정한 양의 목표 글자 수"
@@ -672,8 +686,14 @@ def main() -> int:
     if args.batch is not None and args.combine_with is not None:
         print("오류: --batch와 --combine-with는 함께 사용할 수 없습니다.", file=sys.stderr)
         return 2
+    if args.field == "free_semester" and args.school_level != "middle":
+        print("오류: 자유학기활동은 중학교 영역입니다. --school-level middle을 함께 지정하세요.", file=sys.stderr)
+        return 2
+    if args.school_level == "middle" and args.subject_type in ("common", "vocational"):
+        print("오류: 중학교 기재요령에는 공통과목 1·2 합산과 전공실무과목 한도가 없습니다.", file=sys.stderr)
+        return 2
     try:
-        guideline = active_rule_context()
+        guideline = active_rule_context(level=args.school_level)
         if args.batch is not None:
             texts = read_batch_tsv(args.batch)
         else:
@@ -682,7 +702,7 @@ def main() -> int:
     except ValueError as error:
         print(f"오류: {error}", file=sys.stderr)
         return 2
-    rules = load_year_rules(guideline["school_year"])
+    rules = load_year_rules(guideline["school_year"], level=args.school_level)
     if args.batch is not None:
         result = analyze_batch(
             texts,

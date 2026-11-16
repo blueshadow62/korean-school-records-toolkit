@@ -77,6 +77,32 @@ class UpdateGuidelinesCliTests(unittest.TestCase):
         self.assertEqual(paths["current"].read_text(encoding="utf-8"), first.read_text(encoding="utf-8"))
         self.assertIn("| 2 | 세특 | 3 | 4 |", paths["index"].read_text(encoding="utf-8"))
 
+    def test_middle_level_is_registered_separately_from_high(self) -> None:
+        high = self.write_input("high.md", "# 고등학교\n\n## 세특\n내용\n")
+        middle = self.write_input("middle.md", "# 중학교\n\n## 자유학기\n내용\n")
+        self.assertEqual(self.import_version(high, "2026", "2026-02-12", "--activate").returncode, 0)
+        result = self.run_cli(
+            "--level", "middle", "import",
+            "--input", str(middle),
+            "--school-year", "2026",
+            "--revision-date", "2026-02-12",
+            "--source-title", "2026학년도 학교생활기록부 기재요령(중학교)",
+            "--source-url", "https://example.invalid/guidelines",
+            "--confirmed-official",
+            "--activate",
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.run_cli("--level", "middle", "verify").returncode, 0)
+        self.assertEqual(self.run_cli("verify").returncode, 0)
+        high_paths, middle_paths = root_paths(self.root), root_paths(self.root, "middle")
+        self.assertEqual(middle_paths["guidelines"].name, "guidelines-middle")
+        self.assertEqual(high_paths["current"].read_text(encoding="utf-8"), high.read_text(encoding="utf-8"))
+        self.assertEqual(middle_paths["current"].read_text(encoding="utf-8"), middle.read_text(encoding="utf-8"))
+
+    def test_unknown_level_is_rejected(self) -> None:
+        result = self.run_cli("--level", "elementary", "list")
+        self.assertNotEqual(result.returncode, 0)
+
     def test_import_bootstraps_unreviewed_rules_from_latest_prior_year(self) -> None:
         self.write_analyzer_rule("2026")
         source = self.write_input("2027.md", "# 2027 기재요령\n")
