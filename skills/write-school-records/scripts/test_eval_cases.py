@@ -6,13 +6,13 @@ from pathlib import Path
 
 
 CASES_PATH = Path(__file__).parents[1] / "tests" / "eval-cases" / "cases.json"
-VALID_AREAS = {"subject", "creative", "behavior"}
+VALID_AREAS = {"subject", "creative", "behavior", "free_semester"}
 VALID_GRADES = {"A", "B", "C", "D", "mixed"}
 CODE_MARKERS = {"A 판정", "B 판정", "C 판정", "D 판정", "A 모드", "B 모드", "C 모드", "D 모드"}
 D_REQUIRED_HEADER = "[학생별 사실 미확인 — 그대로 입력하지 않는 작성 후보]"
 D_WARNING = "학생별 관찰·결과가 확인되지 않았으므로 완성형 {}을 생성하지 않습니다."
 # 영역이 드러나지 않는 요청은 세특 문구를 쓰므로, 행특을 명시한 사례만 영역별 문구를 요구한다.
-D_WARNINGS = tuple(D_WARNING.format(word) for word in ("세특", "창체 특기사항", "행동특성 및 종합의견"))
+D_WARNINGS = tuple(D_WARNING.format(word) for word in ("세특", "창체 특기사항", "행동특성 및 종합의견", "자유학기활동 특기사항"))
 REQUIRED_FIELDS = (
     "id",
     "title",

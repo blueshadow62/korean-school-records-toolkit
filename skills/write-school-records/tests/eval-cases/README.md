@@ -6,7 +6,7 @@
 
 ## 파일
 
-- `cases.json` — 평가 케이스 18건. 필드 설명은 아래 참고.
+- `cases.json` — 평가 케이스 19건. 필드 설명은 아래 참고.
 - `scripts/test_eval_cases.py`(스킬 `scripts/` 아래 위치) — `cases.json`의 스키마와 최소 커버리지를 검증하는 unittest. 모델을 호출하지 않는다.
 
 ## 케이스 필드
@@ -15,7 +15,7 @@
 |---|---|
 | `id` | 고유 식별자 |
 | `title` | 케이스 요약 |
-| `area` | `subject`(교과세특) / `creative`(창체) / `behavior`(행특) |
+| `area` | `subject`(교과세특) / `creative`(창체) / `behavior`(행특) / `free_semester`(중학교 자유학기활동) |
 | `expected_internal_grade` | 기대하는 내부 근거 판정(`A`\|`B`\|`C`\|`D`). 행별로 판정이 갈리는 엑셀 케이스만 예외로 `mixed`를 쓰고 행별 기대값은 `rationale`에 적는다. 이 값은 **채점자 참고용 내부 값**이며, 스킬 출력에 이 코드가 노출되면 그 자체로 안전 오류다. |
 | `prompt` | 교사가 스킬에 보낼 요청문(합성 자료 포함) |
 | `must_include` | 출력에 반드시 있어야 하는 문자열 목록(자동 채점) |
