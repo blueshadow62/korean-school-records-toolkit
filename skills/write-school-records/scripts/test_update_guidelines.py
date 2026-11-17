@@ -27,6 +27,8 @@ class UpdateGuidelinesCliTests(unittest.TestCase):
         return subprocess.run(
             [sys.executable, str(SCRIPT), "--root", str(self.root), *args],
             text=True,
+            # update_guidelines.py는 출력을 UTF-8로 고정하므로, 로캘(cp949 등)이 아닌 UTF-8로 읽는다.
+            encoding="utf-8",
             capture_output=True,
             check=False,
         )
