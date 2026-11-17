@@ -15,13 +15,13 @@
 
 ## 실행 명령
 
-아래 명령은 실제 동작이 확인된 실행 형식입니다.
+아래 명령은 실제 동작이 확인된 실행 형식입니다. 플러그인 저장소의 상위 작업 폴더에서 실행하며, 작업 산출물(`rebuild-report.json`, `slice-all.tsv`, `verify-*.tsv`, `protected37.txt`)은 그 폴더의 `reports/`에 둡니다.
 
 ```text
-python tools/corpus/convert_nkis_pdfs_v2.py --pdf-root "<원본 PDF 폴더>" --output "<출력 MD 폴더>" --npx "C:/nvm4w/nodejs/npx.cmd"
-python tools/corpus/slice_kordoc_courses.py --md-root "<출력 MD 폴더>" --corpus "plugins/korean-school-records-toolkit/skills/write-school-records/references/achievement-standards" --skip-list rebuild-report.json --git-root plugins/korean-school-records-toolkit --apply --report slice-all.tsv
-python tools/corpus/verify_corpus_against_pdfs.py --corpus "<코퍼스 경로>" --pdf-root "<원본 PDF 폴더>" --map slice-all.tsv --report verify-corpus.tsv
-python tools/corpus/verify_corpus_against_hwpx.py --corpus "<코퍼스 경로>" --list protected37.txt --hwpx <원본 hwpx/hwp 파일들> --report verify-hwpx.tsv
+python plugins/korean-school-records-toolkit/tools/corpus/convert_nkis_pdfs_v2.py --pdf-root "<원본 PDF 폴더>" --output "<출력 MD 폴더>" --npx "C:/nvm4w/nodejs/npx.cmd"
+python plugins/korean-school-records-toolkit/tools/corpus/slice_kordoc_courses.py --md-root "<출력 MD 폴더>" --corpus "plugins/korean-school-records-toolkit/skills/write-school-records/references/achievement-standards" --skip-list reports/rebuild-report.json --git-root plugins/korean-school-records-toolkit --apply --report reports/slice-all.tsv
+python plugins/korean-school-records-toolkit/tools/corpus/verify_corpus_against_pdfs.py --corpus "<코퍼스 경로>" --pdf-root "<원본 PDF 폴더>" --map reports/slice-all.tsv --report reports/verify-corpus.tsv
+python plugins/korean-school-records-toolkit/tools/corpus/verify_corpus_against_hwpx.py --corpus "<코퍼스 경로>" --list reports/protected37.txt --hwpx <원본 hwpx/hwp 파일들> --report reports/verify-hwpx.tsv
 ```
 
 ## 의존성
