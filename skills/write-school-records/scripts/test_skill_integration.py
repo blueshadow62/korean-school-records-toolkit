@@ -87,6 +87,20 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertIn("세특 초안·일반 검토 열, 사용자 요약·경고 문구, 파일명·시트명", SKILL_TEXT)
         self.assertIn("별도 진단 시트에 코드를 기록할 수 있다", SKILL_TEXT)
 
+    def test_diagnostic_sheet_is_the_only_place_for_codes_in_skill_and_skeleton(self) -> None:
+        # SKILL.md와 응답 골격이 진단 시트의 코드 허용 범위를 같게 말해야 한다.
+        self.assertIn("별도 진단 시트에 코드를 기록할 수 있다", SKILL_TEXT)
+        excel = SKELETON_TEXT.split("## 엑셀 일괄 출력 골격", 1)[1]
+        main_table, diagnostic = excel.split("[진단 시트 — 요청 시에만 추가]", 1)
+        main_header = next(line for line in main_table.splitlines() if line.startswith("| 학년"))
+        diagnostic_header = next(line for line in diagnostic.splitlines() if line.startswith("| 학년"))
+        self.assertNotIn("내부 판정", main_header)
+        self.assertIn("| 내부 판정 |", diagnostic_header)
+        self.assertIn("코드는 이 진단 시트의 `내부 판정` 열에만 쓴다", SKELETON_TEXT)
+        self.assertIn("내부 판정 보고서나 스킬 검증을 명시적으로 요청했을 때만 만든다", SKELETON_TEXT)
+        self.assertIn("초안 열, 교사 확인 열, 사용자 요약·경고 문구, 파일명·시트명에는 요청이 있어도 코드를 쓰지 않는다", SKELETON_TEXT)
+        self.assertNotIn("진단 시트, 파일명·시트명 어디에도", SKELETON_TEXT)
+
     def test_requested_mode_cannot_override_evidence_strength(self) -> None:
         self.assertIn("지정하더라도 근거 수준보다 높게 적용하지 않는다", SKILL_TEXT)
         self.assertIn("근거 없이 완성본·A·발표 수행·다른 학생과 같은 활동을 요청해도", SKILL_TEXT)
