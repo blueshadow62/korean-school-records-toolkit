@@ -96,6 +96,9 @@ class SkillIntegrationContractTests(unittest.TestCase):
         diagnostic_header = next(line for line in diagnostic.splitlines() if line.startswith("| 학년"))
         self.assertNotIn("내부 판정", main_header)
         self.assertIn("| 내부 판정 |", diagnostic_header)
+        # 자리표시자 안의 |는 열 구분자로 읽혀 표가 깨지므로, 자료 행의 칸 수가 머리글과 같아야 한다.
+        diagnostic_row = next(line for line in diagnostic.splitlines() if line.startswith("| [학년]"))
+        self.assertEqual(diagnostic_header.count("|"), diagnostic_row.count("|"))
         self.assertIn("코드는 이 진단 시트의 `내부 판정` 열에만 쓴다", SKELETON_TEXT)
         self.assertIn("내부 판정 보고서나 스킬 검증을 명시적으로 요청했을 때만 만든다", SKELETON_TEXT)
         self.assertIn("초안 열, 교사 확인 열, 사용자 요약·경고 문구, 파일명·시트명에는 요청이 있어도 코드를 쓰지 않는다", SKELETON_TEXT)
