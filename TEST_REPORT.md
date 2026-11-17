@@ -1,5 +1,15 @@
 # Test report
 
+## 2.2.0 — tested on 2026-11-18 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
+
+- Package contract tests (`tests/`, incl. dev/package drift check): 12 passed.
+- `write-school-records` package-local scripts: 152 passed.
+- `write-school-records` development source: 170 passed, 2 skipped (JS cross-check skipped where the sibling skill is absent).
+- `korean-character-count` node tests: 3 passed.
+- `verify_package.py`: passed.
+- The tests now pass in the default Windows console (cp949) without `PYTHONUTF8=1`.
+- Behavior eval cases (`tests/eval-cases/`): schema tests passed; model-run scoring not yet performed.
+
 ## 2.1.0 — tested on 2026-08-30 (Windows, Python 3.14, Node.js 24)
 
 - Package contract tests (`tests/`, incl. dev/package drift check): 11 passed.
