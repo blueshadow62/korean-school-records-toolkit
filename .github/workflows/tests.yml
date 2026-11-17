@@ -1,0 +1,44 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  unittest:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    # PYTHONUTF8은 설정하지 않는다. Windows 기본 로캘 인코딩에서도 테스트가 통과해야
+    # 자식 프로세스 출력을 로캘로 해독하던 결함(2.2.0에서 수정)이 재발할 때 잡힌다.
+    steps:
+      - name: Keep repository line endings on checkout
+        # 기재요령 manifest가 참조본의 sha256을 검사하므로, Windows에서도 CRLF 변환 없이 받는다.
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Package contract tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
+      - name: write-school-records tests
+        run: python -m unittest discover -s skills/write-school-records/scripts -p "test_*.py"
+
+      - name: korean-character-count tests
+        run: node --test skills/korean-character-count/scripts/korean_character_count.test.js
+
+      - name: Package verifier
+        run: python scripts/verify_package.py

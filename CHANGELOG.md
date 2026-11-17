@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- push와 pull request 때 Ubuntu·Windows에서 unittest, node 테스트, `verify_package.py`를 실행하는 GitHub Actions 작업 흐름(`.github/workflows/tests.yml`) 추가. Windows는 `PYTHONUTF8` 없이 실행하고, 참조본 sha256 검사가 깨지지 않도록 줄 끝 변환 없이 체크아웃한다.
+
 ### Changed
 
 - `write-school-records` SKILL.md에서 여러 번 반복되던 규칙을 한 곳에 모았다. 근거 없는 완성형 기록 금지와 필수 경고 문구는 「내부 근거 판정 A–D」의 D 항목에, 내부 A–D 코드를 드러내지 않는 규칙은 같은 절의 한 문단에 둔다. 규칙의 뜻과 강도, 경고 문구는 바꾸지 않았다.
