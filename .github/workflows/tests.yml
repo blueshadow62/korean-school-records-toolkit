@@ -16,11 +16,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     # PYTHONUTF8은 설정하지 않는다. Windows 기본 로캘 인코딩에서도 테스트가 통과해야
     # 자식 프로세스 출력을 로캘로 해독하던 결함(2.2.0에서 수정)이 재발할 때 잡힌다.
+    # core.autocrlf도 러너 기본값 그대로 둔다. .gitattributes가 빠지면 참조본 sha256 검사가 실패해 잡힌다.
     steps:
-      - name: Keep repository line endings on checkout
-        # 기재요령 manifest가 참조본의 sha256을 검사하므로, Windows에서도 CRLF 변환 없이 받는다.
-        run: git config --global core.autocrlf false
-
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
