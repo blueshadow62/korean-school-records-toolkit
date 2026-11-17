@@ -68,13 +68,13 @@ license: CC-BY-NC-SA-4.0
 | 공학·컴퓨터·교육·예술·융합 전공 렌즈 | [major-technology-arts.md](references/major-technology-arts.md) |
 | 초안·첨삭의 문장 품질 정밀화 | [evidence-writing-guide.md](references/evidence-writing-guide.md) |
 | 초안 문장 구조 선택(S1–S10)·배치 반복 점검 | [sentence-structures.md](references/sentence-structures.md) |
+| 교사 자료 입력 형식·엑셀 열 정의 | [intake-template.md](references/intake-template.md) |
+| 응답 골격·D 판정 작성 틀 | [output-skeleton.md](references/output-skeleton.md) |
+| 스킬 행동 검증(합성 케이스·채점 절차) | [tests/eval-cases/README.md](tests/eval-cases/README.md) |
 | 현행 규정·출처·자료 시점 질문 | [source-policy.md](references/source-policy.md) |
 | 중학교 기재요령과 고등학교판의 차이 | 학교급이 중학교이면 [guidelines-middle/differences.md](references/guidelines-middle/differences.md)를 읽고, 원문 범위는 `references/guidelines-middle/current.index.md`에서 찾는다 |
 | 교과별 성취수준 공식 서술과 대조 | 공통 개념은 [achievement-standards/common.md](references/achievement-standards/common.md), 교과·과목 원문과 단계 체계는 [achievement-standards/index.md](references/achievement-standards/index.md)에서 확인한 뒤 필요한 파일만 읽는다. 출처·라이선스 표시가 필요하면 그때 교과별 `index.md`가 가리키는 `sources.json`과 [ATTRIBUTION.md](references/achievement-standards/ATTRIBUTION.md)를 읽는다 |
 | 중학교 교과 성취수준 대조 | 학교급이 중학교이거나 `[9…]` 코드가 있으면 [achievement-standards-middle/index.md](references/achievement-standards-middle/index.md)에서 필요한 파일을 찾는다. 학교급이 고등학교이면 쓰지 않는다 |
-| 교사 자료 입력 형식·엑셀 열 정의 | [intake-template.md](references/intake-template.md) |
-| 응답 골격·D 판정 작성 틀 | [output-skeleton.md](references/output-skeleton.md) |
-| 스킬 행동 검증(합성 케이스·채점 절차) | [tests/eval-cases/README.md](tests/eval-cases/README.md) |
 
 ### 지원 영역
 

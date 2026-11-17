@@ -2,14 +2,20 @@
 
 ## Unreleased
 
+### Fixed
+
+- Git for Windows 기본값(`core.autocrlf=true`)으로 복제하면 기재요령 참조본이 CRLF로 바뀌어 manifest의 sha256 검증과 NEIS 표본 바이트 검사가 실패하던 문제 수정. `.gitattributes`로 텍스트 파일을 LF로 받게 했다. 저장소의 파일 내용은 바뀌지 않는다.
+- `output-skeleton.md` 마지막 안내가 진단 시트에도 A–D 코드를 쓰지 않는다고 해 SKILL.md(요청 시 별도 진단 시트에 기록 가능)와 어긋나던 문제 수정. 진단 시트 골격에 `내부 판정` 열을 두고, 그 밖의 위치에는 쓰지 않는다고 적었다. 두 파일이 맞는지 검사하는 테스트를 추가했다.
+
 ### Added
 
-- push와 pull request 때 Ubuntu·Windows에서 unittest, node 테스트, `verify_package.py`를 실행하는 GitHub Actions 작업 흐름(`.github/workflows/tests.yml`) 추가. Windows는 `PYTHONUTF8` 없이 실행하고, 참조본 sha256 검사가 깨지지 않도록 줄 끝 변환 없이 체크아웃한다.
+- push와 pull request 때 Ubuntu·Windows에서 unittest, node 테스트, `verify_package.py`를 실행하는 GitHub Actions 작업 흐름(`.github/workflows/tests.yml`) 추가. Windows는 `PYTHONUTF8`과 `core.autocrlf`를 러너 기본값 그대로 두고 실행한다.
 
 ### Changed
 
 - `write-school-records` SKILL.md에서 여러 번 반복되던 규칙을 한 곳에 모았다. 근거 없는 완성형 기록 금지와 필수 경고 문구는 「내부 근거 판정 A–D」의 D 항목에, 내부 A–D 코드를 드러내지 않는 규칙은 같은 절의 한 문단에 둔다. 규칙의 뜻과 강도, 경고 문구는 바꾸지 않았다.
 - 판정별 라벨, 근거 부족을 알리는 일반 문장, 응답에 쓰지 않는 내부 명칭처럼 응답 형식에 속하는 세부를 `references/output-skeleton.md`로 옮겼다. SKILL.md 「출력과 점검」은 초안·첨삭·작성 지원으로 답하기 전에 이 파일을 반드시 읽게 한다. `output-skeleton.md`의 최대 글자수 표 안내도 장 번호 대신 표 제목으로 가리킨다.
+- 배포본 SKILL.md 라우팅 표의 세 행(교사 자료 입력 형식, 응답 골격, 스킬 행동 검증)을 개발본과 같은 위치로 옮겼다.
 - `test_skill_integration.py`가 옮겨 간 문구를 `output-skeleton.md`에서 검사하고, SKILL.md가 출력 전에 이 파일을 읽게 하는지와 합친 규칙이 한 번만 나오는지 검사한다.
 
 ## 2.2.0 — 2026-11-18
