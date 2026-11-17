@@ -54,16 +54,15 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertIn("사용자가 모드를 지정하지 않아도 자동 판정", SKILL_TEXT)
         self.assertIn("사용자에게 모드 선택을 묻지 않는다", SKILL_TEXT)
         self.assertIn("일반 생성·첨삭·엑셀 응답에는 A–D 코드나 내부 분류명을 표시하지 않는다", SKILL_TEXT)
-        self.assertIn("A는 `[세특 초안]`, B는 `[세특 초안]`", SKILL_TEXT)
-        self.assertIn("C는 `[세특 초안]`과 `교사 확인 사항`", SKILL_TEXT)
+        self.assertIn("A는 `[세특 초안]`, B는 `[세특 초안]`", SKELETON_TEXT)
+        self.assertIn("C는 `[세특 초안]`과 `교사 확인 사항`", SKELETON_TEXT)
         self.assertIn("학생별 최소 정보가 없으면 C가 아니라 D", SKILL_TEXT)
         self.assertIn("[학생별 사실 미확인 — 그대로 입력하지 않는 작성 후보]", SKILL_TEXT)
         self.assertIn("D는 반드시", SKILL_TEXT)
 
     def test_generation_instruction_does_not_repeat_internal_codes(self) -> None:
-        self.assertIn("생성 지시에서 사용자가 A–D 코드나 하향을 언급해도", SKILL_TEXT)
+        self.assertIn("생성 지시에서 사용자가 A–D 코드나 하향을 언급해도 내부 판정 공개 요청이 아니므로", SKILL_TEXT)
         self.assertIn("그 코드를 인용·반복하거나 판정 결과로 공개하지 않는다", SKILL_TEXT)
-        self.assertIn("사용자가 생성 지시에서 코드를 언급한 것은 내부 판정 공개 요청이 아니므로", SKILL_TEXT)
 
     def test_general_language_replaces_internal_codes(self) -> None:
         for phrase in (
@@ -72,14 +71,16 @@ class SkillIntegrationContractTests(unittest.TestCase):
             "현재 확인된 자료 범위에서 보수적으로 작성했습니다.",
             "추가 관찰 자료가 확인되면 내용을 보강할 수 있습니다.",
         ):
-            self.assertIn(phrase, SKILL_TEXT)
+            self.assertIn(phrase, SKELETON_TEXT)
+        self.assertIn("추가 확인 필요를 일반 언어로 설명한다(문장 예는 [output-skeleton.md](references/output-skeleton.md))", SKILL_TEXT)
+        self.assertIn("D의 필수 경고 두 문장은 이 문장들로 대신하지 않는다", SKELETON_TEXT)
 
     def test_explicit_diagnostic_request_is_the_only_code_disclosure_exception(self) -> None:
         self.assertIn("자동 판정 결과·근거 또는 스킬 검증을 명시적으로 요청한 경우에만", SKILL_TEXT)
         self.assertIn("내부 A–D를 별도로 보고할 수 있다", SKILL_TEXT)
 
     def test_generation_instruction_and_diagnostic_request_are_distinguished(self) -> None:
-        self.assertIn("사용자가 생성 지시에서 코드를 언급한 것은 내부 판정 공개 요청이 아니므로", SKILL_TEXT)
+        self.assertIn("A–D 코드나 하향을 언급해도 내부 판정 공개 요청이 아니므로", SKILL_TEXT)
         self.assertIn("자동 판정 결과·근거 또는 스킬 검증", SKILL_TEXT)
 
     def test_excel_hides_codes_except_in_explicit_diagnostic_sheet(self) -> None:
@@ -109,9 +110,14 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertIn("실제 발표 수행 여부", SKILL_TEXT)
 
     def test_d_mode_blocks_finished_student_claims(self) -> None:
-        self.assertIn("`D`에서는 학생을 주어로 하는 완성형 사실 서술을 출력하지 않는다", SKILL_TEXT)
-        self.assertIn("대괄호 기반 작성 틀·표현 조각·관찰 포인트·교사 확인 질문만 제공", SKILL_TEXT)
-        self.assertIn("경고를 붙여도 예시나 가정의 활동·성과·역량 문장을 재출력하지 않는다", SKILL_TEXT)
+        d_item = SKILL_TEXT.split("5. D:", 1)[1].split("\n", 1)[0]
+        self.assertIn("학생별 활동·관찰·결과물이 없으면 완성형 기록을 생성하지 않는다", d_item)
+        self.assertIn("학생을 주어로 하는 완성형 사실 서술을 출력하지 않으며", d_item)
+        self.assertIn("대괄호 기반 작성 틀·표현 조각·관찰 포인트·교사 확인 질문만 제공", d_item)
+        self.assertIn("경고를 붙여도 예시나 가정의 활동·성과·역량 문장을 재출력하지 않는다", d_item)
+        self.assertIn("[학생별 사실 미확인 — 그대로 입력하지 않는 작성 후보]", d_item)
+        self.assertIn("학생별 관찰·결과가 확인되지 않았으므로 완성형 세특을 생성하지 않습니다.", d_item)
+        self.assertIn("`문장만` 요청해도 이 경고를 생략하지 않는다", d_item)
 
     def test_example_only_input_is_not_student_evidence(self) -> None:
         self.assertIn("학생별 사실 확인 전의 완성 예시는 문체 참고일 뿐 근거가 아니다", SKILL_TEXT)
@@ -124,6 +130,29 @@ class SkillIntegrationContractTests(unittest.TestCase):
 
     def test_d_mode_uses_the_required_nonfinal_warning(self) -> None:
         self.assertIn("학생별 관찰·결과가 확인되지 않았으므로 완성형 세특을 생성하지 않습니다.", SKILL_TEXT)
+
+    def test_output_section_requires_reading_the_skeleton_first(self) -> None:
+        section = SKILL_TEXT.split("## 출력과 점검", 1)[1]
+        self.assertTrue(
+            section.lstrip().startswith(
+                "초안·첨삭·작성 지원으로 답하기 전에는 반드시 [output-skeleton.md](references/output-skeleton.md)를 읽고 그 골격을 따른다."
+            )
+        )
+        self.assertIn("응답 골격·D 판정 작성 틀 | [output-skeleton.md](references/output-skeleton.md)", SKILL_TEXT)
+        self.assertIn("SKILL.md는 초안·첨삭·작성 지원으로 답하기 전에 이 문서를 읽게 하며", SKELETON_TEXT)
+        self.assertIn("생성과 검사를 함께 요청한 경우 검사가 초안 생성을 대신하지 않으며", section)
+        self.assertIn("분석·점검만 요청한 경우에는 초안을 새로 만들지 않는다", section)
+
+    def test_each_consolidated_rule_appears_once_in_skill(self) -> None:
+        for phrase in (
+            "학생을 주어로 하는 완성형 사실 서술을 출력하지 않",
+            "A–D 코드나 내부 분류명을 표시하지 않는다",
+            "세특 초안·일반 검토 열, 사용자 요약·경고 문구, 파일명·시트명",
+            "[학생별 사실 미확인 — 그대로 입력하지 않는 작성 후보]",
+            "별도 진단 시트에 코드를 기록할 수 있다",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertEqual(1, SKILL_TEXT.count(phrase))
 
     def test_safety_critical_failures_override_the_repeat_threshold(self) -> None:
         self.assertIn("한 번만 확인되어도 즉시 수정하는 안전 오류", SKILL_TEXT)
@@ -194,7 +223,8 @@ class SkillIntegrationContractTests(unittest.TestCase):
         ):
             self.assertNotIn(name, SKELETON_TEXT)
         self.assertIn("교사 관찰 | 학생 결과물 | 평가 결과", SKELETON_TEXT)
-        self.assertIn("스크립트 이름·파일 경로·manifest·버전 문자열도 사용자가 요청하지 않으면 쓰지 않는다", SKILL_TEXT)
+        self.assertIn("스크립트 이름·파일 경로·manifest·버전 문자열도 사용자가 요청하지 않으면 쓰지 않는다", SKELETON_TEXT)
+        self.assertIn("출처 유형은 교사 관찰, 학생 결과물처럼 일반 언어로 적는다", SKELETON_TEXT)
         self.assertIn("학년도·개정일·공식 확인 여부를 일반 언어로 표시", SKILL_TEXT)
 
     def test_output_skeleton_fixes_the_draft_labels(self) -> None:
@@ -219,7 +249,7 @@ class SkillIntegrationContractTests(unittest.TestCase):
 
     def test_free_semester_is_routed_and_labelled(self) -> None:
         self.assertIn("[field-free-semester.md](references/field-free-semester.md)", SKILL_TEXT)
-        self.assertIn("`[자유학기 초안]`", SKILL_TEXT)
+        self.assertIn("`[자유학기 초안]`", SKELETON_TEXT)
         self.assertIn("완성형 자유학기활동 특기사항을", SKILL_TEXT)
         self.assertIn("완성형 자유학기활동 특기사항을", SKELETON_TEXT)
         self.assertIn("--field free_semester", SKILL_TEXT)
