@@ -15,6 +15,7 @@
 ### Added
 
 - push와 pull request 때 Ubuntu·Windows에서 unittest, node 테스트, `verify_package.py`를 실행하는 GitHub Actions 작업 흐름(`.github/workflows/tests.yml`) 추가. Windows는 `PYTHONUTF8`과 `core.autocrlf`를 러너 기본값 그대로 두고 실행한다.
+- 교과 안내 세 파일(`subject-humanities.md`, `subject-stem.md`, `subject-practical-arts.md`)에 '중학교 차이' 절 추가. 고등학교 기준인 세특 규정 게이트에서 중학교에서 뒤집히는 항목(입력 대상, 합산·학기별 한도, 소논문 예외, 능력단위)만 적고 `guidelines-middle/differences.md` 2절을 가리킨다.
 
 ### Changed
 
@@ -22,6 +23,8 @@
 - 판정별 라벨, 근거 부족을 알리는 일반 문장, 응답에 쓰지 않는 내부 명칭처럼 응답 형식에 속하는 세부를 `references/output-skeleton.md`로 옮겼다. SKILL.md 「출력과 점검」은 초안·첨삭·작성 지원으로 답하기 전에 이 파일을 반드시 읽게 한다. `output-skeleton.md`의 최대 글자수 표 안내도 장 번호 대신 표 제목으로 가리킨다.
 - 배포본 SKILL.md 라우팅 표의 세 행(교사 자료 입력 형식, 응답 골격, 스킬 행동 검증)을 개발본과 같은 위치로 옮겼다.
 - `test_skill_integration.py`가 옮겨 간 문구를 `output-skeleton.md`에서 검사하고, SKILL.md가 출력 전에 이 파일을 읽게 하는지와 합친 규칙이 한 번만 나오는지 검사한다.
+- SKILL.md 코드 규칙 문단에, 교사가 말한 `성취수준 A`·`성취도 B`는 내부 근거 등급이 아니라 평가 결과 자료로 다룬다는 문장을 추가했다. 두 체계가 같은 글자를 쓰기 때문이다.
+- `sentence-structures.md` 첫머리에 두 번 나오던 '구조 코드는 결과에 노출하지 않는다' 문장을 하나로 줄였다.
 
 ## 2.2.0 — 2026-11-18
 

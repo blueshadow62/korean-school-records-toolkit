@@ -106,6 +106,24 @@ class MiddleGuidelineTests(unittest.TestCase):
         high_only = self.run_analyzer("--field", "free_semester", "--text", "가")
         self.assertEqual(high_only.returncode, 2)
 
+    def test_subject_guides_state_middle_differences_from_section_2(self) -> None:
+        # 교과 안내의 규정 게이트는 고등학교 기준이므로, 중학교에서 뒤집히는 항목을 differences.md 2절에 근거해 적는다.
+        differences = (MIDDLE / "differences.md").read_text(encoding="utf-8")
+        section_2 = differences.split("## 2.", 1)[1].split("## 3.", 1)[0]
+        for fact in ("특기할 만한 사항이 있는 과목·학생에 입력", "모든 과목·모든 학생에 입력", "합산·학기별 규정 없음", "예외 없이 금지"):
+            self.assertIn(fact, section_2)
+        for name in ("subject-humanities.md", "subject-stem.md", "subject-practical-arts.md"):
+            with self.subTest(name=name):
+                text = (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
+                gate, rest = text.split("## 2026 세특 규정 게이트", 1)[1].split("## 중학교 차이", 1)
+                self.assertIn("공통과목 1·2는 합산 500자", gate)
+                middle = rest.split("\n## ", 1)[0]
+                self.assertIn("[guidelines-middle/differences.md](guidelines-middle/differences.md) 2절", middle)
+                self.assertIn("특기할 만한 사항이 있는 과목·학생에 입력", middle)
+                self.assertIn("자유학기 과목은 모든 과목·모든 학생에 입력", middle)
+                self.assertIn("공통과목 1·2 합산과 전공실무과목 학기별 규정은 없다", middle)
+                self.assertIn("연구보고서(소논문)는 예외 없이 금지", middle)
+
     def test_skill_sends_middle_drafts_here(self) -> None:
         skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("references/guidelines-middle/current.index.md", skill)
