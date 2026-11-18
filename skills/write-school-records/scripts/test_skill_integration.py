@@ -104,6 +104,22 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertIn("초안 열, 교사 확인 열, 사용자 요약·경고 문구, 파일명·시트명에는 요청이 있어도 코드를 쓰지 않는다", SKELETON_TEXT)
         self.assertNotIn("진단 시트, 파일명·시트명 어디에도", SKELETON_TEXT)
 
+    def test_every_skeleton_table_row_has_header_cell_count(self) -> None:
+        # 자리표시자 안의 |는 열 구분자로 읽혀 표가 깨진다. 응답 골격의 모든 표에서 각 행의 칸 수가 머리글과 같아야 한다.
+        header = None
+        tables = 0
+        for line in SKELETON_TEXT.splitlines():
+            if not line.startswith("|"):
+                header = None
+                continue
+            if header is None:
+                header = line
+                tables += 1
+                continue
+            with self.subTest(row=line):
+                self.assertEqual(header.count("|"), line.count("|"))
+        self.assertGreaterEqual(tables, 3)
+
     def test_requested_mode_cannot_override_evidence_strength(self) -> None:
         self.assertIn("지정하더라도 근거 수준보다 높게 적용하지 않는다", SKILL_TEXT)
         self.assertIn("근거 없이 완성본·A·발표 수행·다른 학생과 같은 활동을 요청해도", SKILL_TEXT)
@@ -239,7 +255,7 @@ class SkillIntegrationContractTests(unittest.TestCase):
             "supporting_lens",
         ):
             self.assertNotIn(name, SKELETON_TEXT)
-        self.assertIn("교사 관찰 | 학생 결과물 | 평가 결과", SKELETON_TEXT)
+        self.assertIn("교사 관찰·학생 결과물·평가 결과", SKELETON_TEXT)
         self.assertIn("스크립트 이름·파일 경로·manifest·버전 문자열도 사용자가 요청하지 않으면 쓰지 않는다", SKELETON_TEXT)
         self.assertIn("출처 유형은 교사 관찰, 학생 결과물처럼 일반 언어로 적는다", SKELETON_TEXT)
         self.assertIn("학년도·개정일·공식 확인 여부를 일반 언어로 표시", SKILL_TEXT)
