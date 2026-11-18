@@ -190,6 +190,18 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertIn("생성과 검사를 함께 요청한 경우 검사가 초안 생성을 대신하지 않으며", section)
         self.assertIn("분석·점검만 요청한 경우에는 초안을 새로 만들지 않는다", section)
 
+    def test_achievement_level_letters_are_assessment_data_not_internal_codes(self) -> None:
+        # 내부 근거 등급 A–D와 성취수준 A–E가 같은 글자를 쓰므로, 교사가 말한 성취수준은 평가 결과 자료로 구분한다.
+        code_rule = next(line for line in SKILL_TEXT.splitlines() if "A–D 코드나 내부 분류명을 표시하지 않는다" in line)
+        self.assertIn(
+            "교사가 말한 `성취수준 A`, `성취도 B`처럼 성취수준·성취도를 가리키는 글자는 "
+            "내부 등급 언급이 아니라 평가 결과(`assessment_result`) 자료로 다룬다.",
+            code_rule,
+        )
+
+    def test_structure_code_rule_is_stated_once(self) -> None:
+        self.assertEqual(1, STRUCTURE_TEXT.count("구조 코드는 내부 계획에만 사용하고 결과에 노출하지 않는다"))
+
     def test_each_consolidated_rule_appears_once_in_skill(self) -> None:
         for phrase in (
             "학생을 주어로 하는 완성형 사실 서술을 출력하지 않",
@@ -197,6 +209,7 @@ class SkillIntegrationContractTests(unittest.TestCase):
             "세특 초안·일반 검토 열, 사용자 요약·경고 문구, 파일명·시트명",
             "[학생별 사실 미확인 — 그대로 입력하지 않는 작성 후보]",
             "별도 진단 시트에 코드를 기록할 수 있다",
+            "내부 등급 언급이 아니라 평가 결과(`assessment_result`) 자료로 다룬다",
         ):
             with self.subTest(phrase=phrase):
                 self.assertEqual(1, SKILL_TEXT.count(phrase))
