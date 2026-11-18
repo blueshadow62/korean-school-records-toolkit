@@ -47,6 +47,7 @@ EVIDENCE_TERMS = (
     "실험 결과",
     "산출물",
     "표",
+    "도표",
     "그래프",
     "토론",
     "설문",
@@ -163,8 +164,21 @@ def load_year_rules(school_year: str, skill_root: Path | None = None, level: str
     }
 
 
+# 한 글자 낱말은 부분 문자열로 세면 '발표·목표·표현·대표'까지 근거로 집계되므로 낱말 단위로만 센다.
+SINGLE_CHAR_TERM_PARTICLES = r"(?:를|로|에서|에|와|과|의|은|는|가|이|도|만)"
+
+
 def count_terms(text: str, terms: Iterable[str]) -> dict[str, int]:
-    return {term: text.count(term) for term in terms if term in text}
+    counts = {}
+    for term in terms:
+        if len(term) == 1:
+            pattern = rf"(?<![가-힣]){re.escape(term)}(?={SINGLE_CHAR_TERM_PARTICLES}?(?![가-힣]))"
+            count = len(re.findall(pattern, text))
+        else:
+            count = text.count(term)
+        if count:
+            counts[term] = count
+    return counts
 
 
 def approximate_sentence_count(text: str) -> int:
@@ -307,7 +321,7 @@ def analyze(
 
     if field == "creative" and area == "service":
         if grade in (1, 2):
-            warnings.append("봉사활동 특기사항 영역은 2026학년도 3학년에만 있음")
+            warnings.append(f"봉사활동 특기사항 영역은 {school_year}학년도 3학년에만 있음")
         warnings.append(
             "봉사활동 실적 활동내용은 실적별 50자/150Byte 이내의 객관적 내용만 기록하며, "
             "정성평가는 다른 영역에 기록해야 합니다."
@@ -325,7 +339,11 @@ def analyze(
     elif judgment_total > action_total + evidence_total:
         warnings.append("판단적 표현의 비중이 행동·근거 표현보다 높습니다.")
     if normalized and growth_total == 0:
-        warnings.append("피드백, 수정, 성찰 또는 전후 변화가 필요한 기록인지 확인하세요.")
+        # 성장 서사를 만들도록 유도하지 않는다. 변화는 근거 자료에 있을 때만 쓴다.
+        warnings.append(
+            "전후 변화·성찰 표현은 없습니다. 근거 자료에서 확인된 변화가 있을 때만 반영하고, "
+            "확인되지 않은 성장 과정은 덧붙이지 마세요."
+        )
 
     if field == "subject" and not re.search(
         r"개념|성취|과제|탐구|자료|실험|측정|오차|조건|작품|표현|문제|코드|알고리즘|데이터|프로그래밍|컴퓨팅",

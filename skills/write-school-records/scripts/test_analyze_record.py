@@ -114,6 +114,62 @@ class AnalyzeRecordTests(unittest.TestCase):
                 result = analyze(text, field="subject")
                 self.assertNotIn("재학 학교 식별 후보", result["signals"]["prohibited"])
 
+    def test_common_subject_words_are_not_prohibited_candidates(self) -> None:
+        # 사회·역사·국어 세특에 흔한 낱말이 대학 약칭·학교명·대회로 잡히지 않아야 한다.
+        labels = ("서울대 등 대학 약칭·별칭 후보", "대회·수상", "재학 학교 식별 후보")
+        middle_rules = load_year_rules("2026", level="middle")
+        for text in (
+            "현대 사회의 세대 갈등을 주제로 시대의 변화를 분석하고 그대로 정리하여 발표함.",
+            "고대 그리스 민주정과 연대 의식을 비교하고 체육대회 응원 문화와 연결해 설명함. 수상 스포츠 안전 수칙을 조사함.",
+            "공익광고를 분석하고 목표를 세워 표현함. 매우 우수함.",
+            "근대 국가와 청년세대의 역할을 비교하고 이대로 두면 생길 문제를 무대에서 발표함.",
+            "교통사고 예방 캠페인을 기획하고 체육 대회 운영을 도움. 그래프의 막대를 비교함.",
+        ):
+            for rules in (None, middle_rules):
+                with self.subTest(text=text, middle=rules is not None):
+                    prohibited = analyze(text, field="subject", rules=rules)["signals"]["prohibited"]
+                    for label in labels:
+                        self.assertNotIn(label, prohibited)
+
+    def test_real_prohibited_candidates_are_still_flagged(self) -> None:
+        middle_rules = load_year_rules("2026", level="middle")
+        cases = (
+            ("서울대 진학을 희망함.", "서울대 등 대학 약칭·별칭 후보", True),
+            ("연대에 합격함.", "서울대 등 대학 약칭·별칭 후보", True),
+            ("고대 진학을 목표로 함.", "서울대 등 대학 약칭·별칭 후보", True),
+            ("연세대에 진학함.", "서울대 등 대학 약칭·별칭 후보", True),
+            ("명지대에서 열린 캠프에 참가함.", "서울대 등 대학 약칭·별칭 후보", True),
+            ("서울교대에 합격함.", "서울대 등 대학 약칭·별칭 후보", True),
+            ("교내 경시대회 수상.", "대회·수상", True),
+            ("과학경진대회 입상.", "대회·수상", True),
+            ("토론대회에서 최우수상을 수상함.", "대회·수상", True),
+            ("한빛고 재학 중임.", "재학 학교 식별 후보", False),
+            ("대광고 재학 중임.", "재학 학교 식별 후보", False),
+        )
+        for text, label, also_middle in cases:
+            for rules in (None, middle_rules) if also_middle else (None,):
+                with self.subTest(text=text, middle=rules is not None):
+                    self.assertIn(label, analyze(text, field="subject", rules=rules)["signals"]["prohibited"])
+
+    def test_single_character_evidence_term_is_counted_as_a_word(self) -> None:
+        # '표'가 발표·목표·표현의 일부로 세어지면 판단 표현만 있는 기록의 경고가 사라진다.
+        result = analyze("공익광고를 분석하고 목표를 세워 표현함. 매우 우수함.", field="subject")
+        self.assertNotIn("표", result["signals"]["evidence"])
+        self.assertIn("판단적 표현은 있으나 이를 뒷받침할 산출물·자료·과정 근거가 약합니다.", result["warnings"])
+        counted = analyze("조사 결과를 표로 정리하고 표에서 경향을 찾음. 도표를 그림.", field="subject")
+        self.assertEqual(counted["signals"]["evidence"].get("표"), 2)
+        self.assertEqual(counted["signals"]["evidence"].get("도표"), 1)
+
+    def test_missing_growth_terms_do_not_ask_for_a_growth_story(self) -> None:
+        warnings = " ".join(analyze("자료를 조사하여 보고서를 작성함.", field="subject")["warnings"])
+        self.assertIn("확인되지 않은 성장 과정은 덧붙이지 마세요", warnings)
+        self.assertNotIn("필요한 기록인지 확인하세요", warnings)
+
+    def test_service_area_warning_uses_rule_school_year(self) -> None:
+        rules = dict(load_year_rules("2026"), school_year="2027")
+        warnings = analyze("봉사 활동을 함.", field="creative", area="service", grade=1, rules=rules)["warnings"]
+        self.assertIn("봉사활동 특기사항 영역은 2027학년도 3학년에만 있음", warnings)
+
     def test_private_education_pattern_excludes_instructor_fee(self) -> None:
         positive = analyze("OO학원 강사의 지도를 받음. 과외를 받아.")
         self.assertIn("학원 강사 등 사교육·외부활동 후보", positive["signals"]["prohibited"])
