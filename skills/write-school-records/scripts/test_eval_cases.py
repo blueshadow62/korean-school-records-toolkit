@@ -10,6 +10,7 @@ VALID_AREAS = {"subject", "creative", "behavior", "free_semester"}
 VALID_GRADES = {"A", "B", "C", "D", "mixed"}
 CODE_MARKERS = {"A 판정", "B 판정", "C 판정", "D 판정", "A 모드", "B 모드", "C 모드", "D 모드"}
 D_REQUIRED_HEADER = "[학생별 사실 미확인 — 그대로 입력하지 않는 작성 후보]"
+DRAFT_LABELS = {"[세특 초안]", "[창체 초안]", "[행특 초안]", "[자유학기 초안]", "[작성 지원]"}
 D_WARNING = "학생별 관찰·결과가 확인되지 않았으므로 완성형 {}을 생성하지 않습니다."
 # 영역이 드러나지 않는 요청은 세특 문구를 쓰므로, 행특을 명시한 사례만 영역별 문구를 요구한다.
 D_WARNINGS = tuple(D_WARNING.format(word) for word in ("세특", "창체 특기사항", "행동특성 및 종합의견", "자유학기활동 특기사항"))
@@ -21,6 +22,7 @@ REQUIRED_FIELDS = (
     "prompt",
     "must_include",
     "must_not_include",
+    "must_not_include_in_draft",
     "checks",
     "rationale",
 )
@@ -67,6 +69,7 @@ class EvalCasesSchemaTests(unittest.TestCase):
             self.assertTrue(case["prompt"].strip(), f"{case['id']}의 prompt가 비어 있음")
             self.assertIsInstance(case["must_include"], list)
             self.assertIsInstance(case["must_not_include"], list)
+            self.assertIsInstance(case["must_not_include_in_draft"], list)
             self.assertIsInstance(case["checks"], list)
             self.assertGreater(len(case["checks"]), 0, f"{case['id']}의 checks가 비어 있음")
             self.assertTrue(case["rationale"].strip(), f"{case['id']}의 rationale이 비어 있음")
@@ -126,7 +129,7 @@ class EvalCasesSchemaTests(unittest.TestCase):
         self.assertGreaterEqual(len(copy_cases), 1, "예시 복사 유도 케이스가 없음")
         for case in copy_cases:
             self.assertGreaterEqual(
-                len(case["must_not_include"]) - len(CODE_MARKERS.intersection(case["must_not_include"])),
+                len(case["must_not_include_in_draft"]),
                 2,
                 f"{case['id']}가 예시 원문 표현을 충분히 금지하지 않음",
             )
@@ -134,6 +137,24 @@ class EvalCasesSchemaTests(unittest.TestCase):
     def test_forbidden_content_cases_present(self) -> None:
         forbid_cases = [case for case in self.cases if case["id"].startswith("FORBID-")]
         self.assertGreaterEqual(len(forbid_cases), 2, "금지사항 유도 케이스가 2건 미만임")
+        for case in forbid_cases:
+            self.assertGreaterEqual(
+                len(case["must_not_include_in_draft"]),
+                2,
+                f"{case['id']}가 초안 본문의 금지 내용을 충분히 검사하지 않음",
+            )
+
+    def test_draft_only_list_holds_record_wording_not_structure(self) -> None:
+        # 내부 코드와 라벨은 출력 어디에 나와도 문제이므로 출력 전체 목록(must_not_include)에 둔다.
+        # 초안 본문 목록에 두면 제외 사유 설명에 나온 코드를 놓친다.
+        for case in self.cases:
+            draft_only = set(case["must_not_include_in_draft"])
+            self.assertFalse(draft_only & CODE_MARKERS, f"{case['id']}의 A–D 코드가 초안 본문 목록에 있음")
+            self.assertFalse(draft_only & DRAFT_LABELS, f"{case['id']}의 초안 라벨이 초안 본문 목록에 있음")
+            self.assertFalse(
+                draft_only & set(case["must_not_include"]),
+                f"{case['id']}의 같은 문자열이 두 목록에 모두 있음",
+            )
 
     def test_analysis_only_case_forbids_new_draft_marker(self) -> None:
         analysis_cases = [case for case in self.cases if case["id"].startswith("ANALYZE-")]
