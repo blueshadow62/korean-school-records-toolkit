@@ -120,6 +120,20 @@ class SkillIntegrationContractTests(unittest.TestCase):
                 self.assertEqual(header.count("|"), line.count("|"))
         self.assertGreaterEqual(tables, 3)
 
+    def test_intake_template_defers_evidence_threshold_to_skill(self) -> None:
+        # 근거 범위의 기준은 SKILL.md A–D 하나다. 입력 서식이 별도 문턱을 두면 B 근거(소감문 등)만 있는 학생이 D로 떨어진다.
+        intake = (Path(__file__).parents[1] / "references" / "intake-template.md").read_text(encoding="utf-8")
+        fields = intake.split("## 필수·선택 필드", 1)[1]
+        self.assertIn("B: 보고서·활동지·수행평가·소감문·발표 자료 등 제한된 학생별 근거만 있으면", SKILL_TEXT)
+        self.assertIn("이 서식은 초안을 쓸 수 있는 근거의 문턱을 따로 두지 않는다", fields)
+        self.assertIn("[SKILL.md](../SKILL.md) 「내부 근거 판정 A–D」가 정한다", fields)
+        self.assertIn("학생 소감·자기평가만 있어도 그 기준에 따라 자료 범위의 보수적 초안을 쓸 수 있다", fields)
+        self.assertNotIn("최소 하나", fields)
+        self.assertNotIn("필수 필드", fields)
+        # 행특에는 과목·활동명이 없으므로 빈 값이어도 서식이 성립해야 한다.
+        self.assertIn("행특에는 이 필드가 없다", fields)
+        self.assertIn("- 과목·활동명: [과목명 또는 활동명. 행특은 비워 둔다]", intake)
+
     def test_requested_mode_cannot_override_evidence_strength(self) -> None:
         self.assertIn("지정하더라도 근거 수준보다 높게 적용하지 않는다", SKILL_TEXT)
         self.assertIn("근거 없이 완성본·A·발표 수행·다른 학생과 같은 활동을 요청해도", SKILL_TEXT)
