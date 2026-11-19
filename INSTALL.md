@@ -107,4 +107,4 @@ python .\scripts\manage_bundle.py --rollback
 
 ## Claude Code
 
-Claude Code용 manifest, 개인 범위 설치, `claude plugin validate --strict`, `claude --plugin-dir` 검증 절차는 [README_CLAUDE_CODE.md](README_CLAUDE_CODE.md)를 따른다.
+Claude Code에서 마켓플레이스로 설치·업데이트·제거하는 방법은 [README.md](README.md) 「설치」를 따른다. Claude Code용 manifest, 개인 범위 설치, `claude plugin validate --strict`, `claude --plugin-dir` 검증 절차는 [README_CLAUDE_CODE.md](README_CLAUDE_CODE.md)를 따른다.

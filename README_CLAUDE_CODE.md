@@ -2,11 +2,14 @@
 
 이 플러그인은 `write-school-records`, `korean-character-count`를 서로 독립된 Claude Code 스킬로 제공한다. 두 스킬의 공통 원본은 Codex 플러그인과 같으며 `.claude-plugin/plugin.json`만 Claude Code 전용 manifest로 사용한다.
 
+마켓플레이스로 설치하고 확인·업데이트·지우는 방법은 [README.md](README.md) 「설치」에 있다. 이 문서는 폴더를 직접 시험하거나 복사해 설치하는 방법과 개발자용 검증을 다룬다.
+
 ## 요구 사항
 
-- Claude Code 최신 버전
-- `write-school-records`: Python 3 표준 라이브러리
+- Claude Code 최신 버전(한 번에 설치하는 명령은 버전 조건이 있으며 README.md 「설치」에 적었다)
+- `write-school-records`: Python 3(점검 스크립트, 표준 라이브러리만 쓴다)
 - `korean-character-count`: Node.js 18 이상
+- 문서 전용판(`korean-school-records-lite`)은 Python과 Node.js가 필요 없다.
 
 ## 로컬 검증
 

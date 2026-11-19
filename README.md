@@ -8,6 +8,17 @@
 
 교사가 확인한 관찰·평가 근거로 학교생활기록부 세특·창체·행특·중학교 자유학기활동 초안을 쓰고, 글자 수와 NEIS Byte를 계산하는 Claude Code·Codex 겸용 스킬 플러그인이다. 규정은 2026학년도 기재요령을 이 도구가 정리한 요약으로 판단하고(공식 효력은 교육부 원문에 있다), 2022 개정 교육과정 중·고등학교 성취수준을 참고한다. 초안 작성과 글자 수 계산은 서로 독립적으로 사용할 수 있다.
 
+## 빠른 설치
+
+Claude Code가 설치되어 있으면 터미널(명령을 글자로 입력하는 프로그램)에서 아래 두 줄로 전체판을 설치한다.
+
+```bash
+claude plugin marketplace add blueshadow62/korean-school-records-toolkit
+claude plugin install korean-school-records-toolkit@blueshadow62-school-records
+```
+
+전체판은 Python 3와 Node.js 18 이상이 필요하고, 문서 전용판은 필요 없다. 터미널을 쓰지 않고 Claude Code 대화 창에서 설치하는 방법, 문서 전용판, 설치 확인·업데이트·지우기는 [설치](#설치)를 본다.
+
 ## 포함 스킬
 
 | 스킬 | 역할 | 주요 호출 범위 |
@@ -82,16 +93,98 @@
 
 ## 설치
 
-전체판은 Claude Code에서 이 저장소를 마켓플레이스로 추가한 뒤 설치한다.
+설치하는 프로그램은 Claude Code다. 이 저장소는 마켓플레이스(플러그인을 모아 둔 목록)를 겸하므로, 마켓플레이스를 한 번 등록한 뒤 이름으로 설치한다. 아래 명령 형식은 Claude Code 공식 문서([Install and manage plugins](https://code.claude.com/docs/en/plugins/install))로 2026-11-19에 확인했다. 화면에 나오는 문구는 Claude Code 버전에 따라 다를 수 있다.
+
+### 먼저 정할 것
+
+1. **어느 판을 설치할지 정한다.** 둘 가운데 하나만 설치한다. 함께 설치하면 같은 스킬이 두 개 보인다. 다른 판을 이미 설치했다면 먼저 아래 「지우기」로 지운다.
+
+   | 판 | 이런 경우에 고른다 | 필요한 것 |
+   |---|---|---|
+   | 전체판 `korean-school-records-toolkit` | 기계 점검 스크립트와 글자 수 스킬이 필요할 때 | Python 3(점검 스크립트, 표준 라이브러리만 쓴다), Node.js 18 이상(글자 수 스킬) |
+   | 문서 전용판 `korean-school-records-lite` | 문서(스킬 지침)만 필요하거나 Python·Node.js가 없을 때 | 없음 |
+
+2. **Claude Code가 설치되어 있어야 한다.** 설치 방법은 [Claude Code 공식 안내](https://code.claude.com/docs/en/setup)를 따른다.
+
+마켓플레이스 이름은 `blueshadow62-school-records`다.
+
+### 방법 1: Claude Code 대화 창에서 설치 (터미널을 쓰지 않는 방법)
+
+Claude Code를 실행하고 대화 창에 아래 명령을 한 줄씩 입력한다.
+
+전체판:
+
+```text
+/plugin marketplace add blueshadow62/korean-school-records-toolkit
+/plugin install korean-school-records-toolkit@blueshadow62-school-records
+```
+
+문서 전용판:
+
+```text
+/plugin marketplace add blueshadow62/korean-school-records-toolkit
+/plugin install korean-school-records-lite@blueshadow62-school-records
+```
+
+1. 첫째 줄은 마켓플레이스를 등록하는 명령이다. 한 번만 입력한다.
+2. 둘째 줄을 입력하면 설치 범위를 고르는 화면이 열린다. 모든 프로젝트에서 쓰려면 `Install for you (user scope)`를 고른다.
+3. 설치가 끝나면 마지막 줄에 `Plugin is now active.`가 나온다. 이 문구가 나오면 바로 쓸 수 있다. `Run /reload-plugins to apply.`가 나오면 Claude Code가 다시 불러오기를 대신 실행한다.
+
+한 번에 설치할 수도 있다(Claude Code 2.1.275 이상). 마켓플레이스가 아직 등록되어 있지 않으면 등록해도 되는지 먼저 묻는다.
+
+```text
+/plugin install korean-school-records-toolkit --marketplace blueshadow62/korean-school-records-toolkit
+```
+
+### 방법 2: 터미널에서 설치
+
+터미널에서 아래 명령을 한 줄씩 실행한다.
 
 ```bash
 claude plugin marketplace add blueshadow62/korean-school-records-toolkit
 claude plugin install korean-school-records-toolkit@blueshadow62-school-records
 ```
 
-Codex 설치·업데이트·제거 절차는 [INSTALL.md](INSTALL.md)를 따른다. Claude Code 설치와 로컬 검증은 [README_CLAUDE_CODE.md](README_CLAUDE_CODE.md)를 따른다.
+문서 전용판은 둘째 줄의 이름을 `korean-school-records-lite@blueshadow62-school-records`로 바꾼다.
 
-문서 전용판은 디렉터리에 등록되면 claude.ai·Cowork·Claude Code의 디렉터리에서 설치한다. 그 전에 Claude Code에서 시험하려면 같은 마켓플레이스에서 `korean-school-records-lite@blueshadow62-school-records`를 설치한다. 전체판을 이미 설치했다면 먼저 제거한다.
+한 번에 설치할 수도 있다(Claude Code 2.1.292 이상).
+
+```bash
+claude plugin install korean-school-records-toolkit --marketplace blueshadow62/korean-school-records-toolkit
+```
+
+터미널에서 설치한 플러그인은 다음에 Claude Code를 시작할 때 적용된다. 이미 열려 있는 대화에서는 `/reload-plugins`를 입력하면 적용된다.
+
+### 설치 확인
+
+1. 터미널에서 `claude plugin list`를 실행한다. 플러그인 이름 아래에 `Version`, `Scope`, `Status`가 나오고 `Status`가 `✔ enabled`이면 설치된 것이다.
+2. Claude Code 대화 창에 `/`를 입력하면 설치한 스킬이 `/<플러그인 이름>:<스킬 이름>` 꼴로 보인다. 전체판은 `/korean-school-records-toolkit:write-school-records`와 `/korean-school-records-toolkit:korean-character-count`가, 문서 전용판은 `/korean-school-records-lite:write-school-records`가 보인다.
+3. 대화 창에 요청해 본다. 예: "아래 교사 관찰을 근거로 세특 초안을 써 줘." 뒤에 관찰 내용을 붙인다. 학생 이름·학번·학교명은 빼고 입력한다. 요청 예시는 위 「사용 예시」를 본다.
+
+### 새 버전으로 올리기
+
+이 마켓플레이스는 자동 업데이트가 꺼져 있다(공식 문서: 공식 마켓플레이스가 아닌 마켓플레이스는 기본값이 꺼짐). 새 버전이 나오면 직접 올린다.
+
+```bash
+claude plugin update korean-school-records-toolkit@blueshadow62-school-records
+```
+
+문서 전용판은 `korean-school-records-lite@blueshadow62-school-records`로 바꾼다. 업데이트한 버전은 Claude Code를 다시 시작해야 적용된다. 이미 최신이면 `is already at the latest version`이 나온다. 기재요령 원문을 직접 등록해 썼다면, 업데이트가 스킬 폴더를 교체하므로 등록한 원문이 새 설치본에 없다. [USER_GUIDE.md](USER_GUIDE.md) 「기재요령 원문을 직접 등록하기」대로 다시 등록한다.
+
+### 지우기
+
+```bash
+claude plugin uninstall korean-school-records-toolkit@blueshadow62-school-records
+```
+
+문서 전용판은 `korean-school-records-lite@blueshadow62-school-records`로 바꾼다. 마켓플레이스 등록까지 지우려면 `claude plugin marketplace remove blueshadow62-school-records`를 실행한다. 이 마켓플레이스에서 설치한 플러그인이 모두 함께 지워진다(공식 문서).
+
+### 그 밖의 방법
+
+- Claude Code 데스크톱 앱과 VS Code 확장에서는 플러그인 화면에서 설치할 수 있다. 방법은 위 공식 문서의 해당 탭을 본다.
+- Codex 설치·업데이트·제거 절차는 [INSTALL.md](INSTALL.md)를 따른다.
+- 폴더를 내려받아 직접 시험하거나 복사해 설치하는 방법은 [README_CLAUDE_CODE.md](README_CLAUDE_CODE.md)를 따른다.
+- 문서 전용판은 Claude 플러그인 디렉터리에 등록할 예정이다. 등록되면 claude.ai·Cowork의 디렉터리에서도 설치할 수 있다.
 
 ## 실행하는 것과 외부 연결
 
@@ -100,6 +193,7 @@ Codex 설치·업데이트·제거 절차는 [INSTALL.md](INSTALL.md)를 따른�
 - 파일을 쓰는 스크립트는 기재요령 원문 등록 도구(`update_guidelines.py`, 스킬 폴더 안 `references/guidelines*/`에 씀)와 정비용 NEIS 실측값 기록 도구(`compare_neis_counts.py`)다.
 - `tools/corpus/`는 정비하는 사람이 성취수준 자료를 다시 만들 때 직접 실행하는 도구이며 스킬이 실행하지 않는다. 그 가운데 `convert_nkis_pdfs_v2.py`는 `npx`로 kordoc 패키지를 내려받아 실행한다.
 - 문서 전용판에는 스크립트가 없다. 글자 수·Byte는 Claude의 코드 실행 도구가 스킬 문서에 적힌 몇 줄의 코드로 계산하며, 그 코드는 파일을 쓰거나 네트워크에 접속하지 않는다.
+- 입력한 자료를 어떻게 다루는지는 [개인정보 처리 안내](PRIVACY.md)에 있다.
 - 보안 문제 신고와 자세한 설명은 [SECURITY.md](SECURITY.md)를 따른다.
 
 ## 더 읽을 문서
@@ -107,6 +201,7 @@ Codex 설치·업데이트·제거 절차는 [INSTALL.md](INSTALL.md)를 따른�
 | 문서 | 내용 |
 |---|---|
 | [USER_GUIDE.md](USER_GUIDE.md) | 실제로 어떻게 요청하고 쓰는지 |
+| [PRIVACY.md](PRIVACY.md) | 개인정보 처리 안내: 입력한 자료를 수집·저장·전송하지 않는다는 점과 스크립트가 하는 일 |
 | [docs/how-it-works.html](docs/how-it-works.html) | 이 도구가 왜 이렇게 판단하는지를 쉬운 말로 설명. 내려받아 브라우저로 연다 |
 | [docs/dev-vs-package.md](docs/dev-vs-package.md) | 개발본·배포본(전체판)·문서 전용판의 의도된 차이 (기여자용) |
 | [editions/korean-school-records-lite/README.md](editions/korean-school-records-lite/README.md) | 문서 전용판 안내(디렉터리 목록에 쓰이는 설명) |
