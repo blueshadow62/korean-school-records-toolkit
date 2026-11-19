@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
+from analyze_record import active_rule_context
 from update_guidelines import anchor_index, heading_index, index_bytes, load_index_terms, root_paths, sha256_bytes
 
 
 SCRIPT = Path(__file__).with_name("update_guidelines.py")
+SKILL_ROOT = Path(__file__).resolve().parents[1]
 
 
 class UpdateGuidelinesCliTests(unittest.TestCase):
@@ -100,6 +103,55 @@ class UpdateGuidelinesCliTests(unittest.TestCase):
         self.assertEqual(middle_paths["guidelines"].name, "guidelines-middle")
         self.assertEqual(high_paths["current"].read_text(encoding="utf-8"), high.read_text(encoding="utf-8"))
         self.assertEqual(middle_paths["current"].read_text(encoding="utf-8"), middle.read_text(encoding="utf-8"))
+
+    def copy_shipped_files(self) -> None:
+        """배포본에 들어가는 파일(요약·검사 규칙·색인 용어)만 둔 빈 상태를 만든다. 원문과 manifest는 없다."""
+        for directory in ("guidelines", "guidelines-middle"):
+            source = SKILL_ROOT / "references" / directory
+            target = self.root / "references" / directory
+            (target / "analyzer-rules").mkdir(parents=True)
+            for name in ("summary.md", "index-terms.json"):
+                shutil.copy2(source / name, target / name)
+            shutil.copy2(source / "analyzer-rules" / "2026.json", target / "analyzer-rules" / "2026.json")
+
+    def test_list_and_verify_explain_summary_basis_when_nothing_is_registered(self) -> None:
+        self.copy_shipped_files()
+        for level_args in ((), ("--level", "middle")):
+            with self.subTest(level=level_args):
+                listed = self.run_cli(*level_args, "list")
+                self.assertEqual(listed.returncode, 0, listed.stderr)
+                self.assertIn("(등록된 원문 없음)", listed.stdout)
+                verified = self.run_cli(*level_args, "verify")
+                self.assertEqual(verified.returncode, 0, verified.stderr)
+                self.assertIn("등록된 원문 없음", verified.stdout)
+                self.assertIn("summary.md(2026학년도, 2026-02-12 개정판 요약) 기준으로 동작합니다", verified.stdout)
+        self.assertFalse((self.root / "references" / "guidelines" / "manifest.json").exists())
+
+    def test_verify_without_original_or_summary_is_an_error(self) -> None:
+        result = self.run_cli("verify")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("기재요령 요약이 없습니다", result.stderr)
+
+    def test_user_registers_an_original_from_the_shipped_empty_state(self) -> None:
+        # 배포본 상태에서 사용자가 변환한 원문을 등록하면 원문 기준으로 바뀌고, 지우면 다시 요약 기준이 된다.
+        self.copy_shipped_files()
+        source = self.write_input("기재요령(고등학교).md", "# 01 작성 시 유의사항\n내용\n# 08 학교생활기록부 영역별 입력 가능 최대 글자수\n<table><tr><td>동아리활동</td></tr></table>\n")
+        result = self.import_version(source, "2026", "2026-02-12", "--activate")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        verified = self.run_cli("verify")
+        self.assertEqual(verified.returncode, 0, verified.stderr)
+        self.assertIn("검증 통과: 2026_2026-02-12", verified.stdout)
+        listed = self.run_cli("list")
+        self.assertIn("2026_2026-02-12\t2026\t2026-02-12\t확인\t*", listed.stdout)
+        self.assertNotIn("(등록된 원문 없음)", listed.stdout)
+        paths = root_paths(self.root)
+        self.assertIn("08 학교생활기록부 영역별 입력 가능 최대 글자수", paths["index"].read_text(encoding="utf-8"))
+        context = active_rule_context(self.root)
+        self.assertEqual("original", context["basis"])
+        middle = active_rule_context(self.root, "middle")
+        self.assertEqual("summary", middle["basis"])
+        paths["current"].write_text("# 변조\n", encoding="utf-8")
+        self.assertEqual(self.run_cli("verify").returncode, 2)
 
     def test_unknown_level_is_rejected(self) -> None:
         result = self.run_cli("--level", "elementary", "list")

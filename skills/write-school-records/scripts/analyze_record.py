@@ -12,7 +12,15 @@ from collections import Counter
 from pathlib import Path
 from typing import Iterable
 
-from update_guidelines import LEVEL_DIRECTORIES, GuidelineError, load_manifest, root_paths, verify_manifest
+from update_guidelines import (
+    LEVEL_DIRECTORIES,
+    GuidelineError,
+    has_registered_original,
+    load_manifest,
+    read_summary_metadata,
+    root_paths,
+    verify_manifest,
+)
 
 
 ACTION_TERMS = (
@@ -221,13 +229,16 @@ def resolve_field_limit(
                 "vocational_per_semester": "전공실무과목 학기별",
                 "default": "과목별 세부능력 및 특기사항",
             }[limit_key]
+        elif field == "creative" and area == "service" and isinstance(limits_v2.get("creative"), dict):
+            # 봉사활동에는 특기사항 칸이 없고 실적만 입력하므로(3학년 봉사 영역 포함) 실적 한 건의 활동내용 한도로 센다.
+            limit = limits_v2["creative"].get("service_record_item", limit)
+            label_prefix = "봉사활동 실적 활동내용(실적별)"
         elif field == "creative" and area and isinstance(limits_v2.get("creative"), dict):
             creative_limits = limits_v2["creative"]
             limit = creative_limits.get(area, limit)
             area_label = {
                 "autonomy": "자율활동" if grade == 3 else "자율·자치활동",
                 "club": "동아리활동",
-                "service": "봉사활동",
                 "career": "진로활동",
             }[area]
             label_prefix = f"창체 {area_label} 특기사항"
@@ -298,7 +309,7 @@ def analyze(
     )
     if field_limit is not None and neis_bytes > field_limit["bytes"]:
         warnings.append(
-            f"활성 기재요령의 {school_year} 참고 바이트 한도를 "
+            f"{school_year}학년도 기재요령 기준 참고 바이트 한도를 "
             f"{neis_bytes - field_limit['bytes']}Byte 초과했습니다"
             f"(한글 기준 {field_limit['korean_characters']}자, {field_limit['bytes']}Byte; "
             "실제 NEIS 입력값은 별도 확인 필요)."
@@ -321,10 +332,13 @@ def analyze(
 
     if field == "creative" and area == "service":
         if grade in (1, 2):
-            warnings.append(f"봉사활동 특기사항 영역은 {school_year}학년도 3학년에만 있음")
+            warnings.append(
+                f"봉사활동 영역은 {school_year}학년도 3학년에만 있음. 1·2학년 봉사활동은 창체 각 영역과 연계해 운영합니다."
+            )
         warnings.append(
-            "봉사활동 실적 활동내용은 실적별 50자/150Byte 이내의 객관적 내용만 기록하며, "
-            "정성평가는 다른 영역에 기록해야 합니다."
+            "봉사활동은 특기사항 칸 없이 실적을 입력하므로, 이 점검은 실적 한 건의 활동내용(실적별 50자/150Byte)으로 셉니다. "
+            "활동내용에는 객관적 내용만 쓰고 정성평가는 넣지 않습니다. 교사가 관찰한 특기사항은 필요하면 행특에, "
+            "1·2학년은 연계한 창체 영역 특기사항에 쓸 수 있습니다."
         )
 
     action_total = sum(action_counts.values())
@@ -383,7 +397,7 @@ def analyze(
     )
     if creative_condition_hits:
         warnings.append(
-            "창체의 영역·입력 조건을 활성 기재요령과 대조하세요: "
+            "창체의 영역·입력 조건을 기재요령과 대조하세요: "
             + ", ".join(creative_condition_hits)
         )
 
@@ -431,12 +445,12 @@ def analyze(
             "count_contract": "Python Unicode code points after trimming outer whitespace",
             "utf8_bytes": neis_bytes,
             "neis_bytes": neis_bytes,
-            "byte_contract": "UTF-8 encoded bytes after CRLF->LF normalization and outer-whitespace trim; matches the active guideline rule (Hangul 3B, ASCII 1B, Enter 1B) but actual NEIS entry values are not yet measured",
+            "byte_contract": "UTF-8 encoded bytes after CRLF->LF normalization and outer-whitespace trim; matches the guideline byte rule (Hangul 3B, ASCII 1B, Enter 1B) but actual NEIS entry values are not yet measured",
             "default_neis_byte_limit": field_limit["bytes"] if field_limit else None,
             "resolved_limit_label": resolved_limit_label,
             "combined_neis_bytes": combined_neis_bytes,
             "limit_contract": (
-                "Reference limit from the active guideline; "
+                "Reference limit from the guideline year's analyzer rules; "
                 "actual NEIS entry behavior requires separate verification"
                 if field_limit
                 else None
@@ -472,14 +486,10 @@ def format_human(result: dict[str, object]) -> str:
     ]
     guideline = result.get("guideline")
     if isinstance(guideline, dict):
-        level_label = ", 중학교" if guideline.get("school_level") == "middle" else ""
-        lines.append(
-            f"- 활성 기재요령: {guideline.get('active_version', '')} "
-            f"({guideline.get('school_year', '')}학년도{level_label})"
-        )
+        lines.append(f"- {guideline_basis_line(guideline)}")
     if metrics["default_neis_byte_limit"] is not None:
         lines.append(
-            f"- 활성 기재요령의 {result.get('rule_year', '')} 참고 바이트 한도: "
+            f"- {result.get('rule_year', '')}학년도 기재요령 기준 참고 바이트 한도: "
             f"{metrics['default_neis_byte_limit']}Byte (실제 NEIS 입력값 확인 필요)"
         )
     if metrics.get("resolved_limit_label") is not None:
@@ -611,7 +621,10 @@ def format_batch_human(result: dict[str, object]) -> str:
     assert isinstance(rows, list)
     assert isinstance(warnings, list)
     assert isinstance(notes, list)
-    lines = ["학교생활기록부 배치 기계 점검", "행\t글자\t바이트\t경고"]
+    lines = ["학교생활기록부 배치 기계 점검"]
+    if rows and isinstance(rows[0].get("guideline"), dict):
+        lines.append(guideline_basis_line(rows[0]["guideline"]))
+    lines.append("행\t글자\t바이트\t경고")
     for row in rows:
         metrics = row["metrics"]
         lines.append(
@@ -628,26 +641,68 @@ def format_batch_human(result: dict[str, object]) -> str:
     return "\n".join(lines)
 
 
-def active_rule_context(skill_root: Path | None = None, level: str = "high") -> dict[str, str]:
-    """Verify the active guideline of one school level and refuse stale analyzer rules."""
+def guideline_basis_line(guideline: dict[str, object]) -> str:
+    """사람이 읽는 출력에 이 점검이 원문을 대조했는지, 요약만 기준으로 했는지 밝힌다."""
+    level_label = ", 중학교" if guideline.get("school_level") == "middle" else ""
+    year = guideline.get("school_year", "")
+    if guideline.get("basis") == "summary":
+        return (
+            f"기재요령 기준: 원문 미등록, 요약 기준 ({year}학년도{level_label}, "
+            f"{guideline.get('revision_date', '')} 개정판을 이 스킬이 정리한 요약과 검사 규칙)"
+        )
+    return f"활성 기재요령: {guideline.get('active_version', '')} ({year}학년도{level_label}, 등록된 원문 검증 통과)"
+
+
+def active_rule_context(skill_root: Path | None = None, level: str = "high") -> dict[str, object]:
+    """Pick the school year of the analyzer rules for one school level.
+
+    원문을 등록했으면 지금처럼 활성 버전과 해시를 검증하고(틀리면 오류), 등록하지 않았으면
+    배포본에 들어 있는 요약 머리말의 학년도로 검사 규칙을 고른다.
+    """
     root = skill_root.resolve() if skill_root else Path(__file__).resolve().parents[1]
     try:
         paths = root_paths(root, level)
         manifest = load_manifest(paths)
-        verify_manifest(paths, manifest)
+        if has_registered_original(manifest):
+            verify_manifest(paths, manifest)
+            summary = None
+        else:
+            summary = read_summary_metadata(paths["summary"])
     except GuidelineError as error:
         raise ValueError(f"활성 기재요령을 검증할 수 없습니다: {error}") from error
 
-    active = manifest["active_version"]
-    entry = manifest["versions"][active]
-    school_year = str(entry.get("school_year", ""))
+    if summary is None:
+        active = manifest["active_version"]
+        entry = manifest["versions"][active]
+        school_year = str(entry.get("school_year", ""))
+        load_year_rules(school_year, root, level)
+        return {
+            "basis": "original",
+            "active_version": str(active),
+            "school_year": school_year,
+            "school_level": level,
+            "revision_date": str(entry.get("revision_date", "")),
+            "source_title": str(entry.get("source_title", "")),
+            "source_url": str(entry.get("source_url", "")),
+        }
+
+    if summary["school_level"] != level:
+        raise ValueError(
+            f"기재요령 요약의 학교급({summary['school_level']})이 요청한 학교급({level})과 다릅니다: {paths['summary']}"
+        )
+    school_year = summary["school_year"]
     load_year_rules(school_year, root, level)
     return {
-        "active_version": str(active),
+        "basis": "summary",
+        "basis_note": "원문 미등록, 요약 기준",
+        "active_version": None,
         "school_year": school_year,
         "school_level": level,
-        "source_title": str(entry.get("source_title", "")),
-        "source_url": str(entry.get("source_url", "")),
+        "revision_date": summary["revision_date"],
+        "source_title": summary["source_title"],
+        "source_url": summary.get("source_url", ""),
+        "summary_path": paths["summary"].relative_to(paths["root"]).as_posix(),
+        "summary_written": summary.get("summary_written", ""),
     }
 
 
@@ -667,7 +722,7 @@ def parse_args() -> argparse.Namespace:
         "--school-level",
         choices=tuple(LEVEL_DIRECTORIES),
         default="high",
-        help="학교급별 활성 기재요령과 한도(기본: high)",
+        help="학교급별 기재요령(등록된 원문, 없으면 요약)과 한도(기본: high)",
     )
     parser.add_argument(
         "--target-chars", type=positive_int, help="사용자가 지정한 양의 목표 글자 수"
@@ -682,7 +737,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--area",
         choices=("autonomy", "club", "service", "career"),
-        help="창체 세부 영역별 한도 선택",
+        help="창체 세부 영역별 한도 선택(service는 봉사활동 실적 활동내용, 실적별 50자)",
     )
     parser.add_argument("--combine-with", type=Path, help="공통과목 1·2 합산 점검용 UTF-8 텍스트 파일")
     parser.add_argument("--json", action="store_true", help="JSON으로 출력")

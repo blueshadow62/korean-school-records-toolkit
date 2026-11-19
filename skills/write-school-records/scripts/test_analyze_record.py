@@ -4,6 +4,9 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -16,6 +19,8 @@ from analyze_record import (
     read_batch_tsv,
     read_utf8_text,
 )
+
+SKILL_ROOT = Path(__file__).resolve().parents[1]
 
 
 class AnalyzeRecordTests(unittest.TestCase):
@@ -167,8 +172,23 @@ class AnalyzeRecordTests(unittest.TestCase):
 
     def test_service_area_warning_uses_rule_school_year(self) -> None:
         rules = dict(load_year_rules("2026"), school_year="2027")
-        warnings = analyze("봉사 활동을 함.", field="creative", area="service", grade=1, rules=rules)["warnings"]
-        self.assertIn("봉사활동 특기사항 영역은 2027학년도 3학년에만 있음", warnings)
+        warnings = " ".join(analyze("봉사 활동을 함.", field="creative", area="service", grade=1, rules=rules)["warnings"])
+        self.assertIn("봉사활동 영역은 2027학년도 3학년에만 있음", warnings)
+
+    def test_service_area_is_checked_as_one_record_not_as_remarks(self) -> None:
+        # 기재요령에는 봉사활동 특기사항 칸이 없다(3학년 봉사 영역은 실적만 입력). 실적 한 건의 활동내용 50자로 센다.
+        for level in ("high", "middle"):
+            rules = load_year_rules("2026", level=level)
+            self.assertNotIn("service", rules["field_limits_v2"]["creative"])
+            within = analyze("가" * 50, field="creative", area="service", grade=3, rules=rules)
+            over = analyze("가" * 51, field="creative", area="service", grade=3, rules=rules)
+            with self.subTest(level=level):
+                self.assertEqual(150, within["metrics"]["default_neis_byte_limit"])
+                self.assertIn("봉사활동 실적 활동내용(실적별) 50자/150Byte", within["metrics"]["resolved_limit_label"])
+                self.assertNotIn("참고 바이트 한도", " ".join(within["warnings"]))
+                self.assertIn("참고 바이트 한도", " ".join(over["warnings"]))
+                self.assertIn("특기사항 칸 없이 실적을 입력", " ".join(over["warnings"]))
+                self.assertNotIn("봉사활동 특기사항", within["metrics"]["resolved_limit_label"])
 
     def test_private_education_pattern_excludes_instructor_fee(self) -> None:
         positive = analyze("OO학원 강사의 지도를 받음. 과외를 받아.")
@@ -223,8 +243,8 @@ class AnalyzeRecordTests(unittest.TestCase):
         service = analyze(
             "자료를 비교함.", field="creative", grade=2, area="service", rules=rules
         )
-        self.assertIn("봉사활동 특기사항 영역은 2026학년도 3학년에만 있음", service["warnings"])
-        self.assertIn("2학년 창체 봉사활동 특기사항", service["metrics"]["resolved_limit_label"])
+        self.assertIn("봉사활동 영역은 2026학년도 3학년에만 있음", " ".join(service["warnings"]))
+        self.assertIn("2학년 봉사활동 실적 활동내용(실적별)", service["metrics"]["resolved_limit_label"])
         self.assertIn("객관적 내용", " ".join(service["warnings"]))
 
         common = analyze("가" * 300, field="subject", subject_type="common", rules=rules)
@@ -362,6 +382,93 @@ class AnalyzeRecordTests(unittest.TestCase):
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(ValueError, "2027.*규칙 파일"):
+                active_rule_context(root)
+
+    def make_summary_only_root(self, temp: str) -> Path:
+        """원문 변환본 없이 요약·검사 규칙·스크립트만 있는 스킬 폴더(배포본과 같은 구성)를 만든다."""
+        root = Path(temp) / "skill"
+        for directory in ("guidelines", "guidelines-middle"):
+            source = SKILL_ROOT / "references" / directory
+            target = root / "references" / directory
+            (target / "analyzer-rules").mkdir(parents=True)
+            shutil.copy2(source / "summary.md", target / "summary.md")
+            shutil.copy2(source / "analyzer-rules" / "2026.json", target / "analyzer-rules" / "2026.json")
+        (root / "scripts").mkdir()
+        for name in ("analyze_record.py", "update_guidelines.py"):
+            shutil.copy2(SKILL_ROOT / "scripts" / name, root / "scripts" / name)
+        return root
+
+    def test_summary_basis_is_used_when_no_original_is_registered(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = self.make_summary_only_root(temp)
+            for level in ("high", "middle"):
+                with self.subTest(level=level):
+                    context = active_rule_context(root, level)
+                    self.assertEqual("summary", context["basis"])
+                    self.assertEqual("원문 미등록, 요약 기준", context["basis_note"])
+                    self.assertIsNone(context["active_version"])
+                    self.assertEqual("2026", context["school_year"])
+                    self.assertEqual("2026-02-12", context["revision_date"])
+                    self.assertEqual(level, context["school_level"])
+
+    def test_cli_states_summary_basis_without_original(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = self.make_summary_only_root(temp)
+            script = root / "scripts" / "analyze_record.py"
+
+            def run(*args: str) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [sys.executable, str(script), *args],
+                    text=True, encoding="utf-8", capture_output=True, check=False,
+                )
+
+            human = run("--field", "behavior", "--text", "가" * 301)
+            self.assertEqual(0, human.returncode, human.stderr)
+            self.assertIn("기재요령 기준: 원문 미등록, 요약 기준 (2026학년도", human.stdout)
+            self.assertIn("참고 바이트 한도를 3Byte 초과", human.stdout)
+            middle = run("--school-level", "middle", "--field", "free_semester", "--text", "자료를 비교함.", "--json")
+            self.assertEqual(0, middle.returncode, middle.stderr)
+            data = json.loads(middle.stdout)
+            self.assertEqual("summary", data["guideline"]["basis"])
+            self.assertEqual(3000, data["metrics"]["default_neis_byte_limit"])
+
+    def test_registered_original_is_verified_and_a_wrong_hash_is_still_an_error(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = self.make_summary_only_root(temp)
+            guidelines = root / "references" / "guidelines"
+            (guidelines / "versions").mkdir()
+            archive = guidelines / "versions" / "2026_2026-02-12.md"
+            archive.write_text("# 2026 기재요령\n", encoding="utf-8")
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            (guidelines / "current.md").write_bytes(archive.read_bytes())
+            (guidelines / "current.index.md").write_text(
+                f"<!-- active_version=2026_2026-02-12 sha256={digest} -->\n", encoding="utf-8"
+            )
+            manifest = {
+                "schema_version": 1,
+                "active_version": "2026_2026-02-12",
+                "versions": {
+                    "2026_2026-02-12": {
+                        "school_year": "2026",
+                        "revision_date": "2026-02-12",
+                        "archive_path": "references/guidelines/versions/2026_2026-02-12.md",
+                        "sha256": digest,
+                    }
+                },
+            }
+            (guidelines / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            context = active_rule_context(root)
+            self.assertEqual("original", context["basis"])
+            self.assertEqual("2026_2026-02-12", context["active_version"])
+            (guidelines / "current.md").write_text("# 변조\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "current.md가 활성 보관 파일과 일치하지 않습니다"):
+                active_rule_context(root)
+
+    def test_missing_original_and_missing_summary_is_an_error(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = self.make_summary_only_root(temp)
+            (root / "references" / "guidelines" / "summary.md").unlink()
+            with self.assertRaisesRegex(ValueError, "기재요령 요약이 없습니다"):
                 active_rule_context(root)
 
     def test_year_rules_are_loaded_from_structured_json(self) -> None:

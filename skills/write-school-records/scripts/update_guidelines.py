@@ -51,7 +51,49 @@ def root_paths(root: Path, level: str = "high") -> dict[str, Path]:
         "index": guidelines / "current.index.md",
         "index_terms": guidelines / "index-terms.json",
         "analyzer_rules": guidelines / "analyzer-rules",
+        "summary": guidelines / "summary.md",
     }
+
+
+SUMMARY_REQUIRED_KEYS = ("school_level", "school_year", "revision_date", "source_title")
+
+
+def read_summary_metadata(path: Path) -> dict[str, str]:
+    """Read the `key: value` front matter of a guideline summary written by this skill."""
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError as error:
+        raise GuidelineError(f"기재요령 요약이 없습니다: {path}") from error
+    except (OSError, UnicodeError) as error:
+        raise GuidelineError(f"기재요령 요약을 읽을 수 없습니다: {path} ({error})") from error
+    if not lines or lines[0].strip() != "---":
+        raise GuidelineError(f"기재요령 요약 첫 줄에 머리말(---)이 없습니다: {path}")
+    metadata: dict[str, str] = {}
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        key, separator, value = line.partition(":")
+        if separator:
+            metadata[key.strip()] = value.strip()
+    else:
+        raise GuidelineError(f"기재요령 요약 머리말이 닫히지 않았습니다: {path}")
+    missing = [key for key in SUMMARY_REQUIRED_KEYS if not metadata.get(key)]
+    if missing:
+        raise GuidelineError(f"기재요령 요약 머리말에 값이 없습니다: {', '.join(missing)} ({path})")
+    validate_year(metadata["school_year"])
+    validate_date(metadata["revision_date"], "요약의 원문 개정일")
+    return metadata
+
+
+def has_registered_original(manifest: dict[str, Any]) -> bool:
+    """원문 변환본을 하나라도 등록했는지. 배포본처럼 등록하지 않았으면 요약 기준으로 동작한다."""
+    return bool(manifest.get("versions"))
+
+
+def describe_summary(paths: dict[str, Path]) -> str:
+    metadata = read_summary_metadata(paths["summary"])
+    relative = paths["summary"].relative_to(paths["root"]).as_posix()
+    return f"{relative}({metadata['school_year']}학년도, {metadata['revision_date']} 개정판 요약)"
 
 
 def safe_relative(root: Path, value: str) -> Path:
@@ -509,6 +551,8 @@ def command_list(paths: dict[str, Path]) -> None:
         status = "확인" if entry.get("confirmed_official") else "미확인"
         marker = "*" if identifier == active else ""
         print(f"{identifier}\t{entry.get('school_year','')}\t{entry.get('revision_date','')}\t{status}\t{marker}")
+    if not has_registered_original(manifest):
+        print("(등록된 원문 없음)")
 
 
 def command_activate(args: argparse.Namespace, paths: dict[str, Path]) -> None:
@@ -519,6 +563,10 @@ def command_activate(args: argparse.Namespace, paths: dict[str, Path]) -> None:
 
 def command_verify(paths: dict[str, Path]) -> None:
     manifest = load_manifest(paths)
+    if not has_registered_original(manifest):
+        # 원문을 등록하지 않은 상태(배포본 기본값)는 오류가 아니다. 검증할 원문 대신 요약 머리말을 확인한다.
+        print(f"등록된 원문 없음: {describe_summary(paths)} 기준으로 동작합니다. 원문을 쓰려면 import로 등록하세요.")
+        return
     verify_manifest(paths, manifest)
     active = manifest["active_version"]
     entry = manifest["versions"][active]

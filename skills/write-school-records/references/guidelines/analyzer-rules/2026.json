@@ -25,7 +25,6 @@
       "autonomy": {"korean_characters": 500, "bytes": 1500},
       "club": {"korean_characters": 500, "bytes": 1500},
       "career": {"korean_characters": 500, "bytes": 1500},
-      "service": {"grades": [3], "korean_characters": 500, "bytes": 1500},
       "service_record_item": {
         "korean_characters": 50,
         "bytes": 150,

@@ -12,13 +12,13 @@ license: CC-BY-NC-SA-4.0
 2. 초안·첨삭 요청에서 학교급을 알 수 없으면 아래 「학교급 확인」대로 먼저 묻는다.
 3. 학생별 사실, 공통 수업·평가 맥락, 성취기준 해석, 보조 렌즈를 분리하고 학생별 근거 수준을 내부적으로 자동 판정한다. 이 순서로 근거를 우선하며 낮은 순위 자료가 학생별 사실을 덮어쓰지 않는다. 입력 열·필드의 출처 유형 매핑은 [intake-template.md](references/intake-template.md)를, 서식 없는 교사 메모의 출처는 아래 「작성 절차」를 따르며, 어느 쪽으로도 출처가 정해지지 않은 자료는 출처 미확인으로 보수 판정한다.
 4. 공식 기록의 초안·수정·최종 점검이면 아래 표에서 해당 영역 파일 하나를 읽는다. 기재요령은 기재 가능 여부·금지·입력 주체·분량을 확인하는 기준이며 학생의 활동이나 역량을 만들지 않는다.
-5. 기재요령 확인이 필요하면 학교급에 맞는 manifest로 활성 버전을 확인한 뒤 고등학교는 `references/guidelines/current.index.md`, 중학교는 `references/guidelines-middle/current.index.md`에서 필요한 원문 범위만 읽는다. 작성 원칙은 본문, 분량은 최대 글자수 표, 정정은 정정 본문을 우선한다.
+5. 기재요령 확인이 필요하면 학교급에 맞는 요약(고등학교 [guidelines/summary.md](references/guidelines/summary.md), 중학교 [guidelines-middle/summary.md](references/guidelines-middle/summary.md))에서 해당 절만 읽는다. 분량은 요약의 최대 글자수 표를 쓴다. 원문 변환본을 등록해 `scripts/update_guidelines.py verify`가 통과하는 환경에서는 문구 확인이 필요할 때 같은 폴더의 `current.index.md`로 원문 범위를 찾아 읽을 수 있다.
 6. 초안을 먼저 만들고 사실 왜곡·기재요령·금지 표현·분량을 순서대로 점검한다. 단순 분석이거나 문장 생성을 원하지 않을 때만 초안을 생략한다.
 7. 스크립트는 생성 후 기계 점검 또는 기재요령 등록·목록·활성화·검증·롤백이 필요할 때만 실행한다. 생기부 최종본의 글자 수·바이트는 `scripts/analyze_record.py`를 단일 진입점으로 사용한다.
 
 ## 현행 공통 준수 게이트
 
-- 학교급에 맞는 활성 참조본(고등학교 `references/guidelines/current.md`, 중학교 `references/guidelines-middle/current.md`)이 있고 검증을 통과하면 그 참조본과 출처 메타데이터를 최우선 운영 기준으로 삼는다. 이 참조본은 교육부 원문을 재가공한 것이므로 공식 효력은 원문에 있으며, 규정 해석이 결과를 가르는 사안은 원문 확인을 안내한다. 활성 참조본이 없을 때만 이 파일에 포함된 2026 요약을 제한적인 보조 기준으로 사용하며, 최신성은 단정하지 않는다. 이후 개정 지침이나 해당 시도교육청·학교 규정이 충돌하면 더 최신이고 구체적인 규정을 따른다.
+- 규정 판단의 기준은 이 절의 게이트, 영역 파일의 규정 게이트, 학교급별 요약(`references/guidelines/summary.md`, `references/guidelines-middle/summary.md`)이다. 요약은 교육부 「2026학년도 학교생활기록부 기재요령」(2026-02-12 개정)을 바탕으로 이 스킬이 정리한 것이며 공식 효력은 원문에 있다. 원문 변환본이 등록되어 검증을 통과하면 문구 확인에 쓰고, 요약과 다르게 읽히거나 등록된 원문의 학년도가 요약과 다르면 원문을 따르며 요약 갱신이 필요하다고 알린다. 문구가 결과를 가르는 사안과 요약에 없는 사안은 규정을 지어내지 않고 원문 확인과 교육지원청 문의를 안내한다. 이후 개정 지침이나 해당 시도교육청·학교 규정이 충돌하면 더 최신이고 구체적인 규정을 따른다.
 - 실제 학교 교육활동에서 교사가 직접 관찰·평가한 사실만 사용한다. 활동·역할·책·성과·변화를 만들거나 과장하지 않는다.
 - 학교교육계획·학교교육과정에 따른 활동과 허용된 예외만 기록한다. 교외·학교 밖 활동은 영역별 허용 조건이 확인되지 않으면 쓰지 말고 질문한다.
 - 판단 하나마다 행동·산출물·피드백·변화 중 하나 이상의 근거를 연결한다.
@@ -44,7 +44,7 @@ license: CC-BY-NC-SA-4.0
 
 근거 판단, 사실성, 출력 형식은 고등학교와 같게 적용하고, 기재요령은 `2026 학교생활기록부 기재요령(중학교)`를 쓴다.
 
-- 먼저 [guidelines-middle/differences.md](references/guidelines-middle/differences.md)를 읽는다. 문구 확인이 필요하면 `references/guidelines-middle/current.index.md`에서 범위를 찾아 읽는다.
+- 먼저 [guidelines-middle/differences.md](references/guidelines-middle/differences.md)를 읽는다. 규정 세부는 [guidelines-middle/summary.md](references/guidelines-middle/summary.md)에서 찾고, 원문이 등록되어 있으면 같은 폴더의 `current.index.md`로 원문 범위를 찾아 읽을 수 있다.
 - 한도는 중학교판 표를 따른다: 과목별 세특 500자, 창체 영역별 500자, 행특 300자, 자유학기활동 영역별 1,000자. 공통과목 1·2 합산과 전공실무과목 한도는 없다.
 - 교과 세특은 특기할 만한 사항이 있는 과목·학생에 입력하고 입력 대상 범위는 학교 학업성적관리위원회가 정한다. 자유학기에 이수한 과목은 모든 학생에게 입력한다.
 - 모의고사, 재학 학교 식별 금지, 공통과목 합산, 연구보고서(소논문) 예외 과목처럼 고등학교판에만 있는 규정은 적용하지 않는다. 연구보고서(소논문) 관련 사항은 예외 없이 쓰지 않는다.
@@ -72,19 +72,20 @@ license: CC-BY-NC-SA-4.0
 | 응답 골격·D 판정 작성 틀 | [output-skeleton.md](references/output-skeleton.md) |
 | 스킬 행동 검증(합성 케이스·채점 절차) | [tests/eval-cases/README.md](tests/eval-cases/README.md) |
 | 현행 규정·출처·자료 시점 질문 | [source-policy.md](references/source-policy.md) |
-| 중학교 기재요령과 고등학교판의 차이 | 학교급이 중학교이면 [guidelines-middle/differences.md](references/guidelines-middle/differences.md)를 읽고, 원문 범위는 `references/guidelines-middle/current.index.md`에서 찾는다 |
+| 기재 가능 여부·금지·입력 주체·한도 같은 규정 질문(지원하지 않는 영역 포함) | 학교급에 맞는 [guidelines/summary.md](references/guidelines/summary.md) 또는 [guidelines-middle/summary.md](references/guidelines-middle/summary.md)에서 해당 절만 읽는다. 요약에 없는 세부는 지어내지 않고 요약이 가리키는 원문 장을 안내한다 |
+| 중학교 기재요령과 고등학교판의 차이 | 학교급이 중학교이면 [guidelines-middle/differences.md](references/guidelines-middle/differences.md)를 읽고, 규정 세부는 [guidelines-middle/summary.md](references/guidelines-middle/summary.md)에서 찾는다 |
 | 교과별 성취수준 공식 서술과 대조 | 공통 개념은 [achievement-standards/common.md](references/achievement-standards/common.md), 교과·과목 원문과 단계 체계는 [achievement-standards/index.md](references/achievement-standards/index.md)에서 확인한 뒤 필요한 파일만 읽는다. 출처·라이선스 표시가 필요하면 그때 교과별 `index.md`가 가리키는 `sources.json`과 [ATTRIBUTION.md](references/achievement-standards/ATTRIBUTION.md)를 읽는다 |
 | 중학교 교과 성취수준 대조 | 학교급이 중학교이거나 `[9…]` 코드가 있으면 [achievement-standards-middle/index.md](references/achievement-standards-middle/index.md)에서 필요한 파일을 찾는다. 학교급이 고등학교이면 쓰지 않는다 |
 
 ### 지원 영역
 
-지원: 교과 세특(과목별, 한도 과목별 500자), 창체 특기사항(자율·자치/동아리/진로, 3학년 봉사 포함, 영역별 500자), 행특(300자). 이 절의 한도는 모두 [current.md](references/guidelines/current.md)에서 `#`으로 시작하는 '학교생활기록부 영역별 입력 가능 최대 글자수' 제목 아래의 표에 있다. 학년도마다 장 번호와 행 위치가 바뀌므로 행 번호 대신 이 제목으로 찾는다. 중학교는 자유학기활동 특기사항(진로탐색·주제선택, 3학년은 예술·체육·동아리 추가, 영역별 1,000자 — 중학교 [current.md](references/guidelines-middle/current.md)의 같은 제목 표)도 지원하며, 세특·창체·행특 한도는 같은 표를 따른다.
+지원: 교과 세특(과목별, 한도 과목별 500자), 창체 특기사항(자율·자치(3학년은 자율)/동아리/진로, 영역별 500자), 행특(300자). 2026학년도 3학년의 봉사활동 영역은 특기사항 없이 실적만 입력하므로 아래 봉사활동 실적과 같이 다룬다. 이 절의 한도는 모두 [guidelines/summary.md](references/guidelines/summary.md)의 「영역별 입력 가능 최대 글자수」 표에 있다. 이 표는 원문의 '학교생활기록부 영역별 입력 가능 최대 글자수' 표를 옮긴 것이며, 원문이 등록되어 있으면 원문의 같은 제목 표로 확인할 수 있다. 학년도마다 장 번호와 행 위치가 바뀌므로 행 번호 대신 이 제목으로 찾는다. 중학교는 자유학기활동 특기사항(진로탐색·주제선택, 3학년은 예술·체육·동아리 추가, 영역별 1,000자, [guidelines-middle/summary.md](references/guidelines-middle/summary.md)의 같은 제목 표)도 지원하며, 세특·창체·행특 한도는 같은 표를 따른다.
 
-미지원(요청 시 규정 위치만 안내하고 문장을 생성하지 않음, 한도는 같은 표): 개인별 세특(500자), 독서활동상황(공통 500자·과목별 250자), 봉사활동 실적(객관 기술 50자, 정성평가 제외), 출결 특기사항(500자), 학적 특기사항(500자), 정정대장 문안.
+미지원(요청 시 한도와 원문 위치만 안내하고 문장을 생성하지 않음, 한도는 같은 표, 위치는 요약의 '지원하지 않는 영역' 절): 개인별 세특(500자), 독서활동상황(공통 500자·과목별 250자), 봉사활동 실적(객관 기술 50자, 정성평가 제외), 출결 특기사항(500자), 학적 특기사항(500자), 정정대장 문안.
 
 교과별 성취수준 자료는 `curriculum_basis` 등급으로만 사용한다. 학생의 실제 성취를 이 자료로 새로 만들거나 단정하지 않으며, 교사가 확인한 사실을 서술할 때 공식 어휘·강도를 맞추는 용도로만 쓴다.
 
-기재요령 갱신 요청은 `scripts/update_guidelines.py`로 처리한다. 새 원문은 `import`, 버전 전환은 `activate`, 이전 버전 복귀는 같은 `activate --version`으로 수행하고, 작업 전후 `verify`를 실행한다. 중학교판은 모든 명령에 `--level middle`을 붙이며 고등학교판과 따로 관리된다. 공식 확인이 없는 원문은 기본적으로 활성화하지 않으며 결과에 `[확인 필요]`를 남긴다.
+기재요령 갱신 요청은 `scripts/update_guidelines.py`로 처리한다. 새 원문은 `import`, 버전 전환은 `activate`, 이전 버전 복귀는 같은 `activate --version`으로 수행하고, 작업 전후 `verify`를 실행한다. 중학교판은 모든 명령에 `--level middle`을 붙이며 고등학교판과 따로 관리된다. 공식 확인이 없는 원문은 기본적으로 활성화하지 않으며 결과에 `[확인 필요]`를 남긴다. 배포본에는 원문 변환본이 들어 있지 않아 요약 기준으로 동작한다. 원문 문구가 필요한 사용자는 교육부 PDF를 Markdown(.md)으로 바꿔 `import`로 등록할 수 있다(절차는 플러그인의 `USER_GUIDE.md`). 새 학년도 원문을 등록해도 요약과 검사 규칙은 자동으로 바뀌지 않는다.
 
 대학·전공 렌즈는 사용자가 진로 연계를 요청하고 관련 사실이 있을 때만 보조적으로 사용한다. 학생부종합전형 평가요소와 대학인재상은 분석 렌즈일 뿐 학생의 실제 활동·역량보다 우선하지 않으며, 공식 기록에 대학 맞춤 표현을 넣지 않는다.
 
@@ -152,11 +153,11 @@ A–D는 사용자 선택지가 아니라 학생별 생성 범위를 정하는 �
 
 - 모든 판단에 근거가 있는가
 - 교사가 관찰하지 못한 내면·가정·교외 성과를 단정하지 않았는가
-- 활성 기재요령의 공통 금지사항과 해당 영역 파일의 제한을 통과했는가
+- 기재요령(요약, 등록된 원문이 있으면 원문)의 공통 금지사항과 해당 영역 파일의 제한을 통과했는가
 - 해당 영역의 나이스 바이트 한도와 학년별 합산 규칙을 지켰는가
 - 과정과 변화가 활동명보다 구체적인가
 - 오래된 사례를 현행 규정으로 오인하지 않았는가
-- 결과에 사용한 활성 기재요령의 학년도·개정일·공식 확인 여부를 일반 언어로 표시했는가
+- 결과에 사용한 기재요령의 학년도·개정일과, 원문을 대조했는지 요약 기준인지를 일반 언어로 표시했는가
 - 대학 맞춤·입시 예측 표현이 없는가
 - 학교급을 확인했고, 중학교 초안이면 중학교 기재요령의 한도와 고등학교판과의 차이를 적용했는가
 
@@ -166,13 +167,13 @@ A–D는 사용자 선택지가 아니라 학생별 생성 범위를 정하는 �
 python scripts/analyze_record.py --file draft.txt --field subject --target-chars 500
 ```
 
-중학교 기록은 `--school-level middle`을 붙여 중학교 기재요령과 한도로 점검하고, 자유학기활동은 `--field free_semester`로 점검한다. 학년·과목 유형·창체 영역이 확인되면 `--grade`, `--subject-type common|elective|vocational`(공통·전공실무는 고등학교만), `--area autonomy|club|service|career`를 붙여 해당 한도로 점검하고, 공통과목 1·2 합산은 `--combine-with`, 10명 이상 배치의 반복률은 `--batch draft.tsv`로 확인한다. 출력은 활성 기재요령과 검사 규칙의 학년도가 일치할 때만 제공하는 보조 신호이며 최종 준수 판정은 교사가 원자료·학교 규정과 대조해 수행한다.
+중학교 기록은 `--school-level middle`을 붙여 중학교 기재요령과 한도로 점검하고, 자유학기활동은 `--field free_semester`로 점검한다. 학년·과목 유형·창체 영역이 확인되면 `--grade`, `--subject-type common|elective|vocational`(공통·전공실무는 고등학교만), `--area autonomy|club|career`(봉사활동 실적의 활동내용은 `service`, 실적별 50자)를 붙여 해당 한도로 점검하고, 공통과목 1·2 합산은 `--combine-with`, 10명 이상 배치의 반복률은 `--batch draft.tsv`로 확인한다. 출력은 등록된 원문(없으면 요약)과 검사 규칙의 학년도가 일치할 때만 제공하는 보조 신호이며, 원문이 없으면 '원문 미등록, 요약 기준'으로 표시된다. 최종 준수 판정은 교사가 원자료·학교 규정과 대조해 수행한다.
 
-실제 NEIS 입력값 대조가 필요하면 활성 기재요령상 실제 입력 가능한 문자로 만든 `tests/neis-validation` 합성 표본과 `scripts/compare_neis_counts.py`를 사용한다. 실제값이 충분히 수집되기 전에는 계산 계약을 확정하지 않으며, 검증되지 않은 계산값은 참고값으로 표시한다. NEIS 검증에는 실제 학생 기록을 사용하지 않고, 이모지·분해형 자모 같은 일반 Unicode 경계 사례는 생기부 계산 계약에서 제외한다.
+실제 NEIS 입력값 대조가 필요하면 기재요령상 실제 입력 가능한 문자로 만든 `tests/neis-validation` 합성 표본과 `scripts/compare_neis_counts.py`를 사용한다. 실제값이 충분히 수집되기 전에는 계산 계약을 확정하지 않으며, 검증되지 않은 계산값은 참고값으로 표시한다. NEIS 검증에는 실제 학생 기록을 사용하지 않고, 이모지·분해형 자모 같은 일반 Unicode 경계 사례는 생기부 계산 계약에서 제외한다.
 
 ## 최종 검수
 
-1. 원자료·사실 근거와 활성 기재요령을 확인한다.
+1. 원자료·사실 근거와 기재요령 기준(요약, 등록된 원문이 있으면 원문)을 확인한다.
 2. 금지 표현·개인정보·근거 부족을 점검한다.
 3. 최종본을 `analyze_record.py`로 검사해 글자 수·바이트를 다시 확인한다.
 

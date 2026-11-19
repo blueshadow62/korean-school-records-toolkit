@@ -313,7 +313,7 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertIn("교사 관찰·학생 결과물·평가 결과", SKELETON_TEXT)
         self.assertIn("스크립트 이름·파일 경로·manifest·버전 문자열도 사용자가 요청하지 않으면 쓰지 않는다", SKELETON_TEXT)
         self.assertIn("출처 유형은 교사 관찰, 학생 결과물처럼 일반 언어로 적는다", SKELETON_TEXT)
-        self.assertIn("학년도·개정일·공식 확인 여부를 일반 언어로 표시", SKILL_TEXT)
+        self.assertIn("학년도·개정일과, 원문을 대조했는지 요약 기준인지를 일반 언어로 표시", SKILL_TEXT)
 
     def test_output_skeleton_fixes_the_draft_labels(self) -> None:
         self.assertIn("```markdown\n[세특 초안]\n", SKELETON_TEXT)
@@ -334,6 +334,18 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertIn("특기할 만한 사항이 있는 과목·학생에 입력", SKILL_TEXT)
         self.assertIn("고등학교판에만 있는 규정은 적용하지 않는다", SKILL_TEXT)
         self.assertIn("2026학년도 학교생활기록부 기재요령(중학교)", SKELETON_TEXT)
+
+    def test_guideline_summary_is_the_default_rule_basis(self) -> None:
+        # 배포본에는 기재요령 원문 변환본이 없다. 규정 판단은 학교급별 요약이 기준이고, 원문은 등록된 경우에만 문구 확인에 쓴다.
+        for path in ("references/guidelines/summary.md", "references/guidelines-middle/summary.md"):
+            self.assertIn(path, SKILL_TEXT)
+        self.assertNotIn("manifest로 활성 버전을 확인한 뒤", SKILL_TEXT)
+        self.assertNotIn("활성 참조본이 없을 때만", SKILL_TEXT)
+        self.assertIn("규정을 지어내지 않고 원문 확인과 교육지원청 문의를 안내한다", SKILL_TEXT)
+        self.assertIn("요약에 없는 세부는 지어내지 않고 요약이 가리키는 원문 장을 안내한다", SKILL_TEXT)
+        self.assertIn("요약 기준(원문 미대조)", SKELETON_TEXT)
+        self.assertIn("원문을 읽지 않았으면 원문을 확인한 것처럼 쓰지 않는다", SKELETON_TEXT)
+        self.assertNotIn("공식 확인 여부]", SKELETON_TEXT)
 
     def test_free_semester_is_routed_and_labelled(self) -> None:
         self.assertIn("[field-free-semester.md](references/field-free-semester.md)", SKILL_TEXT)
