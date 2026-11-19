@@ -1,5 +1,25 @@
 # Changelog
 
+## 3.1.1 — 2026-11-19
+
+### 바뀌는 점
+
+- **개인정보 처리 안내(`PRIVACY.md`)를 넣었다.** 전체판과 문서 전용판에 각각 있다. 이 플러그인은 입력한 자료를 수집하거나 저장하거나 외부로 보내지 않는다. 제3자에게 제공하지 않으며 사용 기록이나 분석 정보도 모으지 않는다. 스킬은 학생 이름·학번·학교명 없이 쓰도록 만들어졌고, 입력한 내용은 사용하는 AI 서비스의 방침을 따른다. 문의 창구도 적었다. 전체판은 스킬이 실행하는 스크립트 네 개가 하는 일도 밝힌다(네트워크에 접속하지 않고, 파일을 쓰는 스크립트는 둘이다). Claude 플러그인 디렉터리에 제출할 때 개인정보처리방침을 알려야 해서 넣었다.
+- **README의 설치 안내를 교사 눈높이로 보완했다.** 첫 소개 문단 바로 뒤에 '빠른 설치'를 두고, 「설치」 절에 어느 판을 고를지, 전체판에 필요한 것(Python 3, Node.js 18 이상), Claude Code 대화 창에서 설치하는 방법(터미널을 쓰지 않는 방법), 터미널에서 설치하는 방법, 설치 확인, 새 버전으로 올리기, 지우기를 적었다. 명령 형식은 Claude Code 공식 문서로 확인했다. 한 번에 설치하는 명령은 버전 조건이 있어 함께 적었다(대화 창 2.1.275 이상, 터미널 2.1.292 이상).
+- **3.1.0에서 올릴 때 할 일은 없다.** 스킬의 판단 규칙과 참조 자료는 3.1.0과 같다. `claude plugin update korean-school-records-toolkit@blueshadow62-school-records`로 올리고(문서 전용판은 이름을 `korean-school-records-lite@blueshadow62-school-records`로 바꾼다) Claude Code를 다시 시작하면 적용된다. 기재요령 원문을 직접 등록해 썼다면, 업데이트가 스킬 폴더를 교체하므로 원문을 다시 등록한다.
+
+### Added
+
+- `PRIVACY.md`(전체판)와 `editions/korean-school-records-lite/PRIVACY.md`(문서 전용판, 재료는 `editions/source/PRIVACY.md`). 한국어 본문 뒤에 영어 요약을 붙였다. 문서 전용판의 근거는 파일 구성(실행 파일, 훅, 서버 설정이 없음)이고, 전체판의 근거는 스킬 스크립트 소스 검색이다. 두 문서의 공통 문장(수집·저장·전송 금지, 학생 정보 안내, Anthropic 개인정보처리방침 주소, 권고, 문의 창구)은 같은 문구다. Anthropic의 자료 취급은 서술하는 대신 방침 주소를 링크한다.
+- 두 `plugin.json`에 `privacyPolicyUrl`을 적었다. 디렉터리가 목록에 쓰는 공식 항목이며(공식 manifest 참조), 각 판의 `PRIVACY.md`가 있는 GitHub 주소다. 마켓플레이스 항목에는 넣지 않는다(항목에 쓰면 알 수 없는 항목으로 경고한다). `claude plugin validate --strict`는 두 판 모두 경고 없이 통과한다.
+- `scripts/build_directory_edition.py`가 `PRIVACY.md`를 문서 전용판 전용 파일로 받아들이고(재료 `editions/source/PRIVACY.md`) 문서 전용판 `plugin.json`의 `privacyPolicyUrl`을 만든다. `--check`는 그 주소가 자기 폴더의 `PRIVACY.md`를 가리키는지 본다. `verify_package.py`는 전체판의 `PRIVACY.md`와 `privacyPolicyUrl`을 본다.
+- `tests/test_privacy_notice.py`(15건): 두 판의 `PRIVACY.md`가 공통 문장·영어 요약·문의 창구를 담고 README에서 링크되는지, 이메일 주소와 스크립트 이름·설치 명령이 없는지, 문서 전용판에 실행 수단이 없는지, `privacyPolicyUrl`이 맞는지 본다. `PRIVACY.md`가 보증하는 사실은 스킬 스크립트의 소스로 확인한다: 스킬이 실행하는 스크립트는 네 개이고, 네트워크·외부 프로그램·환경 변수를 쓰지 않으며, 파일을 쓰는 스크립트는 `update_guidelines.py`와 `compare_neis_counts.py` 둘이다. 소스를 정적으로 읽는 검사라 모든 우회를 막지는 못하고, 새 import나 쓰기 호출이 생기면 실패해 문서를 다시 확인하게 한다.
+- `tests/test_install_guide.py`(6건): README의 설치 안내가 manifest·마켓플레이스·`edition.json`의 이름으로 만든 명령을 모두 담는지, 버전 조건이 해당 명령 앞에 있는지, 다른 설치 문서가 README 「설치」를 가리키는지, 문서 전용판 문서에 플러그인 설치 명령이 없는지 본다.
+
+### Changed
+
+- `README_CLAUDE_CODE.md`, `USER_GUIDE.md`, `INSTALL.md`의 설치 설명을 README 「설치」와 맞췄다. 사용 설명서가 설치를 `README_CLAUDE_CODE.md`로 안내하고 그 문서가 다시 README로 넘기던 순환을 없앴다.
+
 ## 3.1.0 — 2026-11-19
 
 ### 바뀌는 점

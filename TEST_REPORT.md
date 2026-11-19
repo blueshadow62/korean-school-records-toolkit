@@ -1,5 +1,17 @@
 # Test report
 
+## 3.1.1 — tested on 2026-11-19 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
+
+- Package contract tests (`tests/`): 71 passed (50 before, plus 15 in `test_privacy_notice.py` and 6 in `test_install_guide.py`). In a fresh clone with `core.autocrlf=true` and without the development source beside it: 71 run, 69 passed, 2 skipped (the dev/package checks).
+- `write-school-records` package-local scripts: 205 run, 187 passed, 18 skipped (all 18 compare with a registered guideline original, which the package does not contain).
+- `korean-character-count` node tests: 3 passed.
+- `verify_package.py`: passed. It also checks `PRIVACY.md` and `privacyPolicyUrl` of the full plugin.
+- `python scripts/build_directory_edition.py --check`: passed. The documents-only edition has 322 files (315 `.md`, 4 `.json`, 2 `LICENSE`, 1 `.png`), 8,228,539 bytes in total.
+- `claude plugin validate --strict .` and `claude plugin validate --strict editions/korean-school-records-lite` (Claude Code 2.1.328): both passed with no warning. `privacyPolicyUrl` is a documented `plugin.json` field for the directory listing.
+- The claims in the two `PRIVACY.md` files were checked against the code. The four skill scripts have no network call, no call to an external program, and no read of environment variables. Only `update_guidelines.py` and `compare_neis_counts.py` write files. `test_privacy_notice.py` checks this on every run. The Anthropic privacy policy address (`https://www.anthropic.com/legal/privacy`) answered HTTP 200 on 2026-11-19.
+- The install commands in `README.md` were run in separate temporary `CLAUDE_CONFIG_DIR` folders, so no user setting changed: `claude plugin marketplace add`, `install` (also the one-step `--marketplace` form), `list`, `update`, `uninstall`, and `marketplace remove` all ran as documented. The in-session `/plugin ...` form cannot run in a non-interactive session (`Not logged in`). It follows the official documentation only.
+- Mutation checks in a temporary copy: 12 deliberate breaks were each caught by the matching check. They were a network import, a file write, a new script, an environment read, a removed notice sentence, an install command in an edition document, a missing and a wrong `privacyPolicyUrl`, a listing field in `marketplace.json`, a wrong install command name, a changed table row, and a removed version condition.
+
 ## 3.1.0 — tested on 2026-11-19 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
 
 - Package contract tests (`tests/`, incl. dev/package drift check, the self-hosted marketplace file with both editions, the MIT notice of `korean-character-count`, `SECURITY.md`, the AI-use notice, and 31 tests of the documents-only edition, including the shared icon): 50 passed. In a fresh clone without the development source beside it: 50 run, 48 passed, 2 skipped (the dev/package checks).

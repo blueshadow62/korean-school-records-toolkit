@@ -1,6 +1,6 @@
 {
   "name": "korean-school-records-toolkit",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "학교생활기록부 초안 생성과 한국어 글자 수·NEIS Byte 계산을 제공하는 한국어 교육 기록 업무 도구",
   "author": {
     "name": "blueshadow62",
