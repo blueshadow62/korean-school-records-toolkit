@@ -1,6 +1,13 @@
 # Changelog
 
-## Unreleased
+## 3.1.0 — 2026-11-19
+
+### 바뀌는 점
+
+- **두 가지 판이 생겼다.** 같은 학생부 스킬을 전체판(`korean-school-records-toolkit`)과 문서 전용판(`korean-school-records-lite`, 한국어 학교생활기록부 도구 라이트)으로 제공한다. 근거 판단, 학교급 확인, 응답 형식은 두 판이 같다. 다른 것은 스크립트다. 전체판은 Python·Node.js 스크립트로 글자 수와 NEIS Byte를 계산하고 기재요령 원문 등록과 NEIS 실측 대조도 지원한다. 문서 전용판은 스크립트 없이 문서(Markdown·JSON)로 이루어져 있고, 글자 수는 Claude의 코드 실행 도구가 같은 방식으로 계산한다. 코드를 실행할 수 없는 환경에서는 숫자를 짐작해 적는 대신 계산하지 못했다고 밝힌다. 둘 가운데 하나를 고른다. 함께 설치하면 같은 스킬이 두 개 보인다. 차이는 README의 「두 가지 판」 표에 있다.
+- **Claude Code에서 이 저장소를 마켓플레이스로 설치할 수 있다.** 전체판은 `claude plugin marketplace add blueshadow62/korean-school-records-toolkit`와 `claude plugin install korean-school-records-toolkit@blueshadow62-school-records` 두 줄로 설치한다. 문서 전용판은 같은 마켓플레이스의 `korean-school-records-lite@blueshadow62-school-records`로 설치하고, 전체판을 이미 설치했다면 먼저 제거한다. 문서 전용판은 Claude 플러그인 디렉터리에 등록할 예정이며, 등록되면 claude.ai·Cowork에서도 설치할 수 있다.
+- **3.0.0에서 올릴 때 할 일은 거의 없다.** 판단 규칙, 기재요령 요약, 성취수준 자료는 3.0.0과 같다. 새로 들어가거나 바뀐 스킬 파일은 두 개다: 글자 수 스킬의 `LICENSE`(원 저작물의 라이선스 전문)와 `references/source-policy.md`(제3자 자료의 출처 기록). 플러그인을 업데이트하면 된다. 기재요령 원문을 직접 등록해 썼다면, 업데이트가 스킬 폴더를 교체하므로 등록한 원문이 새 설치본에 없다. 이때는 `USER_GUIDE.md` 「기재요령 원문을 직접 등록하기」대로 다시 등록한다.
+- **전체판 설치본에는 `editions/` 폴더(문서 전용판의 사본, 약 8MB)도 들어 있다.** 전체판에서는 쓰이지 않는다. Claude Code가 읽는 것은 전체판의 `skills/` 두 스킬이다.
 
 ### Added
 

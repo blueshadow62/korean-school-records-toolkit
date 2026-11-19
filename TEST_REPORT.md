@@ -1,6 +1,6 @@
 # Test report
 
-## Unreleased — tested on 2026-11-19 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
+## 3.1.0 — tested on 2026-11-19 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
 
 - Package contract tests (`tests/`, incl. dev/package drift check, the self-hosted marketplace file with both editions, the MIT notice of `korean-character-count`, `SECURITY.md`, the AI-use notice, and 31 tests of the documents-only edition, including the shared icon): 50 passed. In a fresh clone without the development source beside it: 50 run, 48 passed, 2 skipped (the dev/package checks).
 - `write-school-records` package-local scripts: 205 run, 187 passed, 18 skipped (all 18 compare with a registered guideline original, which the package does not contain).
