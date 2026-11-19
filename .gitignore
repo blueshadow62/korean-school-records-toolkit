@@ -2,3 +2,12 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .superpowers/
+# 사용자가 등록한 기재요령 원문 변환본(공공누리 제4유형)은 배포하지 않는다. 요약(summary.md)만 저장소에 둔다.
+skills/write-school-records/references/guidelines/current.md
+skills/write-school-records/references/guidelines/current.index.md
+skills/write-school-records/references/guidelines/manifest.json
+skills/write-school-records/references/guidelines/versions/
+skills/write-school-records/references/guidelines-middle/current.md
+skills/write-school-records/references/guidelines-middle/current.index.md
+skills/write-school-records/references/guidelines-middle/manifest.json
+skills/write-school-records/references/guidelines-middle/versions/

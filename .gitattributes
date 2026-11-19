@@ -1,4 +1,4 @@
 # 저장소의 텍스트 파일은 모두 LF로 저장되어 있다. Windows의 core.autocrlf=true로 받아도
-# CRLF로 바꾸지 않는다: 기재요령 manifest가 참조본(current.md, versions/*.md, current.index.md)의
-# sha256과 바이트를 검사하고, NEIS 표본은 줄바꿈 바이트 수를 검사하기 때문이다.
+# CRLF로 바꾸지 않는다: NEIS 표본 테스트가 줄바꿈 바이트 수를 검사하고, 사용자가 기재요령 원문을
+# 등록하면 manifest가 그 파일의 sha256과 바이트를 검사하기 때문이다(배포본에는 원문이 없다).
 * text=auto eol=lf

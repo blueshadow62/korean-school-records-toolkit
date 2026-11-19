@@ -2,6 +2,7 @@
 """docs/dev-vs-package.md에 기록된 의도된 차이 외에는 개발본과 배포본이 같아야 한다."""
 
 import filecmp
+import re
 import unittest
 from pathlib import Path
 
@@ -20,6 +21,8 @@ ALLOWED_DEV_ONLY = {
 }
 # 재배포 조건을 확인하지 못해 개발본에만 두는 자료 폴더.
 LOCAL_ONLY_DIRS = ("references/writing-examples/", "references/university-guides/")
+# 기재요령 원문 변환본(공공누리 제4유형)과 그 보관본·색인·등록 기록. 개발본에만 두고 배포본은 요약(summary.md)으로 동작한다.
+GUIDELINE_ORIGINAL = re.compile(r"^references/guidelines(?:-middle)?/(?:current\.md|current\.index\.md|manifest\.json|versions/[^/]+\.md)$")
 IGNORED_DIRS = {"__pycache__", ".pytest_cache"}
 
 
@@ -36,8 +39,13 @@ class DevPackageSyncTests(unittest.TestCase):
     def test_only_documented_differences_exist(self) -> None:
         pkg, dev = walk(PACKAGE), walk(DEV)
         self.assertEqual(set(pkg) - set(dev), set(), "배포본에만 있는 파일")
-        dev_only = {rel for rel in set(dev) - set(pkg) if not rel.startswith(LOCAL_ONLY_DIRS)}
+        dev_only = {
+            rel for rel in set(dev) - set(pkg)
+            if not rel.startswith(LOCAL_ONLY_DIRS) and not GUIDELINE_ORIGINAL.match(rel)
+        }
         self.assertEqual(dev_only, ALLOWED_DEV_ONLY, "개발본에만 있는 파일")
+        self.assertFalse([rel for rel in pkg if GUIDELINE_ORIGINAL.match(rel)], "배포본에 들어간 기재요령 원문 변환본")
+        self.assertTrue([rel for rel in dev if GUIDELINE_ORIGINAL.match(rel)], "개발본의 기재요령 원문 변환본이 없다")
         self.assertFalse([rel for rel in pkg if rel.startswith(LOCAL_ONLY_DIRS)], "배포본에 들어간 로컬 전용 자료")
         different = {rel for rel in pkg if not filecmp.cmp(pkg[rel], dev[rel], shallow=False)}
         self.assertEqual(different, ALLOWED_DIFFERENT, "문서화되지 않은 내용 차이")

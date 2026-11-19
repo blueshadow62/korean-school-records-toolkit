@@ -17,6 +17,7 @@
 4. 개발본의 `scripts/`에는 `trim_achievement_examples.py`가 추가로 있다. 성취수준 코퍼스에서 예시 평가 도구 구간을 잘라내는 정비 도구이며, 스킬 실행 중에는 쓰이지 않는다. 같은 계열의 코퍼스 재현 도구는 저장소의 `tools/corpus/`에 있다.
 5. 두 트리의 `scripts/test_skill_integration.py`가 다르다. 이 테스트가 각 트리의 `SKILL.md`를 검사하기 때문이며, 1·2번 차이의 직접적인 결과다. 개발본은 `korean-spell-check` 연계와 맞춤법·재계산 순서를 검증하고, 배포본은 연계 없이 `analyze_record.py`로 최종 확인하는 흐름을 검증한다. 한쪽 `SKILL.md`를 고치면 같은 트리의 이 테스트도 함께 고쳐야 한다.
 6. 개발본에는 `references/writing-examples/`와 `scripts/test_writing_examples.py`, `references/university-guides/`와 `scripts/test_university_guides.py`가 추가로 있다. 세특 문체 참고 예시와 대학 학과 안내 원문으로, 원본에서 재배포를 허용하는 이용 조건을 확인하지 못해 로컬에서만 쓰고 배포 패키지에 넣지 않는다. 그래서 개발본 `SKILL.md`에 이 자료를 부르는 줄과 규칙이 더 있다.
+7. 개발본에는 기재요령 원문 변환본과 그 색인·등록 기록이 추가로 있다: `references/guidelines/`와 `references/guidelines-middle/`의 `current.md`, `current.index.md`, `manifest.json`, `versions/*.md`. 원문이 공공누리 제4유형(출처표시·상업적 이용금지·변경금지)이고 변환본은 표를 다시 짜고 그림 링크를 지운 것이어서 배포 패키지에 넣지 않는다. 배포본은 같은 폴더의 `summary.md`(이 스킬이 쓴 핵심 규정 요약)로 동작하며, 원문 문구가 필요한 사용자는 교육부 원문을 Markdown으로 바꿔 `scripts/update_guidelines.py import`로 직접 등록한다. 개발본의 원문은 요약을 원문과 대조하는 테스트(`scripts/test_guideline_summary.py`의 원문 대조 묶음, `test_guidelines_high.py`·`test_guidelines_middle.py`의 원문 검사)에 쓰이며, 배포본에서는 이 테스트들이 건너뛰어진다. 배포본 `.gitignore`가 이 파일들을 제외하고, `scripts/verify_package.py`와 `tests/test_package.py`가 배포본에 원문이 없는지 검사한다. `tests/test_dev_package_sync.py`는 이 파일들을 경로 형식으로 가려 개발본에만 있는 파일로 허용한다.
 
 ## 의도되지 않은 차이 확인
 

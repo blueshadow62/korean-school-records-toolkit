@@ -130,6 +130,43 @@ def verify_middle_achievement_sources(root: Path, errors: list[str]) -> None:
             errors.append(f"Middle-school achievement attribution is missing: {marker}")
 
 
+GUIDELINE_FOLDERS = {"guidelines": "high", "guidelines-middle": "middle"}
+# 기재요령 원문(공공누리 제4유형)의 변환본과 그 색인·등록 기록. 배포본에는 넣지 않고 요약으로 동작한다.
+GUIDELINE_ORIGINAL_FILES = ("current.md", "current.index.md", "manifest.json")
+
+
+def verify_guideline_summaries(root: Path, errors: list[str]) -> None:
+    references = root / "skills" / "write-school-records" / "references"
+    for folder, level in GUIDELINE_FOLDERS.items():
+        directory = references / folder
+        for name in GUIDELINE_ORIGINAL_FILES:
+            if (directory / name).exists():
+                errors.append(f"Guideline original must not be shipped: {folder}/{name}")
+        versions = directory / "versions"
+        if versions.exists() and any(versions.iterdir()):
+            errors.append(f"Guideline original archive must not be shipped: {folder}/versions/")
+        try:
+            summary = (directory / "summary.md").read_text(encoding="utf-8")
+            attribution = (directory / "ATTRIBUTION.md").read_text(encoding="utf-8")
+        except OSError as error:
+            errors.append(f"Missing guideline summary or attribution in {folder}: {error}")
+            continue
+        head = summary.split("\n---", 1)[0]
+        year = re.search(r"(?m)^school_year: (20\d{2})$", head)
+        for marker in ("---\ndocument: guideline-summary", f"school_level: {level}", "revision_date: ", "source_url: https://www.moe.go.kr/"):
+            if marker not in head:
+                errors.append(f"Guideline summary front matter is missing '{marker.strip()}': {folder}/summary.md")
+        if year is None:
+            errors.append(f"Guideline summary front matter has no school_year: {folder}/summary.md")
+        elif not (directory / "analyzer-rules" / f"{year.group(1)}.json").is_file():
+            errors.append(f"Analyzer rules for the summary year are missing: {folder}/analyzer-rules/{year.group(1)}.json")
+        for marker in ("공공누리 **제4유형**", "summary.md", "포함하지 않음"):
+            if marker not in attribution:
+                errors.append(f"Guideline attribution is missing '{marker}': {folder}/ATTRIBUTION.md")
+    if not (references / "guidelines-middle" / "differences.md").is_file():
+        errors.append("Missing guidelines-middle/differences.md")
+
+
 def verify_release_contract(root: Path, errors: list[str]) -> None:
     version = (root / "VERSION").read_text(encoding="utf-8").strip()
     if version != EXPECTED_RELEASE_VERSION:
@@ -208,6 +245,7 @@ def main() -> int:
     verify_skills(root, errors)
     verify_achievement_sources(root, errors)
     verify_middle_achievement_sources(root, errors)
+    verify_guideline_summaries(root, errors)
     verify_release_contract(root, errors)
     verify_archives_absent(root, errors)
     scan_text_files(root, errors)

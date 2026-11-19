@@ -115,6 +115,44 @@ class PackageContractTests(unittest.TestCase):
         self.assertIn("NCIC 국가교육과정정보센터", attribution)
         self.assertIn("공공누리 제2유형", attribution)
 
+    def test_guideline_originals_are_not_shipped_but_summaries_are(self) -> None:
+        # 기재요령 원문(공공누리 제4유형) 변환본은 배포하지 않고, 이 스킬이 쓴 요약으로 동작한다.
+        references = PLUGIN_ROOT / "skills" / "write-school-records" / "references"
+        for folder, level in (("guidelines", "high"), ("guidelines-middle", "middle")):
+            with self.subTest(folder=folder):
+                directory = references / folder
+                for name in ("current.md", "current.index.md", "manifest.json"):
+                    self.assertFalse((directory / name).exists(), name)
+                self.assertFalse(list((directory / "versions").glob("*")) if (directory / "versions").exists() else [])
+                summary = (directory / "summary.md").read_text(encoding="utf-8")
+                self.assertTrue(summary.startswith("---\ndocument: guideline-summary\n"))
+                self.assertIn(f"school_level: {level}\n", summary)
+                self.assertIn("공식 효력은 교육부 원문에 있다", summary)
+                attribution = (directory / "ATTRIBUTION.md").read_text(encoding="utf-8")
+                self.assertIn("공공누리 **제4유형**", attribution)
+                self.assertIn("포함하지 않음", attribution)
+
+    def test_record_checker_runs_on_the_summary_without_originals(self) -> None:
+        scripts = PLUGIN_ROOT / "skills" / "write-school-records" / "scripts"
+        for level, field, expected_limit in (("high", "subject", 1500), ("middle", "free_semester", 3000)):
+            with self.subTest(level=level):
+                result = subprocess.run(
+                    [sys.executable, str(scripts / "analyze_record.py"), "--school-level", level, "--field", field,
+                     "--text", "자료를 비교하고 결과를 표로 정리함.", "--json"],
+                    capture_output=True, text=True, encoding="utf-8", check=False,
+                )
+                self.assertEqual(0, result.returncode, result.stderr)
+                data = json.loads(result.stdout)
+                self.assertEqual("summary", data["guideline"]["basis"])
+                self.assertEqual("원문 미등록, 요약 기준", data["guideline"]["basis_note"])
+                self.assertEqual(expected_limit, data["metrics"]["default_neis_byte_limit"])
+                verify = subprocess.run(
+                    [sys.executable, str(scripts / "update_guidelines.py"), "--level", level, "verify"],
+                    capture_output=True, text=True, encoding="utf-8", check=False,
+                )
+                self.assertEqual(0, verify.returncode, verify.stderr)
+                self.assertIn("등록된 원문 없음", verify.stdout)
+
     def test_public_metadata_omits_local_absolute_paths(self) -> None:
         metadata_text = (PLUGIN_ROOT / "SOURCE_METADATA.json").read_text(encoding="utf-8")
         self.assertNotIn("source_path", metadata_text)

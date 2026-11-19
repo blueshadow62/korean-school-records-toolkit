@@ -16,7 +16,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     # PYTHONUTF8은 설정하지 않는다. Windows 기본 로캘 인코딩에서도 테스트가 통과해야
     # 자식 프로세스 출력을 로캘로 해독하던 결함(2.2.0에서 수정)이 재발할 때 잡힌다.
-    # core.autocrlf도 러너 기본값 그대로 둔다. .gitattributes가 빠지면 참조본 sha256 검사가 실패해 잡힌다.
+    # core.autocrlf도 러너 기본값 그대로 둔다. .gitattributes가 빠지면 NEIS 표본의 줄바꿈 바이트 검사가 실패해 잡힌다.
+    # 배포본에는 기재요령 원문 변환본이 없으므로 원문 대조 테스트는 건너뛰고 요약 대조 테스트가 돈다.
     steps:
       - uses: actions/checkout@v4
 
