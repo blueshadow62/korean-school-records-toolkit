@@ -32,7 +32,7 @@ EDITIONS = "editions"
 SOURCE = "editions/source"
 SKILL = "skills/write-school-records"
 # 문서 전용판에만 있는 파일. editions/source/에서 그대로 옮긴다.
-EDITION_ONLY_FILES = ("README.md", "SECURITY.md")
+EDITION_ONLY_FILES = ("README.md", "SECURITY.md", "PRIVACY.md")
 # editions/source/에 있어도 되는 파일. 모르는 파일이 생기면 넣을지 정하도록 빌드를 멈춘다.
 SOURCE_FILES = {"edition.json", "changes.md", *EDITION_ONLY_FILES}
 # 전체판 루트에서 옮기는 파일(changes.md의 문구를 바꿔 넣는다).
@@ -238,6 +238,11 @@ def skill_files(root: Path) -> list[str]:
     return found
 
 
+def privacy_policy_url(repository: str, name: str) -> str:
+    """The address of the edition's own PRIVACY.md on GitHub (the default branch)."""
+    return f"{repository}/blob/master/{EDITIONS}/{name}/PRIVACY.md"
+
+
 def manifest(root: Path) -> dict:
     full = json.loads(read_text(root / ".claude-plugin" / "plugin.json"))
     config = edition_config(root)
@@ -250,6 +255,8 @@ def manifest(root: Path) -> dict:
         "author": full["author"],
         "homepage": full["homepage"],
         "repository": full["repository"],
+        # 디렉터리가 목록에 쓰는 개인정보처리방침 주소. plugin.json에만 쓴다(마켓플레이스 항목에 쓰면 알 수 없는 항목으로 경고한다).
+        "privacyPolicyUrl": privacy_policy_url(full["repository"], config["name"]),
         "license": full["license"],
         "keywords": config["keywords"],
         "skills": "./skills/",
@@ -609,6 +616,9 @@ def check_manifest(folder: Path, root: Path = ROOT) -> list[str]:
     for field in ("author", "homepage", "repository", "license"):
         if data.get(field) != full.get(field):
             problems.append(f"문서 전용판 {field}가 전체판과 다르다")
+    expected_url = privacy_policy_url(str(full.get("repository", "")), name)
+    if data.get("privacyPolicyUrl") != expected_url:
+        problems.append(f"문서 전용판 privacyPolicyUrl이 자기 폴더의 PRIVACY.md 주소({expected_url})와 다르다")
     if data.get("skills") != "./skills/":
         problems.append("문서 전용판 skills 경로는 ./skills/이어야 한다")
     if not str(data.get("description", "")).strip():

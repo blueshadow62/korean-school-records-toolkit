@@ -72,6 +72,10 @@ def verify_claude_manifest(root: Path, errors: list[str]) -> None:
     for field in ("homepage", "repository"):
         if not str(manifest.get(field, "")).startswith("https://"):
             errors.append(f"Claude Code manifest {field} must be an https:// URL")
+    # The directory shows this address as the listing's privacy policy. It must name the PRIVACY.md in this repository.
+    expected_privacy_url = f"{manifest.get('repository')}/blob/master/PRIVACY.md"
+    if manifest.get("privacyPolicyUrl") != expected_privacy_url:
+        errors.append(f"Claude Code manifest privacyPolicyUrl must be {expected_privacy_url}")
 
 
 def verify_publisher(root: Path, errors: list[str]) -> None:
@@ -135,7 +139,7 @@ def verify_directory_edition(root: Path, errors: list[str]) -> None:
 
 
 def verify_bundled_licenses(root: Path, errors: list[str]) -> None:
-    """The MIT skill keeps the upstream notice and permission text; the package keeps a security policy."""
+    """The MIT skill keeps the upstream notice and permission text; the package keeps a security policy and a privacy notice."""
     path = root / "skills" / "korean-character-count" / "LICENSE"
     try:
         text = path.read_text(encoding="utf-8")
@@ -148,6 +152,8 @@ def verify_bundled_licenses(root: Path, errors: list[str]) -> None:
                 errors.append(f"korean-character-count/LICENSE is missing: {marker}")
     if not (root / "SECURITY.md").is_file():
         errors.append("Missing SECURITY.md")
+    if not (root / "PRIVACY.md").is_file():
+        errors.append("Missing PRIVACY.md")
 
 
 def verify_skills(root: Path, errors: list[str]) -> None:
