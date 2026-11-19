@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- 이 저장소를 Claude Code 마켓플레이스로도 쓸 수 있게 `.claude-plugin/marketplace.json`(이름 `blueshadow62-school-records`)을 추가했다. README에 설치 명령 두 줄(`claude plugin marketplace add …`, `claude plugin install korean-school-records-toolkit@blueshadow62-school-records`)을 적었다.
+- `SECURITY.md`: 보안 문제를 GitHub Issues로 신고하는 방법(민감한 내용은 공개 이슈에 쓰지 않고 비공개 전달 방법을 요청)과, 스킬이 네트워크에 접속하지 않고 입력 자료를 수집·전송하지 않는다는 사실, 파일을 쓰는 스크립트와 정비용 도구가 하는 일을 적었다.
+- `skills/korean-character-count/LICENSE`: 이 스킬의 원 저작물(`NomaDamas/k-skill`의 `korean-character-count`)과 그 저장소의 MIT 라이선스 전문을 바꾸지 않고 실었고, 이 배포본에서 바꾼 내용(NEIS 줄바꿈 1Byte 등)을 적었다. 원 저장소의 저작권 표시에는 저작권자 이름이 없어 그대로 두었다.
+- README에 '실행하는 것과 외부 연결' 절을 추가했다.
+- `verify_package.py`와 `tests/test_package.py`가 마켓플레이스 파일(이 플러그인 하나를 저장소 루트에서 가리키는지, 소유자 이름이 `plugin.json` 작성자와 같은지), `plugin.json`의 `homepage`·`repository`, 글자 수 스킬의 MIT 표시, `SECURITY.md`, README·USER_GUIDE의 AI 사용 안내를 검사한다.
+
+### Changed
+
+- `.claude-plugin/plugin.json`에 `homepage`(GitHub Pages 문서)와 `repository`(GitHub 저장소)를 넣었다.
+- 루트 `LICENSE`가 중학교 성취수준 자료(NCIC, 공공누리 제2유형), 글자 수 스킬의 원 저작물, 기재요령 원문의 게시 주소, 제3자 자료를 바탕으로 쓴 참조 파일(`holistic-evaluation.md`, `major-*.md`)을 함께 밝힌다. `SOURCE_METADATA.json`에 글자 수 스킬의 원 저장소와 라이선스를 적었다.
+- `references/source-policy.md`에 제3자 자료를 바탕으로 쓴 파일의 원자료, 옮긴 정도(원자료와 문장 대조 결과), 이용 조건 확인 상태를 적었다.
+- README와 USER_GUIDE의 AI 활용 안내를 보완했다: 출력은 교사가 사실과 규정을 대조하기 전의 보조 초안이고, 기재요령은 AI 생성 자료를 그대로 입력하지 않도록 하며, 학교·교육청의 AI 활용 지침과 학생·보호자 고지 의무를 확인하라는 내용이다. USER_GUIDE 라이선스 표의 글자 수 스킬 저작권 표기를 원 저장소 기준으로 고쳤다.
+
 ## 3.0.0 — 2026-11-19
 
 ### 바뀌는 점
