@@ -45,7 +45,7 @@
 
 초안을 요청할 때 학교급을 알 수 없으면 먼저 묻는다. `중2`, `고1`, 성취기준 코드, 고등학교에만 있는 과목명으로 알 수 있으면 묻지 않는다.
 
-중학교 초안은 `2026 학교생활기록부 기재요령(중학교)`를 따른다. 한도는 과목별 세특 500자, 창체 영역별 500자, 행특 300자, 자유학기활동 영역별 1,000자다. 공통과목 1·2 합산, 모의고사, 재학 학교 식별 금지처럼 고등학교판에만 있는 규정은 적용하지 않는다. 두 판의 차이는 `skills/write-school-records/references/guidelines-middle/differences.md`에 정리했다.
+중학교 초안은 `2026 학교생활기록부 기재요령(중학교)`를 따른다. 한도는 과목별 세특 500자, 창체 영역별 500자, 행특 300자, 자유학기활동 영역별 1,000자다. 공통과목 1·2 합산, 모의고사, 재학 학교 식별 금지처럼 고등학교판에만 있는 규정은 적용하지 않는다. 중학교판 규정은 `skills/write-school-records/references/guidelines-middle/summary.md`에, 두 판의 차이는 같은 폴더의 `differences.md`에 정리했다.
 
 ## 안전 원칙
 
@@ -59,7 +59,7 @@
 - 분량 계산은 기록의 사실성을 대신하지 않는다.
 - 성취수준 참고 자료의 공통과목·중고 합본과목은 NCIC 공공누리 제2유형, 선택과목은 NKIS 공공누리 제1유형 조건을 따른다. 자세한 출처 표시는 `skills/write-school-records/references/achievement-standards/ATTRIBUTION.md`를 따른다.
 - 중학교 성취수준 자료는 NCIC 저작권 정책의 공공누리 제2유형 조건을 따른다. 게시물별 표시는 개별로 확인하지 못했다. 자세한 출처 표시는 `skills/write-school-records/references/achievement-standards-middle/ATTRIBUTION.md`를 따른다.
-- `references/guidelines/`의 기재요령 자료는 원문이 아니라 **원문을 근거로 재가공한 참조본**이다. 공식 효력을 갖는 것은 교육부 배포 원문이며, 내용이 다르면 원문을 따른다. 본 저작물은 교육부에서 2026년 작성하여 공공누리 제4유형(출처표시+상업적 이용금지+변경금지)으로 개방한 「2026학년도 학교생활기록부 기재요령 안내」를 이용하였으며, 해당 저작물은 교육부 홈페이지(https://www.moe.go.kr)에서 무료로 내려받으실 수 있다. 재가공 내역을 포함한 자세한 안내는 `skills/write-school-records/references/guidelines/ATTRIBUTION.md`를 따른다. 같은 게시물의 중학교판을 재가공한 `references/guidelines-middle/`도 같은 조건이며, 안내는 같은 폴더의 `ATTRIBUTION.md`를 따른다.
+- 기재요령 원문은 이 패키지에 들어 있지 않다. `references/guidelines/summary.md`(고등학교)와 `references/guidelines-middle/summary.md`(중학교)는 교육부 원문을 바탕으로 이 도구가 직접 정리한 **핵심 규정 요약**이며, 도구는 이 요약으로 규정을 판단한다. 공식 효력을 갖는 것은 교육부 배포 원문이며, 내용이 다르면 원문을 따른다. 본 저작물은 교육부에서 2026년 작성하여 공공누리 제4유형(출처표시+상업적 이용금지+변경금지)으로 개방한 「2026학년도 학교생활기록부 기재요령 안내」를 이용하였으며, 해당 저작물은 교육부 홈페이지(https://www.moe.go.kr)에서 무료로 내려받으실 수 있다. 요약의 성격과 이용 조건은 각 폴더의 `ATTRIBUTION.md`를 따른다. 원문 문구까지 대조하려면 교육부 원문을 Markdown으로 바꿔 직접 등록할 수 있다([USER_GUIDE.md](USER_GUIDE.md) 「기재요령 원문을 직접 등록하기」).
 
 Codex 설치·업데이트·제거 절차는 [INSTALL.md](INSTALL.md)를 따른다. Claude Code 설치와 로컬 검증은 [README_CLAUDE_CODE.md](README_CLAUDE_CODE.md)를 따른다.
 

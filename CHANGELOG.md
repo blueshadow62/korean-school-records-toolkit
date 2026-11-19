@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+### Removed
+
+- 배포본에서 교육부 기재요령 원문 변환본을 뺐다: `references/guidelines/`와 `references/guidelines-middle/`의 `current.md`, `current.index.md`, `manifest.json`, `versions/2026_2026-02-12.md`(8개 파일, 약 2.4MB). 원문은 공공누리 제4유형(출처표시·상업적 이용금지·변경금지)인데 변환본은 표를 다시 짜고 그림 링크를 지운 것이어서 권리 해석에 확인되지 않은 부분이 있었고, 변환본 하나하나가 플러그인 디렉터리 심사의 파일 크기 검토 기준(256KiB)을 넘었다. 또 스킬은 초안을 쓸 때 원문보다 직접 쓴 규정 요약을 주로 쓰고 있었다. 원문 변환본은 개발본에만 둔다.
+
 ### Fixed
 
+- `analyze_record.py --area service`가 3학년 봉사활동을 '특기사항 500자/1,500Byte'로 점검하던 문제 수정. 기재요령은 3학년 봉사활동 영역에 실적만 입력하게 하고(훈령 제433호 제13조②), 최대 글자수 표에도 봉사활동 특기사항 칸이 없다. 이제 실적 한 건의 활동내용(50자/150Byte)으로 세고, 1·2학년이면 봉사활동이 각 영역과 연계해 운영된다고 알린다. 고·중 검사 규칙에서 원문에 없는 `service` 특기사항 한도를 지웠고, SKILL.md 「지원 영역」의 '3학년 봉사 포함, 영역별 500자' 표현도 고쳤다.
+- `guidelines-middle/differences.md`가 최대 글자수를 모든 항목에 학년 단위로 적용하는 것처럼 쓰고, 영재·발명교육 기록 방식이 두 판에서 같다고 쓰던 문제 수정. 학년 단위는 표에 별표가 붙은 창체·독서·행특이고, 발명교육은 중학교판에서 관련 교과 세특 본문에 쓴다.
+- 고등학교 `references/guidelines/ATTRIBUTION.md`의 원문 등록 명령이 실제 인자(`--input`, `--source-title` 필수)와 다르던 문제 수정.
 - Git for Windows 기본값(`core.autocrlf=true`)으로 복제하면 기재요령 참조본이 CRLF로 바뀌어 manifest의 sha256 검증과 NEIS 표본 바이트 검사가 실패하던 문제 수정. `.gitattributes`로 텍스트 파일을 LF로 받게 했다. 저장소의 파일 내용은 바뀌지 않는다.
 - `output-skeleton.md` 마지막 안내가 진단 시트에도 A–D 코드를 쓰지 않는다고 해 SKILL.md(요청 시 별도 진단 시트에 기록 가능)와 어긋나던 문제 수정. 진단 시트 골격에 `내부 판정` 열을 두고, 그 밖의 위치에는 쓰지 않는다고 적었다. 두 파일이 맞는지 검사하는 테스트를 추가했다.
 - `output-skeleton.md` '활용 근거' 표의 자리표시 행에 든 `|`가 열 구분자로 읽혀 3열 표가 11칸으로 깨지던 문제 수정. 진단 시트와 같이 `·`로 나누고 '중 하나'를 붙였다. 이 파일의 모든 표에서 행의 칸 수가 머리글과 같은지 보는 테스트를 추가했다.
@@ -15,11 +22,18 @@
 
 ### Added
 
+- 기재요령 핵심 규정 요약 `references/guidelines/summary.md`(고등학교)와 `references/guidelines-middle/summary.md`(중학교). 교육부 「2026학년도 학교생활기록부 기재요령」(2026-02-12 개정)을 바탕으로 이 스킬이 직접 정리했다. 원문 해설을 옮기지 않고 영역별로 누가·누구에게·무엇을 쓸 수 있고 없는지·예외·한도를 규칙 목록과 표로 썼다. 훈령 조문은 인용 블록으로 구분해 원문 그대로 실었고, 각 규칙에 원문 장을 붙였다. 지원하지 않는 영역은 한도와 원문 위치만 적었다. 머리말에 학년도·원문 개정일·게시 주소·작성일을 기계가 읽을 수 있게 적었다.
+- `scripts/test_guideline_summary.py`: 요약을 검사 규칙과 언제나 대조하고, 원문이 등록된 환경(개발본)에서는 최대 글자수 표의 모든 행, 인용 조문, 장 제목, 금지 항목 이름을 원문과 대조한다.
+- 사용자 설명서에 「기재요령 원문을 직접 등록하기」 절 추가: 교육부 PDF를 kordoc 등으로 Markdown으로 바꾸는 방법, 변환에서 쪽이 빠졌는지 확인할 점, 등록·검증 명령, 재설치 때 등록한 원문이 새 설치본에 없다는 점.
+- `docs/guideline-summary-updates.md`: 새 학년도 기재요령이 나왔을 때 누가, 무엇을 보고, 어떤 테스트로 요약을 갱신하는지.
+- `verify_package.py`와 `tests/test_package.py`가 배포본에 원문 변환본이 없는지, 요약 머리말과 그 학년도의 검사 규칙이 있는지, 원문 없이 점검기와 `update_guidelines.py verify`가 요약 기준으로 동작하는지 검사한다. `.gitignore`가 사용자가 등록한 원문 파일을 제외한다.
 - push와 pull request 때 Ubuntu·Windows에서 unittest, node 테스트, `verify_package.py`를 실행하는 GitHub Actions 작업 흐름(`.github/workflows/tests.yml`) 추가. Windows는 `PYTHONUTF8`과 `core.autocrlf`를 러너 기본값 그대로 두고 실행한다.
 - 교과 안내 세 파일(`subject-humanities.md`, `subject-stem.md`, `subject-practical-arts.md`)에 '중학교 차이' 절 추가. 고등학교 기준인 세특 규정 게이트에서 중학교에서 뒤집히는 항목(입력 대상, 합산·학기별 한도, 소논문 예외, 능력단위)만 적고 `guidelines-middle/differences.md` 2절을 가리킨다.
 
 ### Changed
 
+- 기재요령 판단의 기준을 원문 변환본에서 학교급별 요약으로 바꿨다. 사용자에게 달라지는 점: 규정 판단과 분량 기준은 요약으로 하며, 답변의 기준 줄에 `요약 기준(원문 미대조)`을 적고 원문을 실제로 읽어 대조했을 때만 `원문 대조`라고 쓴다. 요약에 없는 세부 규정(예: 독서활동상황의 기재 방법)은 지어내지 않고 원문의 해당 장을 안내한다. `analyze_record.py`는 원문이 등록되지 않았으면 요약 머리말의 학년도로 검사 규칙을 고르고 출력에 `원문 미등록, 요약 기준`을 밝힌다(JSON은 `guideline.basis`가 `summary`). 원문을 등록했으면 지금처럼 활성 버전과 해시를 검증하고, 해시가 틀리면 오류다. `update_guidelines.py list`·`verify`는 원문이 없는 상태를 오류 대신 요약 기준 동작으로 안내한다.
+- SKILL.md, `source-policy.md`, `output-skeleton.md`, 영역별 안내 문서, `ATTRIBUTION.md`가 요약을 기준으로 가리키고, 원문이 등록된 환경에서만 문구 확인에 원문 색인을 쓰게 고쳤다. `differences.md`와 `field-free-semester.md`의 원문 행 번호 참조를 장 제목과 요약 절 번호로 바꿨다. 원문 표를 읽는 테스트는 원문이 등록된 환경에서만 돌고, 같은 사실을 요약 표에서 확인하는 테스트를 더했다.
 - `write-school-records` SKILL.md에서 여러 번 반복되던 규칙을 한 곳에 모았다. 근거 없는 완성형 기록 금지와 필수 경고 문구는 「내부 근거 판정 A–D」의 D 항목에, 내부 A–D 코드를 드러내지 않는 규칙은 같은 절의 한 문단에 둔다. 규칙의 뜻과 강도, 경고 문구는 바꾸지 않았다.
 - 판정별 라벨, 근거 부족을 알리는 일반 문장, 응답에 쓰지 않는 내부 명칭처럼 응답 형식에 속하는 세부를 `references/output-skeleton.md`로 옮겼다. SKILL.md 「출력과 점검」은 초안·첨삭·작성 지원으로 답하기 전에 이 파일을 반드시 읽게 한다. `output-skeleton.md`의 최대 글자수 표 안내도 장 번호 대신 표 제목으로 가리킨다.
 - 배포본 SKILL.md 라우팅 표의 세 행(교사 자료 입력 형식, 응답 골격, 스킬 행동 검증)을 개발본과 같은 위치로 옮겼다.

@@ -1,5 +1,14 @@
 # Test report
 
+## Unreleased — tested on 2026-11-19 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
+
+- The package no longer ships the guideline originals. `write-school-records` uses the guideline summaries.
+- Package contract tests (`tests/`, incl. dev/package drift check and the "no guideline originals" check): 14 passed.
+- `write-school-records` package-local scripts: 200 run, 184 passed, 16 skipped. All 16 skipped tests compare the summaries or the limit table with a registered guideline original, which the package does not contain.
+- `write-school-records` development source (originals registered): 223 run, 221 passed, 2 skipped (JS cross-check skipped where the sibling skill is absent).
+- `korean-character-count` node tests: 3 passed.
+- `verify_package.py`: passed.
+
 ## 2.2.0 — tested on 2026-11-18 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
 
 - Package contract tests (`tests/`, incl. dev/package drift check): 12 passed.

@@ -60,7 +60,8 @@ Codex marketplace 설치를 제공하려면 별도 marketplace 루트에 `.agent
 3. 변경된 스킬을 확인한다.
 4. `--dry-run` 후 `--install`을 실행한다.
 5. `--verify`와 각 스킬 회귀 테스트를 실행한다.
-6. 별도 marketplace wrapper로 배포할 때는 `plugin-creator`의 cachebuster·재설치 흐름을 사용하고 marketplace 파일을 임의로 편집하지 않는다.
+6. 기재요령 원문을 직접 등록해 썼다면, 설치가 스킬 폴더를 통째로 바꾸므로 등록한 원문(`references/guidelines*/current.md`, `versions/`, `manifest.json` 등)이 새 설치본에는 없다. 이전 설치본은 백업 폴더에 남으므로, [USER_GUIDE.md](USER_GUIDE.md) 「기재요령 원문을 직접 등록하기」대로 다시 등록한다. 등록한 원문이 설치 폴더에 있으면 `--verify`가 그 파일을 `unexpected`로 보고하는 것도 이 때문이다.
+7. 별도 marketplace wrapper로 배포할 때는 `plugin-creator`의 cachebuster·재설치 흐름을 사용하고 marketplace 파일을 임의로 편집하지 않는다.
 
 ## F. 제거와 롤백
 
@@ -100,7 +101,7 @@ python .\scripts\manage_bundle.py --rollback
 
 - 실제 학생 자료를 설치 시험에 사용하지 않는다.
 - 패키지나 로그에 학생 이름·학번·학교명을 넣지 않는다.
-- 생성 결과는 교사가 원자료와 활성 기재요령에 대조한다.
+- 생성 결과는 교사가 원자료와 기재요령(교육부 원문)에 대조한다.
 
 ## Claude Code
 
