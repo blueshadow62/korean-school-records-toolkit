@@ -134,6 +134,33 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertIn("행특에는 이 필드가 없다", fields)
         self.assertIn("- 과목·활동명: [과목명 또는 활동명. 행특은 비워 둔다]", intake)
 
+    def test_unmarked_teacher_memo_counts_as_observation_within_limits(self) -> None:
+        # 교사는 메모에 '관찰함'을 붙이지 않는다. 표지를 요구하면 자기 수업에서 본 행동에도 문장마다 확인 표시가 붙는다.
+        # 넓히는 것은 누가 보았는지의 인정 범위이므로, 제외 대상과 기존 안전 규칙이 그대로 있는지 함께 본다.
+        procedure = SKILL_TEXT.split("## 작성 절차", 1)[1].split("### 내부 근거 판정 A–D", 1)[0]
+        self.assertIn("'관찰함'·'확인함' 같은 표지가 없어도 `teacher_observation`으로 본다", procedure)
+        self.assertIn("표지가 없다는 이유로 직접 관찰 여부를 묻거나, 확인 수준을 낮추거나, `[확인 필요]`를 붙이지 않는다", procedure)
+        self.assertIn("메모에 적힌 것보다 강한 해석이나 메모에 없는 사실을 허용하지 않는다", procedure)
+        for excluded in (
+            "전해 들은 서술(`~했다고 한다`, 다른 교사·학생·보호자에게 들은 내용): 초안에 사실로 쓰는 대신 교사 확인 사항에 적는다",
+            "학생이 쓴 글을 옮긴 것(소감문·자기평가·활동지의 자기 서술): `student_self_report`",
+            "교사가 볼 수 없는 것(학생의 내면·의도·가정 사정, 교외나 다른 교사의 수업처럼 교사가 없던 자리의 일): 교사 관찰로 쓰지 않는다",
+            "행동 없이 평가·인상으로 된 서술(`성실함`, `리더십 있음`): 관찰 사실이 아닌 판단이므로 근거가 되는 행동을 교사 확인 사항으로 요청한다",
+            "누가 보았는지 문맥으로 알 수 없는 서술",
+        ):
+            with self.subTest(excluded=excluded):
+                self.assertIn(excluded, procedure)
+        self.assertIn("결과물을 교사 관찰로, 자기보고를 지속 행동·태도로 확대하지 않는다", SKILL_TEXT)
+        self.assertIn("학생이나 보호자가 작성한 문장을 교사 관찰 기록처럼 사용하지 않는다", SKILL_TEXT)
+        self.assertIn("서식 없는 교사 메모의 출처는 아래 「작성 절차」를 따르며", SKILL_TEXT)
+        # 입력 서식은 표지를 요구하지 않고, 인정 범위는 SKILL.md 한 곳을 가리킨다.
+        intake = (Path(__file__).parents[1] / "references" / "intake-template.md").read_text(encoding="utf-8")
+        mapping = intake.split("## 출처 유형 매핑 규칙", 1)[1].split("## 필수·선택 필드", 1)[0]
+        self.assertIn("[SKILL.md](../SKILL.md) 「작성 절차」가 정한다", mapping)
+        self.assertNotIn("명시한 부분만", intake)
+        self.assertNotIn("명시한 문장만", intake)
+        self.assertIn("'관찰함'·'확인함'은 붙이지 않아도 된다", intake)
+
     def test_requested_mode_cannot_override_evidence_strength(self) -> None:
         self.assertIn("지정하더라도 근거 수준보다 높게 적용하지 않는다", SKILL_TEXT)
         self.assertIn("근거 없이 완성본·A·발표 수행·다른 학생과 같은 활동을 요청해도", SKILL_TEXT)
@@ -210,6 +237,7 @@ class SkillIntegrationContractTests(unittest.TestCase):
             "[학생별 사실 미확인 — 그대로 입력하지 않는 작성 후보]",
             "별도 진단 시트에 코드를 기록할 수 있다",
             "내부 등급 언급이 아니라 평가 결과(`assessment_result`) 자료로 다룬다",
+            "같은 표지가 없어도 `teacher_observation`으로 본다",
         ):
             with self.subTest(phrase=phrase):
                 self.assertEqual(1, SKILL_TEXT.count(phrase))
