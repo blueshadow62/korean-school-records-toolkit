@@ -40,3 +40,8 @@ jobs:
 
       - name: Package verifier
         run: python scripts/verify_package.py
+
+      # 문서 전용판(editions/<이름>/)이 전체판의 빌드 결과와 같고 디렉터리 파일 규칙에 맞는지 본다.
+      # 같은 검사가 verify_package.py와 tests/test_directory_edition.py에도 있다. 여기서는 실패 원인을 바로 보이게 한다.
+      - name: Directory edition is current
+        run: python scripts/build_directory_edition.py --check

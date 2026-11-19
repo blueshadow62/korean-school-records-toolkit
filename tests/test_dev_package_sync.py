@@ -2,6 +2,7 @@
 """docs/dev-vs-package.md에 기록된 의도된 차이 외에는 개발본과 배포본이 같아야 한다."""
 
 import filecmp
+import json
 import re
 import unittest
 from pathlib import Path
@@ -49,6 +50,30 @@ class DevPackageSyncTests(unittest.TestCase):
         self.assertFalse([rel for rel in pkg if rel.startswith(LOCAL_ONLY_DIRS)], "배포본에 들어간 로컬 전용 자료")
         different = {rel for rel in pkg if not filecmp.cmp(pkg[rel], dev[rel], shallow=False)}
         self.assertEqual(different, ALLOWED_DIFFERENT, "문서화되지 않은 내용 차이")
+
+
+# 문서 전용판은 배포본(전체판)에서 scripts/build_directory_edition.py로 만든다. 흐름은 개발본 → 전체판 → 문서 전용판이다.
+EDITION_CONFIG = PLUGIN_ROOT / "editions" / "source" / "edition.json"
+EDITION_CHANGES = PLUGIN_ROOT / "editions" / "source" / "changes.md"
+
+
+@unittest.skipUnless(DEV.exists(), "개발본이 이 저장소 옆에 없음")
+class DevToDirectoryEditionTests(unittest.TestCase):
+    def test_edition_documents_equal_the_dev_source_except_documented_variants(self) -> None:
+        name = json.loads(EDITION_CONFIG.read_text(encoding="utf-8"))["name"]
+        edition = walk(PLUGIN_ROOT / "editions" / name / "skills" / "write-school-records")
+        prefix = "skills/write-school-records/"
+        changes_text = EDITION_CHANGES.read_text(encoding="utf-8")
+        variants = {path[len(prefix):] for path in re.findall(r"(?m)^````find (\S+)$", changes_text) if path.startswith(prefix)}
+        self.assertIn("SKILL.md", variants)
+        dev = walk(DEV)
+        for rel, path in edition.items():
+            if rel in variants:
+                continue
+            with self.subTest(file=rel):
+                self.assertIn(rel, dev, "문서 전용판에만 있는 파일")
+                # 문서 전용판은 LF로 쓰고 개발본 작업 폴더는 CRLF일 수 있으므로 줄바꿈은 맞춰 비교한다.
+                self.assertEqual(dev[rel].read_bytes().replace(b"\r\n", b"\n"), path.read_bytes().replace(b"\r\n", b"\n"))
 
 
 if __name__ == "__main__":
