@@ -2,7 +2,8 @@
   "name": "blueshadow62-school-records",
   "description": "학교생활기록부 초안 작성과 한국어 글자 수·NEIS Byte 계산을 제공하는 korean-school-records-toolkit 플러그인의 마켓플레이스",
   "owner": {
-    "name": "Local education tooling team"
+    "name": "blueshadow62",
+    "url": "https://github.com/blueshadow62"
   },
   "plugins": [
     {

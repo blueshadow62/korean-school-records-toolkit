@@ -12,6 +12,7 @@
 
 ### Changed
 
+- 작성자 표기를 'Local education tooling team'에서 GitHub 계정명 `blueshadow62`(주소 `https://github.com/blueshadow62`)로 바꿨다: 두 `plugin.json`의 `author`, Codex `interface.developerName`, `marketplace.json`의 `owner`.
 - `.claude-plugin/plugin.json`에 `homepage`(GitHub Pages 문서)와 `repository`(GitHub 저장소)를 넣었다.
 - 루트 `LICENSE`가 중학교 성취수준 자료(NCIC, 공공누리 제2유형), 글자 수 스킬의 원 저작물, 기재요령 원문의 게시 주소, 제3자 자료를 바탕으로 쓴 참조 파일(`holistic-evaluation.md`, `major-*.md`)을 함께 밝힌다. `SOURCE_METADATA.json`에 글자 수 스킬의 원 저장소와 라이선스를 적었다.
 - `references/source-policy.md`에 제3자 자료를 바탕으로 쓴 파일의 원자료, 옮긴 정도(원자료와 문장 대조 결과), 이용 조건 확인 상태를 적었다.

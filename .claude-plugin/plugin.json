@@ -5,7 +5,8 @@
   "version": "3.0.0",
   "description": "학교생활기록부 초안 생성과 한국어 글자 수·NEIS Byte 계산을 제공하는 Claude Code용 스킬 플러그인",
   "author": {
-    "name": "Local education tooling team"
+    "name": "blueshadow62",
+    "url": "https://github.com/blueshadow62"
   },
   "homepage": "https://blueshadow62.github.io/korean-school-records-toolkit/",
   "repository": "https://github.com/blueshadow62/korean-school-records-toolkit",

@@ -3,7 +3,8 @@
   "version": "3.0.0",
   "description": "학교생활기록부 초안 생성과 한국어 글자 수·NEIS Byte 계산을 제공하는 한국어 교육 기록 업무 도구",
   "author": {
-    "name": "Local education tooling team"
+    "name": "blueshadow62",
+    "url": "https://github.com/blueshadow62"
   },
   "license": "SEE LICENSE IN LICENSE",
   "keywords": ["korean", "education", "school-records", "neis"],
@@ -12,7 +13,7 @@
     "displayName": "한국어 학교생활기록부 도구",
     "shortDescription": "학생부 초안과 글자 수·NEIS Byte 도구",
     "longDescription": "두 개의 독립 스킬로 근거 기반 학교생활기록부 초안 생성과 글자 수·NEIS Byte 계산을 제공하는 스킬 전용 플러그인입니다.",
-    "developerName": "Local education tooling team",
+    "developerName": "blueshadow62",
     "category": "Productivity",
     "capabilities": ["Write"],
     "defaultPrompt": [
