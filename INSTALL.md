@@ -6,6 +6,8 @@
 
 이 패키지는 `write-school-records`, `korean-character-count`를 독립 스킬로 묶은 스킬 전용 플러그인이다. 앱 또는 MCP 연결은 포함하지 않는다.
 
+저장소의 `editions/korean-school-records-lite/`는 Claude 플러그인 디렉터리에 제출하는 문서 전용판(스크립트 없음)이며 Codex 설치 대상이 아니다. 아래 `scripts/manage_bundle.py`는 `skills/`의 두 스킬만 설치하므로 문서 전용판의 사본은 설치되지 않는다.
+
 ## B. 사전 요구 사항
 
 - `.codex-plugin/plugin.json`을 지원하는 Codex 환경

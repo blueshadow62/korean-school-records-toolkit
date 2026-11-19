@@ -8,12 +8,20 @@
 - `SECURITY.md`: 보안 문제를 GitHub Issues로 신고하는 방법(민감한 내용은 공개 이슈에 쓰지 않고 비공개 전달 방법을 요청)과, 스킬이 네트워크에 접속하지 않고 입력 자료를 수집·전송하지 않는다는 사실, 파일을 쓰는 스크립트와 정비용 도구가 하는 일을 적었다.
 - `skills/korean-character-count/LICENSE`: 이 스킬의 원 저작물(`NomaDamas/k-skill`의 `korean-character-count`)과 그 저장소의 MIT 라이선스 전문을 바꾸지 않고 실었고, 이 배포본에서 바꾼 내용(NEIS 줄바꿈 1Byte 등)을 적었다. 원 저장소의 저작권 표시에는 저작권자 이름이 없어 그대로 두었다.
 - README에 '실행하는 것과 외부 연결' 절을 추가했다.
-- `verify_package.py`와 `tests/test_package.py`가 마켓플레이스 파일(이 플러그인 하나를 저장소 루트에서 가리키는지, 소유자 이름이 `plugin.json` 작성자와 같은지), `plugin.json`의 `homepage`·`repository`, 글자 수 스킬의 MIT 표시, `SECURITY.md`, README·USER_GUIDE의 AI 사용 안내를 검사한다.
+- `verify_package.py`와 `tests/test_package.py`가 마켓플레이스 파일(소유자 이름이 `plugin.json` 작성자와 같은지), `plugin.json`의 `homepage`·`repository`, 글자 수 스킬의 MIT 표시, `SECURITY.md`, README·USER_GUIDE의 AI 사용 안내를 검사한다.
+- **문서 전용판 `korean-school-records-lite`(한국어 학교생활기록부 도구 라이트)**: Claude 플러그인 디렉터리 제출용 판을 `editions/korean-school-records-lite/`에 두었다. 디렉터리는 인증된 조직이 아닌 계정의 플러그인에서 Markdown·텍스트·JSON·YAML과 일부 그림 파일만 받으므로, 스크립트 없이 `write-school-records` 스킬 문서와 참고 자료(성취수준 자료, 기재요령 요약, 영역 안내)만 담았다. claude.ai·Cowork·Claude Code에서 쓴다. 전체판의 위치와 동작은 바뀌지 않는다.
+  - 근거 판단, 공통 게이트, 학교급 확인, 라우팅, 응답 형식은 전체판과 같다. 스크립트에 관한 부분만 다르다: 글자 수·바이트는 코드 실행 도구로 `analyze_record.py`와 같은 방식(CRLF → LF, 앞뒤 공백 제거, 코드 포인트 수, UTF-8 길이)으로 계산하고, 실행할 수 없으면 짐작한 값을 적지 않고 `글자 수는 기계로 점검하지 못했습니다.`라고 밝힌다. 금지 표현은 요약의 공통 금지 절을 기준으로 직접 점검한다. 기재요령 원문 등록, NEIS 실측 대조, 스킬 행동 검증은 지원하지 않는다고 안내한다.
+  - 넣지 않은 것: 스크립트, 시험 자료와 평가 사례, Codex 설정, 글자 수 계산 스킬, 검사 규칙 JSON(`analyzer-rules/`, 정규식이라 모델이 읽고 흉내 내면 정확하지 않다), 원문 색인 검색어(`index-terms.json`).
+  - 아이콘은 아직 넣지 않았다(디렉터리 등록 아이콘은 처음 제출할 때 한 번만 정해진다).
+- `scripts/build_directory_edition.py`: 전체판에서 문서 전용판을 만든다. 허용된 문서만 옮기고 `editions/source/changes.md`의 문구만 바꿔 끼우며, 바꿔 끼우는 문구가 전체판에서 바뀌었거나 규칙이 정해지지 않은 파일이 생기면 멈춘다. `--check`는 커밋된 폴더가 빌드 결과와 같은지와 디렉터리 파일 규칙(파일 종류·크기·개수, `#!`, UTF-8·NUL, 패키지 관리자 설정, 설치·실행 명령, 환경 변수 표현, 링크, `plugin.json`)을 본다.
+- `tests/test_directory_edition.py`(26건): 위 일치와 규칙, 규칙 검사가 실제로 문제를 잡는지, SKILL.md가 스크립트에 관한 부분만 다른지, 계산 방식이 점검기와 같은지, 문서 전용판의 README·LICENSE·`plugin.json`·마켓플레이스 항목을 검사한다. `tests/test_dev_package_sync.py`는 문서 전용판의 문서가 바꿔 끼운 파일을 빼면 개발본과 같은지 본다. CI에 `build_directory_edition.py --check` 단계를 더했다.
 
 ### Changed
 
 - 작성자 표기를 'Local education tooling team'에서 GitHub 계정명 `blueshadow62`(주소 `https://github.com/blueshadow62`)로 바꿨다: 두 `plugin.json`의 `author`, Codex `interface.developerName`, `marketplace.json`의 `owner`.
 - README 첫 소개 문단에 지원 영역(세특·창체·행특·중학교 자유학기활동), 규정 판단의 기준(이 도구가 정리한 2026학년도 기재요령 요약, 공식 효력은 원문), 참고하는 성취수준(2022 개정 중·고등학교)을 적어 GitHub 저장소 설명과 맞췄다.
+- `.claude-plugin/marketplace.json`에 문서 전용판을 두 번째 항목(`source`: `./editions/korean-school-records-lite`)으로 넣고, 두 항목의 `description`으로 전체판과 문서 전용판을 구분했다. 전체판을 설치하면 `editions/` 폴더의 사본도 함께 내려받지만 Claude Code는 전체판의 `skills/` 두 스킬만 읽는다(로컬 마켓플레이스 설치로 확인). `verify_package.py`가 두 항목과 문서 전용판을 확인하고, 한국어 오류 문장이 Windows 기본 로캘에서도 출력되도록 표준 출력을 UTF-8로 맞췄다.
+- README에 「두 가지 판」 절(차이 표와 각 판의 설치 방법)을, USER_GUIDE·INSTALL·`docs/how-it-works.html`·`docs/dev-vs-package.md`에 문서 전용판 안내를 넣었다. `README_CLAUDE_CODE.md`의 '마켓플레이스 등록을 포함하지 않는다'는 문장이 마켓플레이스 파일을 넣은 뒤로 맞지 않아 고쳤다.
 - `.claude-plugin/plugin.json`에 `homepage`(GitHub Pages 문서)와 `repository`(GitHub 저장소)를 넣었다.
 - 루트 `LICENSE`가 중학교 성취수준 자료(NCIC, 공공누리 제2유형), 글자 수 스킬의 원 저작물, 기재요령 원문의 게시 주소, 제3자 자료를 바탕으로 쓴 참조 파일(`holistic-evaluation.md`, `major-*.md`)을 함께 밝힌다. `SOURCE_METADATA.json`에 글자 수 스킬의 원 저장소와 라이선스를 적었다.
 - `references/source-policy.md`에 제3자 자료를 바탕으로 쓴 파일의 원자료, 옮긴 정도(원자료와 문장 대조 결과), 이용 조건 확인 상태를 적었다.

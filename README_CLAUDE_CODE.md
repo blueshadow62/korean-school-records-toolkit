@@ -70,4 +70,4 @@ korean-school-records-toolkit/
 - 학생부 최종 검수에서는 사실 확인 후 분량을 다시 계산한다.
 - 실제 학생 자료를 예제·테스트에 사용하지 않는다.
 
-이 패키지는 Claude Code marketplace 등록을 포함하지 않는다. marketplace 배포가 필요하면 별도의 저장소와 marketplace manifest를 추가해야 한다.
+이 저장소는 `.claude-plugin/marketplace.json`으로 Claude Code 마켓플레이스도 겸한다. 항목은 전체판(`korean-school-records-toolkit`, 저장소 루트)과 문서 전용판(`korean-school-records-lite`, `editions/korean-school-records-lite/`) 두 개이며, 설치 명령은 [README.md](README.md) 「설치」를 따른다. 두 판은 하나만 설치한다. 위 개인 범위 설치로 복사한 전체판에는 `editions/` 폴더의 사본도 들어 있지만, Claude Code는 `plugin.json`의 `skills` 경로(`./skills/`)에 있는 두 스킬만 읽는다.

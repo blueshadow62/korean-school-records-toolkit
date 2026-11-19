@@ -1,13 +1,14 @@
 # 개발본과 배포본의 의도된 차이
 
-이 프로젝트의 스킬은 두 위치에 존재한다.
+이 프로젝트의 스킬은 세 위치에 존재한다. 내용은 개발본 → 배포본(전체판) → 문서 전용판의 순서로 흐른다.
 
 | 경로 | 역할 |
 | --- | --- |
-| `skills/write-school-records/` | 저장소 밖의 개발본. 개발·검증과 설치 동기화에 사용한다. |
-| `plugins/korean-school-records-toolkit/skills/write-school-records/` | Git으로 추적되는 배포본. 플러그인에 포함되어 사용자에게 설치된다. |
+| `skills/write-school-records/` | 저장소 밖의 개발본. 스킬의 원본이며 개발·검증과 설치 동기화에 사용한다. |
+| `plugins/korean-school-records-toolkit/skills/write-school-records/` | Git으로 추적되는 배포본. 전체판 플러그인(`korean-school-records-toolkit`)에 포함되어 사용자에게 설치된다. |
+| `plugins/korean-school-records-toolkit/editions/<이름>/` | 배포본에서 `scripts/build_directory_edition.py`로 만든 문서 전용판 플러그인. 스크립트가 없어 Claude 플러그인 디렉터리에 제출한다. 직접 고치지 않는다. 아래 「전체판과 문서 전용판의 의도된 차이」를 따른다. |
 
-두 트리는 아래 차이를 제외하면 동일하게 유지한다.
+개발본과 배포본은 아래 차이를 제외하면 동일하게 유지한다.
 
 ## 의도된 차이
 
@@ -28,3 +29,21 @@ diff -rq skills/write-school-records plugins/korean-school-records-toolkit/skill
 ```
 
 `__pycache__` 경로는 비교 결과에서 무시한다. 그 밖의 차이는 먼저 이 문서의 의도된 차이인지 확인하고, 해당하지 않으면 드리프트로 조사한다.
+
+## 전체판과 문서 전용판의 의도된 차이
+
+문서 전용판은 Claude 플러그인 디렉터리 제출용이다. 디렉터리는 인증된 조직이 아닌 계정의 플러그인에서 Markdown·텍스트·JSON·YAML과 일부 그림 파일만 받으므로(2026-11-19 개발자 포털 검사 메시지), 스크립트 없이 문서만 담는다. 플러그인 이름과 표시 이름은 `editions/source/edition.json`에 있고, 폴더는 `editions/<이름>/`이다.
+
+1. 넣지 않는 것: 스킬의 `scripts/`, `tests/`, `agents/openai.yaml`(Codex 전용), 기재요령 폴더의 `analyzer-rules/`(점검 스크립트의 검사 규칙)와 `index-terms.json`(원문 등록 도구의 색인 검색어), `korean-character-count` 스킬, 전체판 루트의 `VERSION`·`.codex-plugin/`·`scripts/`·`tests/`·`tools/`·`docs/` 등. 검사 규칙은 정규식이라 모델이 읽고 흉내 내면 정확하지 않으므로 참조 자료로도 두지 않고, 금지 표현은 요약의 공통 금지 절을 기준으로 모델이 직접 점검한다.
+2. 바꿔 끼우는 것: `editions/source/changes.md`의 목록대로 `SKILL.md`, `references/output-skeleton.md`, `references/field-free-semester.md`, `references/source-policy.md`, `references/guidelines/ATTRIBUTION.md`, `references/guidelines-middle/ATTRIBUTION.md`, 루트 `LICENSE`의 정해진 문구만 바꾼다. 스킬 문서에서 바꾸는 곳은 스크립트·시험 자료·원문 등록에 관한 부분이다. 글자 수·바이트는 코드 실행 도구로 계산하게 하며(계산 방식은 `analyze_record.py`의 `normalize_text`와 같다), 코드를 실행할 수 없으면 계산하지 못했다고 밝히게 한다. 원문 등록, NEIS 실측 대조, 스킬 행동 검증은 지원하지 않는다고 안내하게 한다.
+3. 문서 전용판에만 있는 것: `README.md`, `SECURITY.md`(원본은 `editions/source/`), `.claude-plugin/plugin.json`(이름·표시 이름·설명은 `edition.json`에서, 버전은 `VERSION`에서, 작성자·주소·라이선스는 전체판 `plugin.json`에서 가져온다).
+4. 그 밖의 참조 문서(성취수준 자료, 기재요령 요약, 영역 안내 등)는 배포본과 같은 파일이다. 줄바꿈은 LF로 쓴다.
+
+전체판을 고친 뒤에는 문서 전용판을 다시 만든다. 커밋된 폴더가 빌드 결과와 다르면 `tests/test_directory_edition.py`, `scripts/verify_package.py`, CI의 `--check` 단계가 실패한다. 전체판에서 바꿔 끼우는 문구가 바뀌면 빌드가 멈추므로 `changes.md`도 함께 고친다.
+
+```sh
+python scripts/build_directory_edition.py          # editions/<이름>/을 다시 만든다
+python scripts/build_directory_edition.py --check  # 빌드 결과와 같은지, 디렉터리 파일 규칙에 맞는지만 본다
+```
+
+`tests/test_directory_edition.py`는 빌드 결과와의 일치, 파일 종류·크기·개수, `#!` 파일, UTF-8과 NUL, 패키지 관리자 설정 파일, 다른 `.claude-plugin` 폴더, Windows·macOS에서 유지되지 않는 이름, README 낱말 수, 설치·실행 명령과 스크립트 이름, 환경 변수·자격 증명 표현, 상대 링크, `plugin.json`, 마켓플레이스 항목을 검사한다. SKILL.md가 전체판과 스크립트에 관한 부분만 다른지(공통 게이트·학교급 확인·작성 절차·서술 구조·품질 게이트 절은 같은지)도 검사한다. `tests/test_dev_package_sync.py`는 문서 전용판의 문서가 바꿔 끼운 파일을 빼면 개발본과 같은지 본다.
