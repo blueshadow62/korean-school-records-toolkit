@@ -3,8 +3,9 @@
 
 The full plugin at the repository root is the source. This script copies the allowed
 documents of the write-school-records skill, applies the replacements in
-editions/source/changes.md, adds the files that only the edition has, and writes
-editions/<name>/. The edition has no scripts, so it can go to the Claude plugin directory.
+editions/source/changes.md, adds the files that only the edition has, copies the plugin icon
+(.claude-plugin/icon.png) unchanged, and writes editions/<name>/. The edition has no scripts,
+so it can go to the Claude plugin directory.
 
 Usage:
   python scripts/build_directory_edition.py            # write editions/<name>/
@@ -17,8 +18,10 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import struct
 import sys
 import unicodedata
+import zlib
 from pathlib import Path, PurePosixPath
 from typing import NamedTuple
 from urllib.parse import unquote
@@ -34,6 +37,16 @@ EDITION_ONLY_FILES = ("README.md", "SECURITY.md")
 SOURCE_FILES = {"edition.json", "changes.md", *EDITION_ONLY_FILES}
 # 전체판 루트에서 옮기는 파일(changes.md의 문구를 바꿔 넣는다).
 ROOT_FILES = ("LICENSE",)
+# 두 판이 같은 아이콘을 쓴다. 전체판 루트의 이 파일이 원본이고, 문서 전용판에는 바이트 그대로 옮긴다.
+# editions/source/에는 두지 않는다. 사본이 둘이면 서로 달라질 수 있기 때문이다.
+ICON = ".claude-plugin/icon.png"
+# .claude-plugin/ 폴더에 둘 수 있는 파일. plugin.json이 아닌 파일은 아이콘만 받는다.
+PLUGIN_FOLDER_FILES = {".claude-plugin/plugin.json", ICON}
+# 디렉터리의 아이콘 규칙(claude plugin validate의 ICON_MISSING 안내문과 같다): 정사각 PNG, 한 변 512~2048픽셀,
+# 2MB 미만(2MiB로 센다). validate(2.1.328)는 파일이 있는지만 보고 크기·모양은 보지 않으므로 여기서 직접 본다.
+ICON_MIN_SIDE = 512
+ICON_MAX_SIDE = 2048
+ICON_MAX_BYTES = 2 * 1024 * 1024
 IGNORED_PARTS = {"__pycache__", ".pytest_cache"}
 IGNORED_SUFFIXES = {".pyc"}
 
@@ -57,8 +70,9 @@ SKILL_RULES = (
 ALLOWED_SUFFIXES = {".md", ".txt", ".json", ".yaml", ".yml", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico"}
 ALLOWED_NAMES = {"LICENSE", "README", ".gitignore"}
 TEXT_SUFFIXES = {".md", ".txt", ".json", ".yaml", ".yml"}
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 IMAGE_SIGNATURES = {
-    ".png": (b"\x89PNG\r\n\x1a\n",),
+    ".png": (PNG_SIGNATURE,),
     ".jpg": (b"\xff\xd8\xff",),
     ".jpeg": (b"\xff\xd8\xff",),
     ".gif": (b"GIF87a", b"GIF89a"),
@@ -242,6 +256,48 @@ def manifest(root: Path) -> dict:
     }
 
 
+def png_size(data: bytes) -> tuple[int, int]:
+    """Read (width, height) from the IHDR chunk, which must follow the PNG signature directly."""
+    if not data.startswith(PNG_SIGNATURE):
+        raise BuildError("PNG가 아니다(파일 머리가 PNG 서명과 다르다)")
+    # 서명 뒤: 길이 4바이트(13) + 'IHDR' + 내용 13바이트(너비·높이가 각 4바이트) + CRC 4바이트.
+    chunk = data[len(PNG_SIGNATURE):len(PNG_SIGNATURE) + 25]
+    if len(chunk) < 25 or chunk[:8] != b"\x00\x00\x00\x0dIHDR":
+        raise BuildError("PNG의 첫 덩어리가 IHDR이 아니다")
+    if zlib.crc32(chunk[4:21]) != struct.unpack(">I", chunk[21:25])[0]:
+        raise BuildError("PNG 머리(IHDR)의 CRC가 맞지 않는다(파일이 깨졌다)")
+    width, height = struct.unpack(">II", chunk[8:16])
+    return width, height
+
+
+def icon_problems(data: bytes) -> list[str]:
+    """List what keeps an icon from meeting the directory rule: a square PNG, 512-2048 px on a side, under 2 MiB."""
+    try:
+        width, height = png_size(data)
+    except BuildError as error:
+        return [str(error)]
+    problems = []
+    if width != height:
+        problems.append(f"정사각이 아니다({width}×{height}픽셀)")
+    if not all(ICON_MIN_SIDE <= side <= ICON_MAX_SIDE for side in (width, height)):
+        problems.append(f"한 변은 {ICON_MIN_SIDE}~{ICON_MAX_SIDE}픽셀이어야 한다({width}×{height}픽셀)")
+    if len(data) >= ICON_MAX_BYTES:
+        problems.append(f"2MiB 이상이다({len(data):,}바이트)")
+    return problems
+
+
+def read_icon(root: Path = ROOT) -> bytes:
+    """Read the full edition's icon. Stop the build if it is missing or breaks the directory rule."""
+    path = root / ICON
+    if not path.is_file():
+        raise BuildError(f"전체판에 {ICON}가 없다. 두 판이 같은 아이콘을 쓰므로 전체판 루트에 먼저 둔다.")
+    data = path.read_bytes()
+    problems = icon_problems(data)
+    if problems:
+        raise BuildError(f"전체판 {ICON}: " + "; ".join(problems))
+    return data
+
+
 def build(root: Path = ROOT) -> dict[str, bytes]:
     """Return the edition as {relative POSIX path: file bytes}. Nothing is written."""
     root = root.resolve()
@@ -265,7 +321,9 @@ def build(root: Path = ROOT) -> dict[str, bytes]:
     for name in EDITION_ONLY_FILES:
         texts[name] = read_text(root / SOURCE / name)
     texts[".claude-plugin/plugin.json"] = json.dumps(manifest(root), ensure_ascii=False, indent=2) + "\n"
-    return {relative: text.encode("utf-8") for relative, text in sorted(texts.items())}
+    files = {relative: text.encode("utf-8") for relative, text in texts.items()}
+    files[ICON] = read_icon(root)
+    return dict(sorted(files.items()))
 
 
 def folder_files(folder: Path) -> dict[str, Path]:
@@ -396,8 +454,22 @@ def check_forbidden_files(folder: Path) -> list[str]:
             problems.append(f"플러그인 자신의 것이 아닌 .claude-plugin 폴더: {relative.as_posix()}")
         if path.is_dir() and path.name == "skills" and len(parts) >= 2 and parts[-2] == ".claude":
             problems.append(f".claude/skills 폴더: {relative.as_posix()}")
-        if path.is_file() and len(parts) == 2 and parts[0] == ".claude-plugin" and parts[1] != "plugin.json":
-            problems.append(f".claude-plugin 안의 plugin.json이 아닌 파일: {relative.as_posix()}")
+        if (path.is_file() and len(parts) == 2 and parts[0] == ".claude-plugin"
+                and relative.as_posix() not in PLUGIN_FOLDER_FILES):
+            problems.append(f".claude-plugin 안의 plugin.json·icon.png가 아닌 파일: {relative.as_posix()}")
+    return problems
+
+
+def check_icon(folder: Path, root: Path = ROOT) -> list[str]:
+    """The folder has .claude-plugin/icon.png: it meets the directory rule and is the full edition's file."""
+    path = folder / ICON
+    if not path.is_file():
+        return [f"{ICON}가 없다: {folder.name}"]
+    data = path.read_bytes()
+    problems = [f"{folder.name}/{ICON}: {problem}" for problem in icon_problems(data)]
+    original = root / ICON
+    if original.is_file() and data != original.read_bytes():
+        problems.append(f"{folder.name}/{ICON}가 전체판의 {ICON}와 다르다")
     return problems
 
 
@@ -550,6 +622,7 @@ AUDITS = (
     check_encoding,
     check_limits,
     check_forbidden_files,
+    check_icon,
     check_portable_paths,
     check_readme,
     check_no_install_or_script_commands,
