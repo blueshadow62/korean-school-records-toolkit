@@ -1,6 +1,6 @@
 # Test report
 
-## Unreleased — tested on 2026-11-19 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
+## 3.0.0 — tested on 2026-11-19 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
 
 - The package no longer ships the guideline originals. `write-school-records` uses the guideline summaries.
 - Package contract tests (`tests/`, incl. dev/package drift check and the "no guideline originals" check): 14 passed.
