@@ -4,8 +4,8 @@
 
 - The package no longer ships the guideline originals. `write-school-records` uses the guideline summaries.
 - Package contract tests (`tests/`, incl. dev/package drift check and the "no guideline originals" check): 14 passed.
-- `write-school-records` package-local scripts: 200 run, 184 passed, 16 skipped. All 16 skipped tests compare the summaries or the limit table with a registered guideline original, which the package does not contain.
-- `write-school-records` development source (originals registered): 223 run, 221 passed, 2 skipped (JS cross-check skipped where the sibling skill is absent).
+- `write-school-records` package-local scripts: 205 run, 187 passed, 18 skipped. All 18 skipped tests compare the summaries or the limit table with a registered guideline original, which the package does not contain.
+- `write-school-records` development source (originals registered): 228 run, 226 passed, 2 skipped (JS cross-check skipped where the sibling skill is absent).
 - `korean-character-count` node tests: 3 passed.
 - `verify_package.py`: passed.
 
