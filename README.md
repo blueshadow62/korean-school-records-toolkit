@@ -61,6 +61,15 @@
 - 중학교 성취수준 자료는 NCIC 저작권 정책의 공공누리 제2유형 조건을 따른다. 게시물별 표시는 개별로 확인하지 못했다. 자세한 출처 표시는 `skills/write-school-records/references/achievement-standards-middle/ATTRIBUTION.md`를 따른다.
 - 기재요령 원문은 이 패키지에 들어 있지 않다. `references/guidelines/summary.md`(고등학교)와 `references/guidelines-middle/summary.md`(중학교)는 교육부 원문을 바탕으로 이 도구가 직접 정리한 **핵심 규정 요약**이며, 도구는 이 요약으로 규정을 판단한다. 공식 효력을 갖는 것은 교육부 배포 원문이며, 내용이 다르면 원문을 따른다. 본 저작물은 교육부에서 2026년 작성하여 공공누리 제4유형(출처표시+상업적 이용금지+변경금지)으로 개방한 「2026학년도 학교생활기록부 기재요령 안내」를 이용하였으며, 해당 저작물은 교육부 홈페이지(https://www.moe.go.kr)에서 무료로 내려받으실 수 있다. 요약의 성격과 이용 조건은 각 폴더의 `ATTRIBUTION.md`를 따른다. 원문 문구까지 대조하려면 교육부 원문을 Markdown으로 바꿔 직접 등록할 수 있다([USER_GUIDE.md](USER_GUIDE.md) 「기재요령 원문을 직접 등록하기」).
 
+## 설치
+
+Claude Code에서는 이 저장소를 마켓플레이스로 추가한 뒤 플러그인을 설치한다.
+
+```bash
+claude plugin marketplace add blueshadow62/korean-school-records-toolkit
+claude plugin install korean-school-records-toolkit@blueshadow62-school-records
+```
+
 Codex 설치·업데이트·제거 절차는 [INSTALL.md](INSTALL.md)를 따른다. Claude Code 설치와 로컬 검증은 [README_CLAUDE_CODE.md](README_CLAUDE_CODE.md)를 따른다.
 
 ## 더 읽을 문서
