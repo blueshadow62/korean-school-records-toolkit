@@ -85,6 +85,63 @@ RULE_ROWS = {
 }
 
 
+# 기록 여부·위치를 가르는 조건 문구(2026-11-19 독립 검증 보고서 A1~A7, B1과 '넣지 않은 규정' 재검토).
+# (요약 규칙 번호, 그 규칙 줄에 있어야 하는 요약 구절, 원문에 있어야 하는 구절). 비교는 squash로 한다.
+CONDITION_ANCHORS = {
+    "high": [
+        ("2-12", "공공성을 가진 기관에 한함", "공공성을 가진 기관에 한함"),
+        ("2-12", "일반고 직업계열 학과 운영교에 한해", "일반고 직업계열학과 운영교에 한하여 기재 가능"),
+        ("4-6", "미이수 처리하고", "해당 과목을 미이수 처리하고"),
+        ("4-6", "세특은 쓰지 않는다", "과목별 세부능력 특기사항은 미기재"),
+        ("4-6", "공동교육과정 과목을 이수하지 못한 학생의 성적을 산출하지 않고 학생부 기재에서 제외한다", "공동교육과정 미이수 학생의 경우 성적 미산출 및 학생부 기재 제외"),
+        ("4-18", "교육 수료증이 발급되는 과정", "교육 수료증이 발급되는"),
+        ("4-18", "학교가 자체로 실시한 과정은 들지 않는다", "학교 자체 실시 과정 제외"),
+        ("4-20", "17개 교과군 가운데 하나", "17개 교과군 중에서"),
+        ("4-21", "단순 독후활동 외의 교육활동", "단순 독후활동(감상문 작성 등) 외 교육활동"),
+        ("4-22", "이수 내용만 문장으로 쓴다", "문장으로 이수 내용만을 입력한다"),
+        ("5-8", "병원학교·원격수업기관에서 한 활동 내용이 있으면", "원격수업기관의 활동 내용이 있는 경우"),
+        ("5-8", "현장체험학습(수련활동 등) 기간에 참여하지 않은 학생", "현장체험학습(수련활동 등) 기간 동안 미참여 학생"),
+        ("5-16", "3학년은 3월 1일부터 졸업일까지", "3학년은 3월 1일부터 졸업일까지"),
+        ("5-16", "재선출일", "재선출일"),
+        ("5-19", "학교장이 승인한 활동만 인정한다", "학교장이 승인한 경우만 인정"),
+        ("5-19", "학교 밖에서 조직된 스포츠클럽은 학교스포츠클럽으로 인정하지 않는다", "학교 이외에서 조직된 스포츠클럽은 인정하지 않는다"),
+        ("5-28", "물품이나 현금을 단순히 기부한 것", "물품 및 현금의 단순 기부"),
+    ],
+    "middle": [
+        ("4-16", "교육 수료증이 발급되는 과정", "교육 수료증이 발급되는"),
+        ("4-16", "학교가 자체로 실시한 과정은 들지 않는다", "학교자체 실시 과정 제외"),
+        ("4-17", "단순 독후활동 외의 교육활동", "단순 독후활동(감상문 작성 등) 외 교육활동"),
+        ("4-17", "자유학기활동상황", "자유학기활동상황 등)에 입력할 수 있다"),
+        ("4-18", "이수 내용만 문장으로 쓴다", "문장으로 이수 내용만을 입력한다"),
+        ("4-18", "그 과목 관련 내용을 일절 쓰지 않는다", "해당 과목 관련 내용을 일절 기재하지"),
+        ("5-8", "병원학교·원격수업기관에서 한 활동 내용이 있으면", "원격수업기관의 활동 내용이 있는 경우"),
+        ("5-16", "3학년은 3월 1일부터 졸업일까지", "3학년은 3월 1일부터 졸업일까지"),
+        ("5-16", "재선출일", "재선출일"),
+        ("5-21", "학교장이 승인한 기간에 한 것으로 한정", "학교장이 승인한 기간에 수행한 것으로 한정한다"),
+        ("5-21", "학교장이 승인한 활동만 인정한다", "학교장이 승인한 경우만 인정"),
+        ("5-21", "학교 밖에서 조직된 스포츠클럽은 학교스포츠클럽으로 인정하지 않는다", "학교 이외에서 조직된 스포츠클럽은 인정하지 않는다"),
+        ("5-29", "물품이나 현금을 단순히 기부한 것", "물품 및 현금의 단순 기부"),
+        ("6-6", "병원학교·원격수업기관에서 한 활동 내용이 있으면", "원격수업기관의 활동 내용이 있는 경우"),
+    ],
+}
+
+# 영역 문서의 게이트가 가리키는 규칙 번호. (문서, 시작 제목, 끝 제목, 번호를 찾을 요약의 학교급)
+RULE_POINTER_SECTIONS = [
+    (name, start, end, level)
+    for name in ("subject-humanities.md", "subject-stem.md", "subject-practical-arts.md", "field-creative.md")
+    for start, end, level in (("규정 게이트", "## 중학교 차이", "high"), ("## 중학교 차이", "\n## ", "middle"))
+]
+RULE_NUMBER_RE = re.compile(r"(?<![\d.\-])(\d{1,2}-\d{1,2})(?![\d\-])")
+
+
+def rule_line(text: str, rule: str) -> str:
+    """요약에서 규칙 번호가 붙은 줄(목록 항목이나 표 행) 하나를 돌려준다."""
+    lines = [line for line in text.splitlines() if f"**{rule}**" in line]
+    if len(lines) != 1:
+        raise AssertionError(f"규칙 {rule}의 줄이 {len(lines)}개다")
+    return lines[0]
+
+
 def dots(value: str) -> str:
     for mark in ("ㆍ", "･", "‧", "・", "∙"):
         value = value.replace(mark, "·")
@@ -289,6 +346,43 @@ class SummaryShapeTests(unittest.TestCase):
                     self.assertIsNotNone(row, area)
                     self.assertIn("「", row)
 
+    def test_conditions_that_decide_the_record_are_in_their_rules(self) -> None:
+        for level, anchors in CONDITION_ANCHORS.items():
+            text = summary_text(level)
+            for rule, phrase, _ in anchors:
+                with self.subTest(level=level, rule=rule, phrase=phrase):
+                    self.assertIn(squash(phrase), squash(rule_line(text, rule)))
+
+    def test_guide_documents_point_to_rules_that_exist(self) -> None:
+        # 영역 문서의 게이트는 요약 규칙 번호를 가리킨다. 요약 번호가 바뀌면 여기서 드러난다.
+        rules = {level: set(re.findall(r"\*\*(\d+-\d+)\*\*", summary_text(level))) for level in LEVELS}
+        for name, start, end, level in RULE_POINTER_SECTIONS:
+            text = (SKILL_ROOT / "references" / name).read_text(encoding="utf-8")
+            body = text.split(start, 1)[1].split(end, 1)[0]
+            numbers = RULE_NUMBER_RE.findall(body)
+            with self.subTest(name=name, section=start):
+                self.assertTrue(numbers, "게이트가 요약 규칙 번호를 가리키지 않는다")
+                for number in numbers:
+                    self.assertIn(number, rules[level], f"{name}의 {number}가 {level} 요약에 없다")
+
+    def test_skill_principles_are_kept_apart_from_guideline_rules(self) -> None:
+        # 검증 보고서 B2·B3: 기재요령의 권장·유의 조항과 스킬이 더 보수적으로 정한 원칙을 섞지 않는다.
+        skill = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+        gate = skill.split("## 현행 공통 준수 게이트", 1)[1].split("\n## ", 1)[0]
+        self.assertIn("`스킬 원칙`은 이 스킬이 기재요령보다 보수적으로 정한 작업 원칙이다", gate)
+        self.assertIn("(기재요령 1-9, 1-10)", gate)
+        self.assertIn("AI 생성문은 윤문 보조안일 뿐이며, 교사가 사실·과장·금지사항을 최종 대조하기 전에는 입력용 확정문으로 제시하지 않는다(스킬 원칙)", gate)
+        behavior = (SKILL_ROOT / "references" / "field-behavior.md").read_text(encoding="utf-8")
+        self.assertIn("누가기록은 권장 사항이며 전국 공통의 필수 절차가 아니다. (고 6-3, 중 7-3)", behavior)
+        self.assertIn("기재요령 위반이라고 안내하지 않는다", behavior)
+        for level, rule in (("high", "6-3"), ("middle", "7-3")):
+            with self.subTest(level=level):
+                self.assertIn("권한다", rule_line(summary_text(level), rule))
+        differences = (SKILL_ROOT / "references" / "guidelines-middle" / "differences.md").read_text(encoding="utf-8")
+        banned = differences.split("같은 기재 금지 사항", 1)[1].split("\n\n", 1)[0]
+        self.assertNotIn("AI", banned)
+        self.assertIn("보조 수단으로 쓰는 것 자체를 금지하지는 않는다", differences)
+
 
 class SummaryOriginalMixin:
     """원문이 등록된 환경에서 요약을 원문과 대조한다."""
@@ -358,6 +452,13 @@ class SummaryOriginalMixin:
             with self.subTest(term=term):
                 self.assertIn(squash(term), squash(rules_section), "요약 2절에 없는 항목")
                 self.assertIn(squash(term), chapter, "원문 유의사항 장에 없는 항목")
+
+    def test_conditions_that_decide_the_record_appear_in_the_original(self) -> None:
+        # 요약에 넣은 조건이 등록된 원문에도 있는지 본다. 새 학년도 원문을 등록했을 때 빠지거나 바뀐 조건이 여기서 드러난다.
+        original = squash(self.normalized)
+        for rule, _, phrase in CONDITION_ANCHORS[self.level]:
+            with self.subTest(rule=rule, phrase=phrase):
+                self.assertIn(squash(phrase), original)
 
 
 @unittest.skipUnless(original_registered("high"), "고등학교 기재요령 원문이 등록되지 않은 환경(배포본)")
