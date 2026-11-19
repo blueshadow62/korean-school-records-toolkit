@@ -49,7 +49,8 @@
 
 ## 안전 원칙
 
-- 이 도구를 활용하실 때에는 근무하시는 시도교육청의 AI 활용 지침 등을 확인하시기 바랍니다.
+- 이 도구의 출력은 교사가 사실과 규정을 대조하기 전의 보조 초안이다. 기재요령은 AI로 생성한 자료를 서술형 항목에 그대로 입력하지 않도록 하고, 윤문 같은 보조 수단으로 썼다면 최종 입력 전에 허위·과장 여부와 유의사항 준수를 철저히 확인하게 한다.
+- 이 도구를 활용하실 때에는 근무하시는 학교·시도교육청의 AI 활용 지침과, 학생·보호자에게 AI 사용 사실을 알려야 하는지(고지 의무)를 확인하시기 바랍니다. 참고로 Anthropic 사용 정책은 입학 허가·순위 결정, 입학·졸업을 정하는 평가의 채점 같은 교육 분야 결정에 AI를 쓰면 자격 있는 사람의 검토와 당사자에 대한 AI 사용 고지를 요구한다.
 - `write-school-records`는 CC BY-NC-SA 4.0 라이선스(© 2026 류기현, 부산 동아공고)이며, 비영리 목적에 한해 원저작자 표시·동일조건변경허락 조건으로 자유롭게 사용·수정·재배포할 수 있다. 상업적 이용은 금지되며 문의는 이 저장소의 GitHub Issue로 한다.
 - 실제 학생 자료를 예제·테스트·패키지에 포함하지 않는다.
 - 배포 전 학생 이름, 학번, 학교명 등 개인정보를 제거한다.
@@ -71,6 +72,14 @@ claude plugin install korean-school-records-toolkit@blueshadow62-school-records
 ```
 
 Codex 설치·업데이트·제거 절차는 [INSTALL.md](INSTALL.md)를 따른다. Claude Code 설치와 로컬 검증은 [README_CLAUDE_CODE.md](README_CLAUDE_CODE.md)를 따른다.
+
+## 실행하는 것과 외부 연결
+
+- 두 스킬은 이 플러그인 폴더 안의 스크립트만 실행한다. `write-school-records`는 Python 3 표준 라이브러리 스크립트를, `korean-character-count`는 Node.js 스크립트를 쓴다.
+- 스킬과 스크립트는 네트워크에 접속하지 않고, 입력한 학생 자료를 수집하거나 외부로 보내지 않는다.
+- 파일을 쓰는 스크립트는 기재요령 원문 등록 도구(`update_guidelines.py`, 스킬 폴더 안 `references/guidelines*/`에 씀)와 정비용 NEIS 실측값 기록 도구(`compare_neis_counts.py`)다.
+- `tools/corpus/`는 정비하는 사람이 성취수준 자료를 다시 만들 때 직접 실행하는 도구이며 스킬이 실행하지 않는다. 그 가운데 `convert_nkis_pdfs_v2.py`는 `npx`로 kordoc 패키지를 내려받아 실행한다.
+- 보안 문제 신고와 자세한 설명은 [SECURITY.md](SECURITY.md)를 따른다.
 
 ## 더 읽을 문서
 
