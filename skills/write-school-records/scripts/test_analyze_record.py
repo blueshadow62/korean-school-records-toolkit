@@ -405,7 +405,7 @@ class AnalyzeRecordTests(unittest.TestCase):
                 with self.subTest(level=level):
                     context = active_rule_context(root, level)
                     self.assertEqual("summary", context["basis"])
-                    self.assertEqual("원문 미등록, 요약 기준", context["basis_note"])
+                    self.assertEqual("이 도구가 정리한 요약 기준(원문 미등록, 원문과 직접 대조하지 않음)", context["basis_note"])
                     self.assertIsNone(context["active_version"])
                     self.assertEqual("2026", context["school_year"])
                     self.assertEqual("2026-02-12", context["revision_date"])
@@ -424,7 +424,13 @@ class AnalyzeRecordTests(unittest.TestCase):
 
             human = run("--field", "behavior", "--text", "가" * 301)
             self.assertEqual(0, human.returncode, human.stderr)
-            self.assertIn("기재요령 기준: 원문 미등록, 요약 기준 (2026학년도", human.stdout)
+            # 교사가 바로 알아볼 수 있게: 누가 정리한 요약인지, 바탕이 된 원문의 학년도·개정일, 원문과 대조하지 않았다는 사실.
+            self.assertIn(
+                "기재요령 기준: 이 도구가 정리한 요약 기준(교육부 2026학년도 학교생활기록부 기재요령(고등학교), 2026년 2월 12일 개정판 바탕)",
+                human.stdout,
+            )
+            self.assertIn("원문과 직접 대조하지 않았습니다", human.stdout)
+            self.assertNotIn("원문 미등록, 요약 기준", human.stdout)
             self.assertIn("참고 바이트 한도를 3Byte 초과", human.stdout)
             middle = run("--school-level", "middle", "--field", "free_semester", "--text", "자료를 비교함.", "--json")
             self.assertEqual(0, middle.returncode, middle.stderr)

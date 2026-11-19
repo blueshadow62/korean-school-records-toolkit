@@ -343,7 +343,8 @@ class SkillIntegrationContractTests(unittest.TestCase):
         self.assertNotIn("활성 참조본이 없을 때만", SKILL_TEXT)
         self.assertIn("규정을 지어내지 않고 원문 확인과 교육지원청 문의를 안내한다", SKILL_TEXT)
         self.assertIn("요약에 없는 세부는 지어내지 않고 요약이 가리키는 원문 장을 안내한다", SKILL_TEXT)
-        self.assertIn("요약 기준(원문 미대조)", SKELETON_TEXT)
+        self.assertIn("기준: 이 도구가 정리한 요약 기준(교육부 2026학년도 학교생활기록부 기재요령(고등학교), 2026년 2월 12일 개정판 바탕, 원문과 직접 대조하지 않음)", SKELETON_TEXT)
+        self.assertNotIn("요약 기준(원문 미대조)", SKELETON_TEXT)
         self.assertIn("원문을 읽지 않았으면 원문을 확인한 것처럼 쓰지 않는다", SKELETON_TEXT)
         self.assertNotIn("공식 확인 여부]", SKELETON_TEXT)
 

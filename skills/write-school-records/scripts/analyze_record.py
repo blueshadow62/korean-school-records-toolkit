@@ -641,15 +641,29 @@ def format_batch_human(result: dict[str, object]) -> str:
     return "\n".join(lines)
 
 
+SUMMARY_BASIS_NOTE = "이 도구가 정리한 요약 기준(원문 미등록, 원문과 직접 대조하지 않음)"
+
+
+def readable_date(value: object) -> str:
+    """'2026-02-12'를 교사가 읽기 쉬운 '2026년 2월 12일'로 바꾼다. 형식이 다르면 그대로 둔다."""
+    match = re.fullmatch(r"(\d{4})-(\d{2})-(\d{2})", str(value))
+    if not match:
+        return str(value)
+    year, month, day = match.groups()
+    return f"{year}년 {int(month)}월 {int(day)}일"
+
+
 def guideline_basis_line(guideline: dict[str, object]) -> str:
     """사람이 읽는 출력에 이 점검이 원문을 대조했는지, 요약만 기준으로 했는지 밝힌다."""
-    level_label = ", 중학교" if guideline.get("school_level") == "middle" else ""
     year = guideline.get("school_year", "")
     if guideline.get("basis") == "summary":
+        level_name = "중학교" if guideline.get("school_level") == "middle" else "고등학교"
         return (
-            f"기재요령 기준: 원문 미등록, 요약 기준 ({year}학년도{level_label}, "
-            f"{guideline.get('revision_date', '')} 개정판을 이 스킬이 정리한 요약과 검사 규칙)"
+            f"기재요령 기준: 이 도구가 정리한 요약 기준(교육부 {year}학년도 학교생활기록부 기재요령({level_name}), "
+            f"{readable_date(guideline.get('revision_date', ''))} 개정판 바탕). "
+            "원문이 등록되지 않아 원문과 직접 대조하지 않았습니다."
         )
+    level_label = ", 중학교" if guideline.get("school_level") == "middle" else ""
     return f"활성 기재요령: {guideline.get('active_version', '')} ({year}학년도{level_label}, 등록된 원문 검증 통과)"
 
 
@@ -694,7 +708,7 @@ def active_rule_context(skill_root: Path | None = None, level: str = "high") -> 
     load_year_rules(school_year, root, level)
     return {
         "basis": "summary",
-        "basis_note": "원문 미등록, 요약 기준",
+        "basis_note": SUMMARY_BASIS_NOTE,
         "active_version": None,
         "school_year": school_year,
         "school_level": level,

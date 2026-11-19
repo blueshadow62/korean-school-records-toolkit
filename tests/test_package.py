@@ -144,7 +144,7 @@ class PackageContractTests(unittest.TestCase):
                 self.assertEqual(0, result.returncode, result.stderr)
                 data = json.loads(result.stdout)
                 self.assertEqual("summary", data["guideline"]["basis"])
-                self.assertEqual("원문 미등록, 요약 기준", data["guideline"]["basis_note"])
+                self.assertEqual("이 도구가 정리한 요약 기준(원문 미등록, 원문과 직접 대조하지 않음)", data["guideline"]["basis_note"])
                 self.assertEqual(expected_limit, data["metrics"]["default_neis_byte_limit"])
                 verify = subprocess.run(
                     [sys.executable, str(scripts / "update_guidelines.py"), "--level", level, "verify"],
