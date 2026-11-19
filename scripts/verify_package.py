@@ -73,6 +73,23 @@ def verify_claude_manifest(root: Path, errors: list[str]) -> None:
             errors.append(f"Claude Code manifest {field} must be an https:// URL")
 
 
+def verify_publisher(root: Path, errors: list[str]) -> None:
+    """The publisher is written the same way in both manifests and in the Codex interface."""
+    try:
+        claude = json.loads((root / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        codex = json.loads((root / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        errors.append(f"Cannot read plugin manifests: {error}")
+        return
+    author = claude.get("author", {})
+    if codex.get("author") != author:
+        errors.append("Codex and Claude Code manifests must name the same author")
+    if codex.get("interface", {}).get("developerName") != author.get("name"):
+        errors.append("Codex interface.developerName must match author.name")
+    if not str(author.get("url", "")).startswith("https://"):
+        errors.append("author.url must be an https:// URL")
+
+
 MARKETPLACE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
@@ -284,6 +301,7 @@ def main() -> int:
     errors: list[str] = []
     verify_manifest(root, errors)
     verify_claude_manifest(root, errors)
+    verify_publisher(root, errors)
     verify_marketplace(root, errors)
     verify_bundled_licenses(root, errors)
     verify_skills(root, errors)

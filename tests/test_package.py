@@ -107,6 +107,17 @@ class PackageContractTests(unittest.TestCase):
         self.assertIn("claude plugin marketplace add blueshadow62/korean-school-records-toolkit", readme)
         self.assertIn(f"claude plugin install {manifest['name']}@{marketplace['name']}", readme)
 
+    def test_publisher_is_the_same_in_every_manifest(self) -> None:
+        # 작성자 표기는 GitHub 계정명과 그 주소다. 개인 메일과 실명은 manifest에 넣지 않는다.
+        claude = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        codex = json.loads((PLUGIN_ROOT / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        marketplace = json.loads((PLUGIN_ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
+        expected = {"name": "blueshadow62", "url": "https://github.com/blueshadow62"}
+        self.assertEqual(expected, claude["author"])
+        self.assertEqual(expected, codex["author"])
+        self.assertEqual(expected, marketplace["owner"])
+        self.assertEqual("blueshadow62", codex["interface"]["developerName"])
+
     def test_bundled_mit_skill_keeps_the_upstream_notice(self) -> None:
         # MIT 허락 조건: 원 저작물의 저작권 표시와 허락 문구 전문을 함께 싣는다. 원본에 없는 저작권자를 지어내지 않는다.
         text = (PLUGIN_ROOT / "skills" / "korean-character-count" / "LICENSE").read_text(encoding="utf-8")
