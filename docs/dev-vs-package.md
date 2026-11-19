@@ -38,6 +38,7 @@ diff -rq skills/write-school-records plugins/korean-school-records-toolkit/skill
 2. 바꿔 끼우는 것: `editions/source/changes.md`의 목록대로 `SKILL.md`, `references/output-skeleton.md`, `references/field-free-semester.md`, `references/source-policy.md`, `references/guidelines/ATTRIBUTION.md`, `references/guidelines-middle/ATTRIBUTION.md`, 루트 `LICENSE`의 정해진 문구만 바꾼다. 스킬 문서에서 바꾸는 곳은 스크립트·시험 자료·원문 등록에 관한 부분이다. 글자 수·바이트는 코드 실행 도구로 계산하게 하며(계산 방식은 `analyze_record.py`의 `normalize_text`와 같다), 코드를 실행할 수 없으면 계산하지 못했다고 밝히게 한다. 원문 등록, NEIS 실측 대조, 스킬 행동 검증은 지원하지 않는다고 안내하게 한다.
 3. 문서 전용판에만 있는 것: `README.md`, `SECURITY.md`(원본은 `editions/source/`), `.claude-plugin/plugin.json`(이름·표시 이름·설명은 `edition.json`에서, 버전은 `VERSION`에서, 작성자·주소·라이선스는 전체판 `plugin.json`에서 가져온다).
 4. 그 밖의 참조 문서(성취수준 자료, 기재요령 요약, 영역 안내 등)는 배포본과 같은 파일이다. 줄바꿈은 LF로 쓴다.
+5. 아이콘 `.claude-plugin/icon.png`는 두 판이 같은 파일이다. 전체판 루트의 파일이 원본이고, 빌드가 문서 전용판으로 바이트 그대로 옮긴다(`editions/source/`에는 두지 않는다). 디렉터리 기준은 정사각 PNG, 한 변 512~2048픽셀, 2MB 미만이다. 이 기본 위치에 있으면 `plugin.json`에 `icon`을 쓰지 않아도 디렉터리 검사가 찾는다. 그림을 바꾸려면 전체판 루트의 파일을 바꾸고 문서 전용판을 다시 만든다.
 
 전체판을 고친 뒤에는 문서 전용판을 다시 만든다. 커밋된 폴더가 빌드 결과와 다르면 `tests/test_directory_edition.py`, `scripts/verify_package.py`, CI의 `--check` 단계가 실패한다. 전체판에서 바꿔 끼우는 문구가 바뀌면 빌드가 멈추므로 `changes.md`도 함께 고친다.
 
@@ -46,4 +47,4 @@ python scripts/build_directory_edition.py          # editions/<이름>/을 다�
 python scripts/build_directory_edition.py --check  # 빌드 결과와 같은지, 디렉터리 파일 규칙에 맞는지만 본다
 ```
 
-`tests/test_directory_edition.py`는 빌드 결과와의 일치, 파일 종류·크기·개수, `#!` 파일, UTF-8과 NUL, 패키지 관리자 설정 파일, 다른 `.claude-plugin` 폴더, Windows·macOS에서 유지되지 않는 이름, README 낱말 수, 설치·실행 명령과 스크립트 이름, 환경 변수·자격 증명 표현, 상대 링크, `plugin.json`, 마켓플레이스 항목을 검사한다. SKILL.md가 전체판과 스크립트에 관한 부분만 다른지(공통 게이트·학교급 확인·작성 절차·서술 구조·품질 게이트 절은 같은지)도 검사한다. `tests/test_dev_package_sync.py`는 문서 전용판의 문서가 바꿔 끼운 파일을 빼면 개발본과 같은지 본다.
+`tests/test_directory_edition.py`는 빌드 결과와의 일치, 파일 종류·크기·개수, `#!` 파일, UTF-8과 NUL, 패키지 관리자 설정 파일, 다른 `.claude-plugin` 폴더, Windows·macOS에서 유지되지 않는 이름, README 낱말 수, 설치·실행 명령과 스크립트 이름, 환경 변수·자격 증명 표현, 상대 링크, `plugin.json`, 아이콘(두 판이 같은 파일인지, 정사각 PNG·한 변 512~2048픽셀·2MiB 미만인지), 마켓플레이스 항목을 검사한다. `claude plugin validate`는 아이콘이 있는지는 보지만 크기는 보지 않으므로 이 검사가 필요하다. SKILL.md가 전체판과 스크립트에 관한 부분만 다른지(공통 게이트·학교급 확인·작성 절차·서술 구조·품질 게이트 절은 같은지)도 검사한다. `tests/test_dev_package_sync.py`는 문서 전용판의 문서가 바꿔 끼운 파일을 빼면 개발본과 같은지 본다.

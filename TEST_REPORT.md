@@ -2,14 +2,15 @@
 
 ## Unreleased — tested on 2026-11-19 (Windows, Python 3.14, Node.js 26, without `PYTHONUTF8`)
 
-- Package contract tests (`tests/`, incl. dev/package drift check, the self-hosted marketplace file with both editions, the MIT notice of `korean-character-count`, `SECURITY.md`, the AI-use notice, and 26 tests of the documents-only edition): 45 passed. In a fresh clone without the development source beside it: 45 run, 43 passed, 2 skipped (the dev/package checks).
+- Package contract tests (`tests/`, incl. dev/package drift check, the self-hosted marketplace file with both editions, the MIT notice of `korean-character-count`, `SECURITY.md`, the AI-use notice, and 31 tests of the documents-only edition, including the shared icon): 50 passed. In a fresh clone without the development source beside it: 50 run, 48 passed, 2 skipped (the dev/package checks).
 - `write-school-records` package-local scripts: 205 run, 187 passed, 18 skipped (all 18 compare with a registered guideline original, which the package does not contain).
 - `write-school-records` development source (originals registered): 228 run, 226 passed, 2 skipped.
 - `korean-character-count` node tests: 3 passed.
 - `verify_package.py`: passed. It now also checks that the documents-only edition equals a fresh build and follows the directory file rules.
-- `python scripts/build_directory_edition.py --check`: passed. The documents-only edition has 320 files (314 `.md`, 4 `.json`, 2 `LICENSE`), 8,209,846 bytes in total; the largest file is 189,790 bytes.
-- `claude plugin validate --strict .` (Claude Code 2.1.328): passed. One plugin-directory warning: no listing icon (`ICON_MISSING`).
-- `claude plugin validate --strict editions/korean-school-records-lite`: passed. One plugin-directory warning: no listing icon (`ICON_MISSING`).
+- `python scripts/build_directory_edition.py --check`: passed. The documents-only edition has 321 files (314 `.md`, 4 `.json`, 2 `LICENSE`, 1 `.png`), 8,222,284 bytes in total; the largest file is 189,790 bytes.
+- `claude plugin validate --strict .` (Claude Code 2.1.328): passed. No plugin-directory warning. The validator finds the icon at `.claude-plugin/icon.png`, so `plugin.json` has no `icon` entry.
+- `claude plugin validate --strict editions/korean-school-records-lite`: passed. No plugin-directory warning.
+- Icon: both editions carry the same `.claude-plugin/icon.png` (1024×1024 PNG, 12,438 bytes). The file in the full plugin is the original. The build copies it unchanged. `claude plugin validate` only checks that an icon exists. Real PNGs of 256×256, 1024×512, and 4096×4096 passed it. The icon check in `build_directory_edition.py` rejects them. It also checks that the file is a PNG with a good IHDR header, square, 512 to 2048 px on a side, under 2 MiB, and the same file in both editions. A fresh clone with `core.autocrlf=true` keeps both icons byte for byte.
 - Local marketplace install with a separate `CLAUDE_CONFIG_DIR`: the full plugin lists 2 skills although its installed copy also holds `editions/`; the documents-only edition lists 1 skill.
 - Behavior evaluation of the documents-only edition (`tests/eval-cases` cases A-01, B-01, D-01, FORBID-02, BATCH-01, ANALYZE-01, LEVEL-04, MEMO-01, and A-01 again without a code execution tool; one fresh agent per case, a separate agent for the second pass): first-pass string checks 9 of 9 passed; second-pass checks 31 passed, 0 partial, 0 failed; no safety errors; no response named a script or a command. Every character and byte value written in a draft's length section matched `analyze_record.py`. The run without code execution wrote `글자 수는 기계로 점검하지 못했습니다.` and gave no estimated value.
 - Line endings: a checkout without `.gitattributes` and with `core.autocrlf=true` (371 of 372 files CRLF) passed the same package tests, node tests, `verify_package.py`, and `claude plugin validate --strict`.

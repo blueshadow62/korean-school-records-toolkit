@@ -12,9 +12,9 @@
 - **문서 전용판 `korean-school-records-lite`(한국어 학교생활기록부 도구 라이트)**: Claude 플러그인 디렉터리 제출용 판을 `editions/korean-school-records-lite/`에 두었다. 디렉터리는 인증된 조직이 아닌 계정의 플러그인에서 Markdown·텍스트·JSON·YAML과 일부 그림 파일만 받으므로, 스크립트 없이 `write-school-records` 스킬 문서와 참고 자료(성취수준 자료, 기재요령 요약, 영역 안내)만 담았다. claude.ai·Cowork·Claude Code에서 쓴다. 전체판의 위치와 동작은 바뀌지 않는다.
   - 근거 판단, 공통 게이트, 학교급 확인, 라우팅, 응답 형식은 전체판과 같다. 스크립트에 관한 부분만 다르다: 글자 수·바이트는 코드 실행 도구로 `analyze_record.py`와 같은 방식(CRLF → LF, 앞뒤 공백 제거, 코드 포인트 수, UTF-8 길이)으로 계산하고, 실행할 수 없으면 짐작한 값을 적지 않고 `글자 수는 기계로 점검하지 못했습니다.`라고 밝힌다. 금지 표현은 요약의 공통 금지 절을 기준으로 직접 점검한다. 기재요령 원문 등록, NEIS 실측 대조, 스킬 행동 검증은 지원하지 않는다고 안내한다.
   - 넣지 않은 것: 스크립트, 시험 자료와 평가 사례, Codex 설정, 글자 수 계산 스킬, 검사 규칙 JSON(`analyzer-rules/`, 정규식이라 모델이 읽고 흉내 내면 정확하지 않다), 원문 색인 검색어(`index-terms.json`).
-  - 아이콘은 아직 넣지 않았다(디렉터리 등록 아이콘은 처음 제출할 때 한 번만 정해진다).
-- `scripts/build_directory_edition.py`: 전체판에서 문서 전용판을 만든다. 허용된 문서만 옮기고 `editions/source/changes.md`의 문구만 바꿔 끼우며, 바꿔 끼우는 문구가 전체판에서 바뀌었거나 규칙이 정해지지 않은 파일이 생기면 멈춘다. `--check`는 커밋된 폴더가 빌드 결과와 같은지와 디렉터리 파일 규칙(파일 종류·크기·개수, `#!`, UTF-8·NUL, 패키지 관리자 설정, 설치·실행 명령, 환경 변수 표현, 링크, `plugin.json`)을 본다.
-- `tests/test_directory_edition.py`(26건): 위 일치와 규칙, 규칙 검사가 실제로 문제를 잡는지, SKILL.md가 스크립트에 관한 부분만 다른지, 계산 방식이 점검기와 같은지, 문서 전용판의 README·LICENSE·`plugin.json`·마켓플레이스 항목을 검사한다. `tests/test_dev_package_sync.py`는 문서 전용판의 문서가 바꿔 끼운 파일을 빼면 개발본과 같은지 본다. CI에 `build_directory_edition.py --check` 단계를 더했다.
+- `scripts/build_directory_edition.py`: 전체판에서 문서 전용판을 만든다. 허용된 문서만 옮기고 `editions/source/changes.md`의 문구만 바꿔 끼우며, 바꿔 끼우는 문구가 전체판에서 바뀌었거나 규칙이 정해지지 않은 파일이 생기면 멈춘다. `--check`는 커밋된 폴더가 빌드 결과와 같은지와 디렉터리 파일 규칙(파일 종류·크기·개수, `#!`, UTF-8·NUL, 패키지 관리자 설정, 설치·실행 명령, 환경 변수 표현, 링크, 아이콘, `plugin.json`)을 본다.
+- `tests/test_directory_edition.py`(31건): 위 일치와 규칙, 규칙 검사가 실제로 문제를 잡는지, SKILL.md가 스크립트에 관한 부분만 다른지, 계산 방식이 점검기와 같은지, 문서 전용판의 README·LICENSE·`plugin.json`·마켓플레이스 항목, 두 판의 아이콘을 검사한다. `tests/test_dev_package_sync.py`는 문서 전용판의 문서가 바꿔 끼운 파일을 빼면 개발본과 같은지 본다. CI에 `build_directory_edition.py --check` 단계를 더했다.
+- 두 판의 `.claude-plugin/icon.png`에 같은 아이콘(1024×1024 PNG)을 넣었다. 전체판 루트의 파일이 원본이고 `build_directory_edition.py`가 문서 전용판으로 바이트 그대로 옮긴다. `--check`·`verify_package.py`·`tests/test_directory_edition.py`가 두 판의 아이콘이 있고 서로 같은지, 정사각 PNG이며 한 변이 512~2048픽셀이고 2MiB 미만인지 본다. 기본 위치라 `plugin.json`에 `icon`을 쓰지 않으며, `claude plugin validate`의 `ICON_MISSING` 경고가 사라졌다(이 명령은 아이콘이 있는지는 보지만 크기는 보지 않는다). 디렉터리의 목록 아이콘은 개발자 포털에서 처음 저장·제출할 때 정해지고, 나중에 파일을 바꿔도 달라지지 않는다.
 
 ### Changed
 
