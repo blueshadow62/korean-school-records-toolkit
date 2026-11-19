@@ -94,6 +94,39 @@ class PackageContractTests(unittest.TestCase):
             install_readme,
         )
 
+    def test_repository_works_as_its_own_marketplace(self) -> None:
+        # 디렉터리 제출 준비: 이 저장소 자체를 마켓플레이스로 추가해 이름으로 설치할 수 있어야 한다.
+        manifest = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        marketplace = json.loads((PLUGIN_ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
+        self.assertEqual([{"name": manifest["name"], "source": "./"}], marketplace["plugins"])
+        self.assertEqual(manifest["author"]["name"], marketplace["owner"]["name"])
+        self.assertRegex(marketplace["name"], r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+        self.assertTrue(manifest["homepage"].startswith("https://"))
+        self.assertEqual("https://github.com/blueshadow62/korean-school-records-toolkit", manifest["repository"])
+        readme = (PLUGIN_ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("claude plugin marketplace add blueshadow62/korean-school-records-toolkit", readme)
+        self.assertIn(f"claude plugin install {manifest['name']}@{marketplace['name']}", readme)
+
+    def test_bundled_mit_skill_keeps_the_upstream_notice(self) -> None:
+        # MIT 허락 조건: 원 저작물의 저작권 표시와 허락 문구 전문을 함께 싣는다. 원본에 없는 저작권자를 지어내지 않는다.
+        text = (PLUGIN_ROOT / "skills" / "korean-character-count" / "LICENSE").read_text(encoding="utf-8")
+        self.assertIn("https://github.com/NomaDamas/k-skill", text)
+        self.assertIn("MIT License\n\nCopyright (c) 2026\n\nPermission is hereby granted", text.replace("\r\n", "\n"))
+        root_license = (PLUGIN_ROOT / "LICENSE").read_text(encoding="utf-8")
+        self.assertIn("skills/korean-character-count/LICENSE", root_license)
+        self.assertIn("achievement-standards-middle", root_license)
+        self.assertIn("references/source-policy.md", root_license)
+
+    def test_security_policy_and_ai_notice_are_published(self) -> None:
+        security = (PLUGIN_ROOT / "SECURITY.md").read_text(encoding="utf-8")
+        self.assertIn("https://github.com/blueshadow62/korean-school-records-toolkit/issues", security)
+        self.assertNotRegex(security, r"[\w.+-]+@[\w-]+\.[\w.]+")
+        for name in ("README.md", "USER_GUIDE.md"):
+            with self.subTest(name=name):
+                text = (PLUGIN_ROOT / name).read_text(encoding="utf-8")
+                self.assertIn("고지 의무", text)
+                self.assertIn("보조 초안", text)
+
     def test_zip_artifacts_are_absent(self) -> None:
         self.assertFalse(any(PLUGIN_ROOT.rglob("*.zip")))
         self.assertFalse(any(PLUGIN_ROOT.rglob("*.zip.sha256")))

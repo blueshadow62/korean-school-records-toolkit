@@ -68,6 +68,48 @@ def verify_claude_manifest(root: Path, errors: list[str]) -> None:
         errors.append("Claude Code manifest version and VERSION differ")
     if manifest.get("skills") != "./skills/":
         errors.append("Claude Code manifest skills path must be ./skills/")
+    for field in ("homepage", "repository"):
+        if not str(manifest.get(field, "")).startswith("https://"):
+            errors.append(f"Claude Code manifest {field} must be an https:// URL")
+
+
+MARKETPLACE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+def verify_marketplace(root: Path, errors: list[str]) -> None:
+    """The repository also works as its own marketplace: one entry, this plugin, from the repository root."""
+    path = root / ".claude-plugin" / "marketplace.json"
+    if not path.exists():
+        return
+    try:
+        marketplace = json.loads(path.read_text(encoding="utf-8"))
+        manifest = json.loads((root / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        errors.append(f"Invalid marketplace manifest: {error}")
+        return
+    name = str(marketplace.get("name", ""))
+    if not MARKETPLACE_NAME.match(name) or ".." in name:
+        errors.append(f"Marketplace name is not allowed: {name!r}")
+    if marketplace.get("owner", {}).get("name") != manifest.get("author", {}).get("name"):
+        errors.append("Marketplace owner.name must match plugin.json author.name")
+    if marketplace.get("plugins") != [{"name": manifest.get("name"), "source": "./"}]:
+        errors.append("Marketplace must list exactly this plugin with source ./")
+
+
+def verify_bundled_licenses(root: Path, errors: list[str]) -> None:
+    """The MIT skill keeps the upstream notice and permission text; the package keeps a security policy."""
+    path = root / "skills" / "korean-character-count" / "LICENSE"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as error:
+        errors.append(f"Missing korean-character-count/LICENSE: {error}")
+    else:
+        for marker in ("https://github.com/NomaDamas/k-skill", "MIT License", "Copyright (c) 2026",
+                       "The above copyright notice and this permission notice shall be included"):
+            if marker not in text:
+                errors.append(f"korean-character-count/LICENSE is missing: {marker}")
+    if not (root / "SECURITY.md").is_file():
+        errors.append("Missing SECURITY.md")
 
 
 def verify_skills(root: Path, errors: list[str]) -> None:
@@ -242,6 +284,8 @@ def main() -> int:
     errors: list[str] = []
     verify_manifest(root, errors)
     verify_claude_manifest(root, errors)
+    verify_marketplace(root, errors)
+    verify_bundled_licenses(root, errors)
     verify_skills(root, errors)
     verify_achievement_sources(root, errors)
     verify_middle_achievement_sources(root, errors)
