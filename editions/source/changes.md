@@ -256,4 +256,5 @@ This distribution bundles two independent local skills.
 Korean School Records Toolkit Lite (korean-school-records-lite) — license notice
 
 This is the documents-only edition of korean-school-records-toolkit (https://github.com/blueshadow62/korean-school-records-toolkit). It holds one skill, write-school-records, and its reference documents. It does not hold scripts or the korean-character-count skill.
+
 ````
