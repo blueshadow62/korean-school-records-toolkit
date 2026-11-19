@@ -13,6 +13,9 @@
       "name": "korean-character-count",
       "source_type": "existing 1.0.0 source selection",
       "source_identifier": "existing-1.0.0-source:korean-character-count",
+      "upstream_repository": "https://github.com/NomaDamas/k-skill",
+      "upstream_path": "korean-character-count",
+      "license": "MIT; see skills/korean-character-count/LICENSE",
       "test_status": "See TEST_REPORT.md",
       "selection_reason": "Preserves the source selected for 1.0.0 without payload changes."
     },

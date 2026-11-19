@@ -118,7 +118,7 @@ python scripts/update_guidelines.py verify
 | 기능 | 라이선스 | 저작권 표기 |
 |---|---|---|
 | 학생부 작성 도우미 | CC BY-NC-SA 4.0 — 비영리·동일조건변경허락·저작자표시 | © 2026 류기현(부산 동아공고) |
-| 글자 수 계산 | MIT — 자유롭게 사용·수정·재배포 | 표기 없음 |
+| 글자 수 계산 | MIT — 자유롭게 사용·수정·재배포. 원 저작물은 [NomaDamas/k-skill](https://github.com/NomaDamas/k-skill)의 `korean-character-count` | 원 저장소의 표시 `Copyright (c) 2026`(저작권자 이름 없음). 전문과 바꾼 내용은 `skills/korean-character-count/LICENSE` |
 
 학생부 작성 도우미는 **비영리 목적(학교 등 교육기관의 내부 사용 포함)에 한해** 자유롭게 쓰고 고칠 수 있습니다. 수정본을 배포할 때도 같은 라이선스를 적용해야 하고, 원저작자 표시를 유지해야 합니다. 상업적 이용은 금지되며, 문의는 이 저장소의 GitHub Issue로 받습니다.
 
