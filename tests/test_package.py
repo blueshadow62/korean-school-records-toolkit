@@ -96,9 +96,17 @@ class PackageContractTests(unittest.TestCase):
 
     def test_repository_works_as_its_own_marketplace(self) -> None:
         # 디렉터리 제출 준비: 이 저장소 자체를 마켓플레이스로 추가해 이름으로 설치할 수 있어야 한다.
+        # 항목은 전체판(저장소 루트)과 문서 전용판(editions/<이름>/) 두 개이며, 설명으로 둘을 구분한다.
         manifest = json.loads((PLUGIN_ROOT / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
         marketplace = json.loads((PLUGIN_ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
-        self.assertEqual([{"name": manifest["name"], "source": "./"}], marketplace["plugins"])
+        edition = json.loads((PLUGIN_ROOT / "editions" / "source" / "edition.json").read_text(encoding="utf-8"))
+        self.assertEqual(
+            [(manifest["name"], "./"), (edition["name"], f"./editions/{edition['name']}")],
+            [(entry["name"], entry["source"]) for entry in marketplace["plugins"]],
+        )
+        descriptions = [entry["description"] for entry in marketplace["plugins"]]
+        self.assertTrue(descriptions[0].startswith("전체판"), descriptions[0])
+        self.assertTrue(descriptions[1].startswith("문서 전용판"), descriptions[1])
         self.assertEqual(manifest["author"]["name"], marketplace["owner"]["name"])
         self.assertRegex(marketplace["name"], r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
         self.assertTrue(manifest["homepage"].startswith("https://"))

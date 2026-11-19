@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import sys
@@ -94,13 +95,15 @@ MARKETPLACE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
 def verify_marketplace(root: Path, errors: list[str]) -> None:
-    """The repository also works as its own marketplace: one entry, this plugin, from the repository root."""
+    """The repository also works as its own marketplace: the full plugin from the repository root
+    and the documents-only edition from editions/<name>/."""
     path = root / ".claude-plugin" / "marketplace.json"
     if not path.exists():
         return
     try:
         marketplace = json.loads(path.read_text(encoding="utf-8"))
         manifest = json.loads((root / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        edition = json.loads((root / "editions" / "source" / "edition.json").read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         errors.append(f"Invalid marketplace manifest: {error}")
         return
@@ -109,8 +112,26 @@ def verify_marketplace(root: Path, errors: list[str]) -> None:
         errors.append(f"Marketplace name is not allowed: {name!r}")
     if marketplace.get("owner", {}).get("name") != manifest.get("author", {}).get("name"):
         errors.append("Marketplace owner.name must match plugin.json author.name")
-    if marketplace.get("plugins") != [{"name": manifest.get("name"), "source": "./"}]:
-        errors.append("Marketplace must list exactly this plugin with source ./")
+    plugins = marketplace.get("plugins", [])
+    expected = [(manifest.get("name"), "./"), (edition.get("name"), f"./editions/{edition.get('name')}")]
+    if [(entry.get("name"), entry.get("source")) for entry in plugins] != expected:
+        errors.append("Marketplace must list the full plugin (source ./) and then the documents-only edition "
+                      "(source ./editions/<name>)")
+    descriptions = [str(entry.get("description", "")).strip() for entry in plugins]
+    if not all(descriptions) or len(set(descriptions)) != len(descriptions):
+        errors.append("Each marketplace entry needs its own description, so that users can tell the editions apart")
+
+
+def verify_directory_edition(root: Path, errors: list[str]) -> None:
+    """The documents-only edition must equal a fresh build and follow the directory file rules."""
+    builder_path = Path(__file__).resolve().with_name("build_directory_edition.py")
+    spec = importlib.util.spec_from_file_location("build_directory_edition", builder_path)
+    if spec is None or spec.loader is None:
+        errors.append(f"Cannot load {builder_path.name}")
+        return
+    builder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(builder)
+    errors.extend(f"Directory edition: {problem}" for problem in builder.check(root))
 
 
 def verify_bundled_licenses(root: Path, errors: list[str]) -> None:
@@ -294,6 +315,10 @@ def scan_text_files(root: Path, errors: list[str]) -> None:
 
 
 def main() -> int:
+    # 문서 전용판 검사의 오류 문장은 한국어다. Windows 기본 로캘(cp1252 등)에서도 출력하다 멈추지 않게 한다.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("plugin_root", type=Path, nargs="?", default=Path(__file__).resolve().parents[1])
     args = parser.parse_args()
@@ -303,6 +328,7 @@ def main() -> int:
     verify_claude_manifest(root, errors)
     verify_publisher(root, errors)
     verify_marketplace(root, errors)
+    verify_directory_edition(root, errors)
     verify_bundled_licenses(root, errors)
     verify_skills(root, errors)
     verify_achievement_sources(root, errors)

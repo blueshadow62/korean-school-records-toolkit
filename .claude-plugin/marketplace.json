@@ -1,6 +1,6 @@
 {
   "name": "blueshadow62-school-records",
-  "description": "학교생활기록부 초안 작성과 한국어 글자 수·NEIS Byte 계산을 제공하는 korean-school-records-toolkit 플러그인의 마켓플레이스",
+  "description": "학교생활기록부 초안 작성 도구의 전체판(스크립트 포함)과 문서 전용판(스크립트 없음)을 제공하는 마켓플레이스. 두 판 가운데 하나만 설치한다",
   "owner": {
     "name": "blueshadow62",
     "url": "https://github.com/blueshadow62"
@@ -8,7 +8,13 @@
   "plugins": [
     {
       "name": "korean-school-records-toolkit",
-      "source": "./"
+      "source": "./",
+      "description": "전체판: 학생부 초안 스킬에 기계 점검 스크립트(Python), 글자 수·NEIS Byte 계산 스킬(Node.js), 기재요령 원문 등록 도구를 함께 넣은 판. Claude Code·Codex용"
+    },
+    {
+      "name": "korean-school-records-lite",
+      "source": "./editions/korean-school-records-lite",
+      "description": "문서 전용판: 스크립트 없이 학생부 초안 스킬과 참고 자료만 넣은 판. 글자 수는 Claude의 코드 실행 도구로 계산한다. claude.ai·Cowork·Claude Code용"
     }
   ]
 }
