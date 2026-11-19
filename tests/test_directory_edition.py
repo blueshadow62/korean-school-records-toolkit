@@ -10,8 +10,10 @@ from __future__ import annotations
 import importlib.util
 import json
 import re
+import struct
 import tempfile
 import unittest
+import zlib
 from pathlib import Path
 
 
@@ -41,10 +43,20 @@ PROTECTED_SECTIONS = ("현행 공통 준수 게이트", "학교급 확인", "작
 # 문서 전용판의 스킬 문서에 남으면 안 되는, 이 판에 없는 도구·자료의 이름.
 ABSENT_TOOLS = ("analyze_record", "update_guidelines", "compare_neis", "korean-character-count", "tests/",
                 "eval-cases", "neis-validation", "agents/openai.yaml")
+# 두 판이 같이 쓰는 아이콘의 위치. 이 기본 위치에 있으면 plugin.json에 icon을 쓰지 않아도 디렉터리 검사가 찾는다.
+ICON = ".claude-plugin/icon.png"
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 
 
 def text(path: Path) -> str:
     return path.read_bytes().decode("utf-8").replace("\r\n", "\n")
+
+
+def png_header(width: int, height: int, *, valid_crc: bool = True) -> bytes:
+    """PNG 서명과 IHDR 덩어리만 있는 바이트. 크기와 머리 검사에는 이것으로 충분하다."""
+    body = b"IHDR" + struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    checksum = zlib.crc32(body) if valid_crc else 0
+    return PNG_SIGNATURE + struct.pack(">I", 13) + body + struct.pack(">I", checksum)
 
 
 def sections(document: str) -> dict[str, str]:
@@ -199,12 +211,74 @@ class EditionContentTests(unittest.TestCase):
         self.assertEqual(config["name"], manifest["name"])
         self.assertEqual(EDITION.name, manifest["name"])
         self.assertEqual((PLUGIN_ROOT / "VERSION").read_text(encoding="utf-8").strip(), manifest["version"])
+        # 아이콘은 기본 위치(ICON)에 있어 claude plugin validate가 찾는다. icon 항목을 따로 쓰지 않는다.
         self.assertNotIn("icon", manifest)
         self.assertEqual([], BUILDER.check_manifest(EDITION, PLUGIN_ROOT))
         marketplace = json.loads(text(PLUGIN_ROOT / ".claude-plugin" / "marketplace.json"))
         entry = next(e for e in marketplace["plugins"] if e["name"] == manifest["name"])
         self.assertEqual(f"./editions/{manifest['name']}", entry["source"])
         self.assertTrue((PLUGIN_ROOT / entry["source"] / ".claude-plugin" / "plugin.json").is_file())
+
+
+class IconTests(unittest.TestCase):
+    """두 판이 같은 아이콘을 쓴다. 디렉터리 기준: .claude-plugin/icon.png에 정사각 PNG, 한 변 512~2048픽셀, 2MB 미만."""
+
+    def test_both_editions_carry_the_same_icon_that_meets_the_directory_rule(self) -> None:
+        full, edition = PLUGIN_ROOT / ICON, EDITION / ICON
+        self.assertTrue(full.is_file(), "전체판에 아이콘이 없다")
+        self.assertTrue(edition.is_file(), "문서 전용판에 아이콘이 없다")
+        self.assertEqual(full.read_bytes(), edition.read_bytes(), "두 판의 아이콘이 서로 다르다")
+        for label, path in (("전체판", full), ("문서 전용판", edition)):
+            data = path.read_bytes()
+            with self.subTest(edition=label):
+                # 검사 코드의 오류가 이 시험을 통과시키지 않도록 파일 머리의 바이트 위치에서 직접 읽는다.
+                self.assertEqual(PNG_SIGNATURE, data[:8])
+                self.assertEqual(b"IHDR", data[12:16])
+                width, height = struct.unpack(">II", data[16:24])
+                self.assertEqual(width, height, "정사각이 아니다")
+                self.assertGreaterEqual(width, 512)
+                self.assertLessEqual(width, 2048)
+                self.assertLess(len(data), 2 * 1024 * 1024)
+
+    def test_build_copies_the_full_icon_unchanged(self) -> None:
+        # 문서 전용판에는 원본을 바이트 그대로 옮긴다. 줄바꿈 변환이나 다시 저장하는 일이 없어야 한다.
+        self.assertEqual((PLUGIN_ROOT / ICON).read_bytes(), BUILDER.build(PLUGIN_ROOT)[ICON])
+
+    def test_icon_rule_constants_and_boundaries(self) -> None:
+        self.assertEqual((512, 2048, 2 * 1024 * 1024),
+                         (BUILDER.ICON_MIN_SIDE, BUILDER.ICON_MAX_SIDE, BUILDER.ICON_MAX_BYTES))
+        self.assertEqual((1024, 512), BUILDER.png_size(png_header(1024, 512)))
+        for data in (png_header(512, 512), png_header(1024, 1024), png_header(2048, 2048)):
+            self.assertEqual([], BUILDER.icon_problems(data))
+        unsuitable = {
+            "PNG가 아님": b"\xff\xd8\xff\xe0" + b"x" * 64,
+            "비어 있음": b"",
+            "머리가 잘림": PNG_SIGNATURE + b"\x00\x00\x00\x0dIHDR",
+            "IHDR이 첫 덩어리가 아님": PNG_SIGNATURE + struct.pack(">I", 13) + b"IDAT" + b"\0" * 17,
+            "머리의 CRC가 틀림": png_header(1024, 1024, valid_crc=False),
+            "정사각이 아님": png_header(1024, 512),
+            "한 변이 511": png_header(511, 511),
+            "한 변이 2049": png_header(2049, 2049),
+            "한 변이 4096": png_header(4096, 4096),
+        }
+        for label, data in unsuitable.items():
+            with self.subTest(label=label):
+                self.assertEqual(1, len(BUILDER.icon_problems(data)), BUILDER.icon_problems(data))
+        header = png_header(1024, 1024)
+        self.assertEqual([], BUILDER.icon_problems(header + b"\0" * (BUILDER.ICON_MAX_BYTES - 1 - len(header))))
+        self.assertEqual(1, len(BUILDER.icon_problems(header + b"\0" * (BUILDER.ICON_MAX_BYTES - len(header)))))
+
+    def test_build_stops_when_the_full_icon_is_missing_or_unsuitable(self) -> None:
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            with self.assertRaises(BUILDER.BuildError):
+                BUILDER.read_icon(root)
+            (root / ".claude-plugin").mkdir()
+            (root / ICON).write_bytes(png_header(256, 256))
+            with self.assertRaises(BUILDER.BuildError):
+                BUILDER.read_icon(root)
+            (root / ICON).write_bytes(png_header(1024, 1024))
+            self.assertEqual(png_header(1024, 1024), BUILDER.read_icon(root))
 
 
 class DirectoryRuleTests(unittest.TestCase):
@@ -264,7 +338,23 @@ class DirectoryRuleCatchesProblemsTests(unittest.TestCase):
         self.put(".claude/skills/x/SKILL.md", b"---\n")
         self.put(".claude-plugin/notes.md", b"x\n")
         self.put(".mcp.json", b"{}\n")
+        # 플러그인 자신의 아이콘은 .claude-plugin/ 안에 둘 수 있다. 다른 이름의 그림은 둘 수 없다.
+        self.put(".claude-plugin/icon.png", png_header(1024, 1024))
         self.assertEqual(6, len(BUILDER.check_forbidden_files(self.folder)))
+        self.put(".claude-plugin/icon.svg", b"<svg/>\n")
+        self.assertEqual(7, len(BUILDER.check_forbidden_files(self.folder)))
+
+    def test_rejects_an_icon_that_is_missing_different_or_unsuitable(self) -> None:
+        self.assertEqual(1, len(BUILDER.check_icon(self.folder, PLUGIN_ROOT)))
+        self.put(ICON, (PLUGIN_ROOT / ICON).read_bytes())
+        self.assertEqual([], BUILDER.check_icon(self.folder, PLUGIN_ROOT))
+        # 규칙에 맞는 PNG여도 전체판의 아이콘과 다른 파일이면 두 판이 어긋난 것이다.
+        self.put(ICON, png_header(1024, 1024))
+        different = BUILDER.check_icon(self.folder, PLUGIN_ROOT)
+        self.assertEqual(1, len(different), different)
+        # 규칙에도 맞지 않고 전체판과도 다르면 두 가지가 모두 잡힌다.
+        self.put(ICON, png_header(256, 256))
+        self.assertEqual(2, len(BUILDER.check_icon(self.folder, PLUGIN_ROOT)))
 
     def test_rejects_names_that_do_not_survive_windows_and_macos(self) -> None:
         # 마지막 이름은 '가'를 풀어쓴 꼴(NFD)이다.
